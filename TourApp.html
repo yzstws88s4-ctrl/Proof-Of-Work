@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Proof Of Work - Touren App</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --success: #10b981;
+  --success-hover: #059669;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --input-bg: #f1f5f9;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --input-bg: #0f172a;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container { width: 100%; max-width: 500px; }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.driver-badge {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-toggle-btn, .logout-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.theme-toggle-btn { width: 40px; padding: 0; }
+.theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+button, .nav-link-btn {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary { background-color: var(--primary); color: white; }
+.btn-success { background-color: var(--success); color: white; }
+.btn-danger { background-color: var(--danger); color: white; }
+.btn-secondary { background-color: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
+
+.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.btn-grid button { margin-bottom: 0; padding: 12px 8px; font-size: 14px; }
+
+textarea, input[type="text"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+textarea { height: 140px; resize: vertical; }
+
+select {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.toggle-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--input-bg);
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border); transition: .2s; border-radius: 24px;
+}
+.slider:before {
+  position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+  background-color: white; transition: .2s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--success); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+#tour-view { display: none; }
+
+.current-destination {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.dest-label { font-size: 12px; text-transform: uppercase; color: var(--primary); font-weight: 700; }
+.dest-text { font-size: 18px; font-weight: 700; margin-top: 6px; word-break: break-word; }
+.gps-status { font-size: 12px; color: var(--success); margin-top: 8px; }
+
+.stop-list {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  background: var(--input-bg);
+}
+
+.stop-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.stop-item:active { background: rgba(37, 99, 235, 0.1); }
+.stop-item.done { opacity: 0.6; }
+.stop-item.done .stop-name { text-decoration: line-through; }
+.stop-item.active { background: var(--card); font-weight: 600; color: var(--primary); }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  cursor: pointer;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="title-group">
+      <h1 class="title">Proof Of Work</h1>
+      <span class="driver-badge" id="driverEmailDisplay">Fahrer Modus</span>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
+        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      <button class="logout-btn" onclick="logout()">Abmelden</button>
+    </div>
+  </div>
+
+  <div class="card" id="setup-view">
+    <div style="font-weight: 600; margin-bottom: 12px; font-size: 14px;">Eigene Tour erstellen oder einlesen</div>
+    <div class="btn-grid">
+      <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">Kamera (OCR)</button>
+      <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">Aus Galerie</button>
+    </div>
+
+    <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
+    <input type="file" id="galleryInput" accept="image/*" style="display: none;" onchange="handleOcrImage(event)">
+
+    <textarea id="addressInput" placeholder="Adressen zeilenweise einfügen..."></textarea>
+
+    <div class="toggle-box">
+      <div>
+        <strong style="font-size: 14px; display: block;">Fotobeweis-Pflicht</strong>
+        <span style="font-size: 12px; color: var(--text-muted);">Erfordert Foto vor Stopp-Abschluss</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="photoProofToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <select id="mapAppSelect" onchange="renderTourUI()">
+      <option value="google">Google Maps (Direktstart)</option>
+      <option value="apple">Apple Maps (Direktstart)</option>
+    </select>
+
+    <button class="btn-primary" onclick="loadSupabaseTour()" style="margin-bottom: 10px;">🔄 Tour vom Chef laden</button>
+    <button class="btn-success" onclick="startManualTour()">Tour starten</button>
+  </div>
+
+  <div class="card" id="tour-view">
+    <div class="current-destination">
+      <div class="dest-label" id="stopCounter">Stopp 1</div>
+      <div class="dest-text" id="currentStopText">Lade Stopps...</div>
+      <div class="gps-status" id="gpsStatusText">📍 GPS wird initialisiert...</div>
+    </div>
+
+    <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-primary" style="padding: 16px; font-size: 16px;">
+      🚀 JETZT NAVIGIEREN
+    </a>
+
+    <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
+
+    <button class="btn-success" id="manualCompleteBtn" onclick="triggerCompleteStop()">
+      Ankunft bestätigen / Nächster Stopp
+    </button>
+
+    <div style="margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">
+      Tourübersicht
+    </div>
+    <div class="stop-list" id="stopListContainer"></div>
+
+    <div style="margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Erfasste Fotobeweise (<span id="photoCount">0</span>)</div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+
+    <button class="btn-danger" style="margin-top: 20px;" onclick="resetTour()">Tour beenden / Zurück</button>
+  </div>
+</div>
+
+<canvas id="proofCanvas" style="display:none;"></canvas>
+
+<div class="modal-overlay" id="customModal">
+  <div class="modal-box">
+    <div style="font-size:18px; font-weight:700;" id="modalTitle">Hinweis</div>
+    <div id="modalBody" style="margin: 12px 0; font-size: 14px;"></div>
+    <div id="modalActions">
+      <button class="btn-primary" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cvfbkxzhpxopbkaymvvf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_EK07XF7umKLsdfbRK9p6gQ_0-5AkSjb';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let tourStops = [];
+let currentStopIndex = 0;
+let currentSupabaseTourId = null;
+let loadedChefStops = [];
+
+window.onload = async () => {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  
+  if (!session) {
+    window.location.href = 'Login.html';
+    return;
+  }
+
+  currentUser = session.user;
+  document.getElementById('driverEmailDisplay').innerText = currentUser.email.split('@')[0];
+
+  initGPS();
+};
+
+async function loadSupabaseTour() {
+  const { data: tours, error } = await supabaseClient
+    .from('tours')
+    .select('*, stops(*)')
+    .eq('assigned_to', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Fehler beim Laden der Touren:", error);
+    showModal("Fehler", "Tour konnte nicht aus der Datenbank geladen werden.");
+    return;
+  }
+
+  if (tours && tours.length > 0) {
+    const tour = tours[0];
+    currentSupabaseTourId = tour.id;
+    if (tour.stops && tour.stops.length > 0) {
+      loadedChefStops = tour.stops.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+      
+      const addressText = loadedChefStops.map(s => s.address).join('\n');
+      document.getElementById('addressInput').value = addressText;
+      
+      showModal("Erfolg", "Tour vom Chef erfolgreich ins Eingabefeld geladen! Du kannst sie jetzt anpassen und dann auf 'Tour starten' drücken.");
+    } else {
+      showModal("Hinweis", "Keine Stopps für deine zugewiesene Tour gefunden.");
+    }
+  } else {
+    showModal("Info", "Keine zugewiesene Live-Tour für dich gefunden.");
+  }
+}
+
+function startManualTour() {
+  const input = document.getElementById('addressInput').value.trim();
+  if (!input) return alert("Bitte gib mindestens eine Adresse ein.");
+
+  const lines = input.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+  
+  if (currentSupabaseTourId && loadedChefStops.length > 0) {
+    tourStops = lines.map((addr, idx) => {
+      const match = loadedChefStops.find(s => s.address === addr);
+      return {
+        id: match ? match.id : idx,
+        address: addr,
+        done: match ? match.status === 'erledigt' : false,
+        photo_url: match ? match.photo_url : null
+      };
+    });
+  } else {
+    tourStops = lines.map((addr, idx) => ({ id: idx, address: addr, done: false }));
+    currentSupabaseTourId = null;
+  }
+
+  const firstOpen = tourStops.findIndex(s => !s.done);
+  currentStopIndex = firstOpen !== -1 ? firstOpen : 0;
+
+  showTourView();
+}
+
+function showTourView() {
+  document.getElementById('setup-view').style.display = 'none';
+  document.getElementById('tour-view').style.display = 'block';
+  renderTourUI();
+}
+
+function renderTourUI() {
+  const container = document.getElementById('stopListContainer');
+  container.innerHTML = '';
+
+  if (tourStops.length === 0) return;
+
+  const current = tourStops[currentStopIndex];
+
+  if (current && !current.done) {
+    document.getElementById('stopCounter').innerText = `Stopp ${currentStopIndex + 1} von ${tourStops.length}`;
+    document.getElementById('currentStopText').innerText = current.address;
+    
+    const mapType = document.getElementById('mapAppSelect').value;
+    const navUrl = mapType === 'apple' 
+      ? `http://maps.apple.com/?daddr=${encodeURIComponent(current.address)}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.address)}`;
+    
+    document.getElementById('navDirectBtn').href = navUrl;
+    document.getElementById('navDirectBtn').style.display = 'flex';
+  } else {
+    document.getElementById('stopCounter').innerText = "Geschafft!";
+    document.getElementById('currentStopText').innerText = "🎉 Alle Stopps erledigt!";
+    document.getElementById('navDirectBtn').style.display = 'none';
+  }
+
+  tourStops.forEach((stop, idx) => {
+    const item = document.createElement('div');
+    const isActive = idx === currentStopIndex && !stop.done;
+    item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
+    item.innerHTML = `
+      <div class="stop-name"><strong>#${idx + 1}</strong> ${stop.address}</div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function triggerCompleteStop() {
+  const isProofRequired = document.getElementById('photoProofToggle').checked;
+  if (isProofRequired) {
+    document.getElementById('proofCameraInput').click();
+  } else {
+    completeCurrentStop(null);
+  }
+}
+
+async function handleProofCapture(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const completeBtn = document.getElementById('manualCompleteBtn');
+  completeBtn.disabled = true;
+  completeBtn.innerText = "Hochladen & Speichern...";
+
+  let publicPhotoUrl = null;
+
+  try {
+    if (currentSupabaseTourId) {
+      const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+      const filePath = `tour_proofs/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabaseClient.storage
+        .from('proofs')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error("Storage Upload Fehler:", uploadError);
+      } else {
+        const { data: urlData } = supabaseClient.storage
+          .from('proofs')
+          .getPublicUrl(filePath);
+        
+        publicPhotoUrl = urlData.publicUrl;
+      }
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const gallery = document.getElementById('galleryGrid');
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      item.innerHTML = `<img src="${e.target.result}">`;
+      gallery.appendChild(item);
+      
+      const countEl = document.getElementById('photoCount');
+      countEl.innerText = parseInt(countEl.innerText) + 1;
+    };
+    reader.readAsDataURL(file);
+
+    await completeCurrentStop(publicPhotoUrl);
+
+  } catch (err) {
+    console.error("Fehler beim Verarbeiten des Beweises:", err);
+    showModal("Fehler", "Fotobeweis konnte nicht verarbeitet werden.");
+  } finally {
+    completeBtn.disabled = false;
+    completeBtn.innerText = "Ankunft bestätigen / Nächster Stopp";
+    event.target.value = '';
+  }
+}
+
+async function completeCurrentStop(photoUrl = null) {
+  const current = tourStops[currentStopIndex];
+  if (!current) return;
+
+  current.done = true;
+
+  if (current.id && typeof current.id === 'string') {
+    const updatePayload = { status: 'erledigt', completed_at: new Date().toISOString() };
+    if (photoUrl) updatePayload.photo_url = photoUrl;
+
+    await supabaseClient
+      .from('stops')
+      .update(updatePayload)
+      .eq('id', current.id);
+  }
+
+  if (currentStopIndex < tourStops.length - 1) {
+    currentStopIndex++;
+  }
+
+  renderTourUI();
+}
+
+async function handleOcrImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  showModal("OCR Scan", "Scanner liest Adressen aus dem Bild...");
+  try {
+    const res = await Tesseract.recognize(file, 'deu');
+    const lines = res.data.text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 3);
+    document.getElementById('addressInput').value = lines.join('\n');
+    closeModal();
+  } catch (err) {
+    showModal("Fehler", "OCR konnte nicht ausgeführt werden.");
+  }
+  event.target.value = '';
+}
+
+function resetTour() {
+  document.getElementById('setup-view').style.display = 'block';
+  document.getElementById('tour-view').style.display = 'none';
+}
+
+function initGPS() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      () => { document.getElementById('gpsStatusText').innerText = "📍 GPS Signal Aktiv"; },
+      () => { document.getElementById('gpsStatusText').innerText = "⚠ GPS deaktiviert"; }
+    );
+  }
+}
+
+function showModal(title, body) {
+  document.getElementById('modalTitle').innerText = title;
+  document.getElementById('modalBody').innerText = body;
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('customModal').style.display = 'none';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  if (current === 'dark') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', 'dark');
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  window.location.href = 'Login.html';
+}
+</script>
+</body>
+</html>

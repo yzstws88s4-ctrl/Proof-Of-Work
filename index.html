@@ -1,724 +1,151 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>TourenNavi Pro & ProofOfWork</title>
-    
-    <!-- Tesseract.js für Kamera OCR -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-    
-    <style>
-        :root {
-            --primary: #4F46E5;
-            --primary-hover: #4338CA;
-            --success: #10B981;
-            --success-hover: #059669;
-            --danger: #EF4444;
-            --bg: #0F172A;
-            --card: #1E293B;
-            --text: #F8FAFC;
-            --text-muted: #94A3B8;
-            --border: #334155;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 16px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            background: var(--primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .title {
-            font-size: 20px;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .badge {
-            background: rgba(79, 70, 229, 0.2);
-            color: #818CF8;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-        }
-
-        button, .nav-link-btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            transition: background-color 0.2s, transform 0.1s;
-            text-decoration: none;
-            box-sizing: border-box;
-        }
-
-        button:active, .nav-link-btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-success { background-color: var(--success); color: white; }
-        .btn-danger { background-color: var(--danger); color: white; }
-        .btn-secondary { background-color: var(--border); color: var(--text); }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .btn-grid button {
-            margin-bottom: 0;
-            padding: 14px 8px;
-            font-size: 14px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 140px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-            color: white;
-            font-size: 15px;
-            line-height: 1.4;
-            resize: vertical;
-            margin-bottom: 12px;
-        }
-
-        select {
-            width: 100%;
-            padding: 14px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 16px;
-        }
-
-        /* Toggle Option Switch */
-        .toggle-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(0,0,0,0.2);
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 16px;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 48px;
-            height: 26px;
-        }
-
-        .switch input { opacity: 0; width: 0; height: 0; }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--border);
-            transition: .3s;
-            border-radius: 26px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; width: 18px;
-            left: 4px; bottom: 4px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider { background-color: var(--success); }
-        input:checked + .slider:before { transform: translateX(22px); }
-
-        /* Camera Box */
-        #scanner-box, #proof-box {
-            display: none;
-            margin-bottom: 16px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #000;
-            position: relative;
-        }
-
-        video { width: 100%; display: block; }
-
-        #progress-wrap {
-            display: none;
-            margin-bottom: 12px;
-        }
-
-        .progress-bar-bg {
-            background: var(--border);
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            background: var(--primary);
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .progress-text {
-            font-size: 13px;
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 6px;
-        }
-
-        /* Active Tour View */
-        #tour-view { display: none; }
-
-        .current-destination {
-            background: rgba(79, 70, 229, 0.15);
-            border: 1px solid rgba(79, 70, 229, 0.4);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .dest-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #818CF8;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .dest-text {
-            font-size: 20px;
-            font-weight: 800;
-            margin-top: 6px;
-            word-break: break-word;
-        }
-
-        .gps-status {
-            font-size: 12px;
-            color: var(--success);
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .stop-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            margin-bottom: 16px;
-        }
-
-        .stop-item {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 14px;
-        }
-
-        .stop-item:last-child { border-bottom: none; }
-        .stop-item.done { opacity: 0.4; text-decoration: line-through; }
-        .stop-item.active { background: rgba(255,255,255,0.05); font-weight: 700; color: #818CF8; }
-
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-        }
-
-        .preview-img {
-            width: 100%;
-            border-radius: 10px;
-            margin: 12px 0;
-            border: 1px solid var(--border);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Proof Of Work - Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --input-bg: #f1f5f9;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --input-bg: #0f172a;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0; padding: 20px;
+      display: flex; justify-content: center; align-items: center; min-height: 100vh;
+    }
+    .login-container { width: 100%; max-width: 400px; position: relative; }
+    .theme-toggle-btn {
+      position: absolute; top: -60px; right: 0;
+      background: var(--card); border: 1px solid var(--border); color: var(--text);
+      width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; box-shadow: var(--shadow); }
+    .title-group { text-align: center; margin-bottom: 24px; }
+    .title { font-size: 24px; font-weight: 700; margin: 0 0 6px 0; }
+    .subtitle { font-size: 13px; color: var(--text-muted); margin: 0; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+    input { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); font-size: 14px; margin-bottom: 16px; }
+    button.submit-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; background: var(--primary); color: white; cursor: pointer; }
+    button.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error { color: #ef4444; font-size: 13px; margin-top: 12px; text-align: center; font-weight: 500; min-height: 18px; }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="logo">
-            <div class="logo-icon">🗺️</div>
-            <div>
-                <h1 class="title">TourenNavi Pro</h1>
-            </div>
-        </div>
-        <span class="badge">Automatik-Proof</span>
+<div class="login-container">
+  <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
+    <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+  </button>
+
+  <div class="card">
+    <div class="title-group">
+      <h1 class="title">Proof Of Work</h1>
+      <p class="subtitle">Anmeldung für Chefs & Fahrer</p>
     </div>
 
-    <!-- SETUP VIEW -->
-    <div class="card" id="setup-view">
-        <div class="btn-grid">
-            <button class="btn-secondary" onclick="toggleCamera()">📷 Live-Kamera</button>
-            <button class="btn-secondary" onclick="triggerGalleryUpload()">🖼️ Aus Galerie</button>
-        </div>
-
-        <input type="file" id="galleryInput" accept="image/*" style="display: none;" onchange="handleGalleryImage(event)">
-
-        <div id="scanner-box">
-            <video id="webcam" autoplay playsinline></video>
-            <button class="btn-primary" style="margin: 10px; width: calc(100% - 20px);" onclick="snapAndOcr()">📸 Foto analysieren</button>
-            <canvas id="snapCanvas" style="display:none;"></canvas>
-        </div>
-
-        <div id="progress-wrap">
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="p-fill"></div></div>
-            <div class="progress-text" id="p-text">Lade OCR Modul...</div>
-        </div>
-
-        <textarea id="addressInput" placeholder="Adressen hier einfügen..."></textarea>
-
-        <!-- FEAT: Foto-Nachweis An/Aus Schalter -->
-        <div class="toggle-box">
-            <div>
-                <strong style="font-size: 14px; display: block;">Foto-Nachweis bei Ankunft</strong>
-                <span style="font-size: 12px; color: var(--text-muted);">Öffnet Kamera automatisch per GPS</span>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="photoProofToggle" checked>
-                <span class="slider"></span>
-            </label>
-        </div>
-
-        <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px;">Navi-App wählen:</label>
-        <select id="mapAppSelect" onchange="updateNavBtnLink()">
-            <option value="google">Google Maps (Direktstart)</option>
-            <option value="apple">Apple Maps (Direktstart)</option>
-        </select>
-
-        <button class="btn-success" onclick="startTour()">🚀 Tour starten</button>
-    </div>
-
-    <!-- ACTIVE TOUR VIEW -->
-    <div class="card" id="tour-view">
-        <div class="current-destination">
-            <div class="dest-label" id="stopCounter">Stopp 1 von 1</div>
-            <div class="dest-text" id="currentStopText">Lade...</div>
-            <div class="gps-status" id="gpsStatusText">📡 GPS-Tracking aktiv...</div>
-        </div>
-
-        <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-primary" style="padding: 18px; font-size: 18px;">
-            🗺️ JETZT NAVIGIEREN
-        </a>
-
-        <!-- Proof Camera Container -->
-        <div id="proof-box">
-            <video id="proofVideo" autoplay playsinline></video>
-            <button class="btn-success" style="margin: 10px; width: calc(100% - 20px);" onclick="captureProofPhoto()">
-                📷 Fotobeweis speichern (mit GPS-Stempel)
-            </button>
-            <canvas id="proofCanvas" style="display:none;"></canvas>
-        </div>
-
-        <button class="btn-success" id="manualCompleteBtn" onclick="manualCompleteStop()">
-            ✅ Bin da! Nächster Stopp
-        </button>
-
-        <div style="margin-top: 16px; font-size: 14px; font-weight: 600; margin-bottom: 8px;">Gesamte Tour:</div>
-        <div class="stop-list" id="stopListContainer"></div>
-
-        <button class="btn-danger" style="margin-top: 10px;" onclick="promptResetTour()">🛑 Tour beenden</button>
-    </div>
-</div>
-
-<!-- Modal für Fotonachweis / Bestätigung -->
-<div class="modal-overlay" id="customModal">
-    <div class="modal-box">
-        <div class="modal-title" id="modalTitle">Hinweis</div>
-        <div id="modalBody"></div>
-        <div class="modal-actions" id="modalActions" style="margin-top: 15px;">
-            <button class="btn-primary" onclick="closeModal()">OK</button>
-        </div>
-    </div>
+    <form onsubmit="handleLogin(event)">
+      <label for="username">Benutzername oder E-Mail</label>
+      <input type="text" id="username" required placeholder="z. B. max_mustermann oder chef" autocomplete="username">
+      
+      <label for="password">Passwort</label>
+      <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+      
+      <button type="submit" id="submitBtn" class="submit-btn">Anmelden</button>
+    </form>
+    <div id="errorMsg" class="error"></div>
+  </div>
 </div>
 
 <script>
-    let stops = [];
-    let currentIndex = 0;
-    let cameraStream = null;
-    let watchPositionId = null;
-    let currentCoords = { lat: 0, lng: 0 };
-    let photoProofEnabled = true;
+  const SUPABASE_URL = 'https://cvfbkxzhpxopbkaymvvf.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_EK07XF7umKLsdfbRK9p6gQ_0-5AkSjb';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    window.onload = () => {
-        const savedStops = localStorage.getItem('tn_stops');
-        const savedIndex = localStorage.getItem('tn_index');
-        const savedProof = localStorage.getItem('tn_proof_toggle');
-        
-        if (savedProof !== null) {
-            document.getElementById('photoProofToggle').checked = (savedProof === 'true');
-        }
+  window.onload = async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session && session.user) {
+      await redirectUser(session.user.id);
+    }
+  };
 
-        if (savedStops) {
-            try {
-                stops = JSON.parse(savedStops);
-                currentIndex = savedIndex ? parseInt(savedIndex, 10) : 0;
-                if (stops && stops.length > 0) showTourScreen();
-            } catch (e) {}
-        }
-    };
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', current === 'dark' ? '' : 'dark');
+  }
 
-    function startTour() {
-        cleanAddressesInInput();
-        const text = document.getElementById('addressInput').value;
-        stops = text.split('\n').map(s => s.trim()).filter(s => s.length > 2);
-        photoProofEnabled = document.getElementById('photoProofToggle').checked;
+  async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    
+    let identifier = document.getElementById('username').value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
 
-        if (stops.length === 0) {
-            showModal('Keine Adressen', '<p style="color:var(--text-muted)">Bitte gib mindestens eine Adresse ein.</p>');
-            return;
-        }
+    errorMsg.innerText = 'Prüfe Zugangsdaten...';
+    btn.disabled = true;
 
-        currentIndex = 0;
-        localStorage.setItem('tn_proof_toggle', photoProofEnabled);
-        saveData();
-        showTourScreen();
+    if (!identifier.includes('@')) {
+      identifier = `${identifier}@app.local`;
     }
 
-    function showTourScreen() {
-        document.getElementById('setup-view').style.display = 'none';
-        document.getElementById('tour-view').style.display = 'block';
-        updateTourUI();
-        startGpsTracking();
+    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ 
+      email: identifier, 
+      password 
+    });
+
+    if (authError) {
+      errorMsg.innerText = 'Login fehlgeschlagen: Zugangsdaten ungültig.';
+      btn.disabled = false;
+      return;
     }
 
-    function updateTourUI() {
-        document.getElementById('stopCounter').innerText = `Stopp ${currentIndex + 1} von ${stops.length}`;
-        document.getElementById('currentStopText').innerText = stops[currentIndex] || 'Tour beendet!';
+    await redirectUser(authData.user.id);
+  }
 
-        updateNavBtnLink();
-        renderStopList();
+  async function redirectUser(userId) {
+    const errorMsg = document.getElementById('errorMsg');
+    
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      errorMsg.innerText = 'Profil konnte nicht geladen werden.';
+      document.getElementById('submitBtn').disabled = false;
+      return;
     }
 
-    function renderStopList() {
-        const container = document.getElementById('stopListContainer');
-        container.innerHTML = '';
-        stops.forEach((stop, idx) => {
-            const item = document.createElement('div');
-            item.className = 'stop-item' + (idx < currentIndex ? ' done' : '') + (idx === currentIndex ? ' active' : '');
-            item.innerHTML = `<span>${idx + 1}. ${stop}</span><span>${idx < currentIndex ? '✅' : (idx === currentIndex ? '📍' : '⏳')}</span>`;
-            container.appendChild(item);
-        });
+    if (profile.role === 'chef') {
+      window.location.href = 'ChefDashboard.html';
+    } else {
+      window.location.href = 'TourApp.html';
     }
-
-    /* GPS Tracking & Automatische Ankunftserkennung */
-    function startGpsTracking() {
-        if ('geolocation' in navigator) {
-            watchPositionId = navigator.geolocation.watchPosition(
-                (pos) => {
-                    currentCoords.lat = pos.coords.latitude;
-                    currentCoords.lng = pos.coords.longitude;
-                    document.getElementById('gpsStatusText').innerHTML = `🟢 GPS Aktiv (${currentCoords.lat.toFixed(4)}, ${currentCoords.lng.toFixed(4)})`;
-                },
-                (err) => {
-                    document.getElementById('gpsStatusText').innerHTML = `⚠️ GPS nicht verfügbar`;
-                },
-                { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
-            );
-        }
-    }
-
-    function manualCompleteStop() {
-        if (photoProofEnabled) {
-            openProofCamera();
-        } else {
-            advanceToNextStop();
-        }
-    }
-
-    async function openProofCamera() {
-        const proofBox = document.getElementById('proof-box');
-        proofBox.style.display = 'block';
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            document.getElementById('proofVideo').srcObject = stream;
-        } catch (e) {
-            showModal('Kamera-Fehler', '<p style="color:var(--text-muted)">Kamerazugriff wurde nicht erlaubt.</p>');
-        }
-    }
-
-    function captureProofPhoto() {
-        const video = document.getElementById('proofVideo');
-        const canvas = document.getElementById('proofCanvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-
-        // Bild zeichnen
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Wasserzeichen / Metadaten-Stempel
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('de-DE') + ' - ' + now.toLocaleTimeString('de-DE');
-        const gpsStr = `GPS: ${currentCoords.lat.toFixed(5)} N, ${currentCoords.lng.toFixed(5)} E`;
-        const stopStr = `Stopp: ${stops[currentIndex]}`;
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
-
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 16px sans-serif';
-        ctx.fillText(stopStr, 15, canvas.height - 52);
-        ctx.font = '14px sans-serif';
-        ctx.fillText(`${dateStr} | ${gpsStr}`, 15, canvas.height - 22);
-
-        const imgData = canvas.toDataURL('image/jpeg');
-
-        // Kamera stoppen
-        const stream = video.srcObject;
-        if (stream) stream.getTracks().forEach(t => t.stop());
-        document.getElementById('proof-box').style.display = 'none';
-
-        // Bestätigung & Vorschau
-        showProofConfirmation(imgData);
-    }
-
-    function showProofConfirmation(imgData) {
-        const body = `
-            <p style="font-size:13px; color:var(--text-muted);">Foto mit Zeitstempel & GPS-Daten erfasst:</p>
-            <img src="${imgData}" class="preview-img">
-        `;
-        showModal('Fotobeweis Gespeichert', body, () => {
-            advanceToNextStop();
-        });
-    }
-
-    function advanceToNextStop() {
-        if (currentIndex < stops.length - 1) {
-            currentIndex++;
-            saveData();
-            updateTourUI();
-        } else {
-            showModal('🎉 Geschafft!', '<p style="color:var(--text-muted)">Du hast alle Stopps erfolgreich abgeschlossen!</p>', () => {
-                resetTourData();
-            });
-        }
-    }
-
-    /* Hilfsfunktionen & OCR */
-    function cleanLine(raw) {
-        let text = raw.trim();
-        text = text.replace(/^[\s\]\[\)\(\-\*\•\d+\.]+/g, '').trim();
-        return text;
-    }
-
-    function cleanAddressesInInput() {
-        const inputArea = document.getElementById('addressInput');
-        const lines = inputArea.value.split('\n');
-        const cleaned = lines.map(line => cleanLine(line)).filter(l => l.length > 3);
-        inputArea.value = cleaned.join('\n');
-    }
-
-    function updateNavBtnLink() {
-        const btn = document.getElementById('navDirectBtn');
-        if (!stops[currentIndex]) { btn.href = '#'; return; }
-
-        const target = encodeURIComponent(stops[currentIndex]);
-        const appChoice = document.getElementById('mapAppSelect').value;
-
-        if (appChoice === 'apple') {
-            btn.href = `http://maps.apple.com/?daddr=${target}&dirflg=d`;
-        } else {
-            btn.href = `https://www.google.com/maps/dir/?api=1&destination=${target}&dir_action=navigate`;
-        }
-    }
-
-    function showModal(title, bodyHtml, onConfirm = null) {
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalBody').innerHTML = bodyHtml;
-        const actionsBox = document.getElementById('modalActions');
-        actionsBox.innerHTML = '';
-
-        if (onConfirm) {
-            const confirmBtn = document.createElement('button');
-            confirmBtn.className = 'btn-success';
-            confirmBtn.innerText = 'Weiter zum nächsten Stopp';
-            confirmBtn.onclick = () => { closeModal(); onConfirm(); };
-            actionsBox.appendChild(confirmBtn);
-        } else {
-            const okBtn = document.createElement('button');
-            okBtn.className = 'btn-primary';
-            okBtn.innerText = 'OK';
-            okBtn.onclick = closeModal;
-            actionsBox.appendChild(okBtn);
-        }
-        document.getElementById('customModal').style.display = 'flex';
-    }
-
-    function closeModal() { document.getElementById('customModal').style.display = 'none'; }
-    function saveData() {
-        localStorage.setItem('tn_stops', JSON.stringify(stops));
-        localStorage.setItem('tn_index', currentIndex.toString());
-    }
-    function promptResetTour() {
-        showModal('Tour beenden?', '<p style="color:var(--text-muted)">Möchtest du wirklich abbrechen?</p>', () => resetTourData());
-    }
-    function resetTourData() {
-        if (watchPositionId) navigator.geolocation.clearWatch(watchPositionId);
-        localStorage.removeItem('tn_stops');
-        localStorage.removeItem('tn_index');
-        stops = []; currentIndex = 0;
-        document.getElementById('setup-view').style.display = 'block';
-        document.getElementById('tour-view').style.display = 'none';
-    }
-
-    async function toggleCamera() {
-        const box = document.getElementById('scanner-box');
-        if (box.style.display === 'block') {
-            box.style.display = 'none';
-            if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
-        } else {
-            box.style.display = 'block';
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                document.getElementById('webcam').srcObject = cameraStream;
-            } catch (e) {
-                showModal('Fehler', '<p style="color:var(--text-muted)">Kamerazugriff verweigert.</p>');
-            }
-        }
-    }
-    function triggerGalleryUpload() { document.getElementById('galleryInput').click(); }
-    function handleGalleryImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => processImageSource(e.target.result);
-        reader.readAsDataURL(file);
-    }
-    async function snapAndOcr() {
-        const video = document.getElementById('webcam');
-        const canvas = document.getElementById('snapCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        toggleCamera();
-        processImageSource(canvas.toDataURL('image/png'));
-    }
-    async function processImageSource(imageSource) {
-        const pWrap = document.getElementById('progress-wrap');
-        const pFill = document.getElementById('p-fill');
-        const pText = document.getElementById('p-text');
-        pWrap.style.display = 'block';
-        pFill.style.width = '0%';
-        pText.innerText = 'Lese Adressen...';
-
-        try {
-            const worker = await Tesseract.createWorker({
-                logger: m => {
-                    if (m.status === 'recognizing text') {
-                        let pct = Math.round(m.progress * 100);
-                        pFill.style.width = pct + '%';
-                        pText.innerText = `Lese Adressen: ${pct}%`;
-                    }
-                }
-            });
-            await worker.loadLanguage('deu');
-            await worker.initialize('deu');
-            const { data: { text } } = await worker.recognize(imageSource);
-            await worker.terminate();
-            const area = document.getElementById('addressInput');
-            area.value = (area.value ? area.value + '\n' : '') + text;
-            cleanAddressesInInput();
-            setTimeout(() => { pWrap.style.display = 'none'; }, 1500);
-        } catch (e) {
-            pText.innerText = 'Fehler beim Lesen.';
-        }
-    }
+  }
 </script>
+
 </body>
 </html>
