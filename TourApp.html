@@ -268,21 +268,6 @@ input:checked + .slider:before { transform: translateX(20px); }
   color: var(--text);
 }
 
-.proof-link-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--primary);
-  font-weight: 600;
-  text-decoration: none;
-  font-size: 12px;
-  margin-top: 6px;
-}
-
-.proof-link-btn:hover {
-  text-decoration: underline;
-}
-
 .modal-overlay {
   display: none;
   position: fixed;
@@ -404,7 +389,11 @@ input:checked + .slider:before { transform: translateX(20px); }
       </div>
     </div>
 
-    <button class="btn-danger" style="margin-top: 24px;" onclick="resetTour()">Tour beenden / Zurück</button>
+    <!-- GETRENNTE BUTTONS FÜR ZURÜCK UND TOUR BEENDEN -->
+    <div class="btn-grid" style="margin-top: 24px;">
+      <button class="btn-secondary" onclick="goBackToSetup()">⬅ Zurück</button>
+      <button class="btn-danger" id="finishTourBtn" onclick="finishAndSaveTour()">🏁 Tour beenden</button>
+    </div>
   </div>
 </div>
 
@@ -422,7 +411,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 320px; object-fit: contain;">
     </div>
 
-    <button class="btn-success" id="confirmProofBtn" style="margin-bottom: 0; width: 100%;" onclick="confirmAndUploadProof()">
+    <button class="btn-success" id="confirmProofBtn" style="margin-bottom: 0; width: 100%;" onclick="confirmProofLocally()">
       Bestätigen & Nächster Stopp
     </button>
   </div>
@@ -556,11 +545,12 @@ function startManualTour() {
         address: addr,
         notes: match ? match.notes || '' : '',
         done: match ? match.status === 'erledigt' : false,
-        photo_url: match ? match.photo_url : null
+        photo_url: match ? match.photo_url : null,
+        localBlob: null
       };
     });
   } else {
-    tourStops = lines.map((addr, idx) => ({ id: idx, address: addr, notes: '', done: false }));
+    tourStops = lines.map((addr, idx) => ({ id: idx, address: addr, notes: '', done: false, photo_url: null, localBlob: null }));
     currentSupabaseTourId = null;
   }
 
@@ -602,7 +592,7 @@ function renderTourUI() {
     document.getElementById('stopCounter').innerText = "Geschafft!";
     document.getElementById('currentStopText').innerText = "🎉 Alle Stopps erledigt!";
     document.getElementById('navDirectBtn').style.display = 'none';
-    document.getElementById('manualCompleteBtn').style.display = 'none';
+    document.getElementById('manualCompleteBtn').style.display = 'none'; // Verhindert weitere Fotos nach dem letzten Stopp
   }
 
   tourStops.forEach((stop, idx) => {
@@ -639,11 +629,6 @@ async function saveStopNote() {
   const val = document.getElementById('stopNoteInput').value.trim();
   tourStops[editingStopIndex].notes = val;
 
-  const stop = tourStops[editingStopIndex];
-  if (stop.id && typeof stop.id === 'string') {
-    await supabaseClient.from('stops').update({ notes: val }).eq('id', stop.id);
-  }
-
   closeNoteModal();
   renderTourUI();
 }
@@ -655,7 +640,7 @@ function triggerCompleteStop() {
   if (isProofRequired) {
     document.getElementById('proofCameraInput').click();
   } else {
-    completeCurrentStop(null);
+    completeCurrentStopLocally(null);
   }
 }
 
@@ -730,7 +715,7 @@ function refreshStampPreview() {
           tempCanvasBlob = blob;
           document.getElementById('modalProofImagePreview').src = URL.createObjectURL(blob);
           resolve();
-        }, 'image/jpeg', 0.90);
+        }, 'image/jpeg', 0.85);
       };
       img.src = e.target.result;
     };
@@ -746,7 +731,7 @@ function updateLiveStampNote() {
   }, 250);
 }
 
-function addPhotoToGallery(photoUrl, address, stopNum, noteText) {
+function addPhotoToGallery(imageSrc, address, stopNum, noteText) {
   const gallery = document.getElementById('galleryGrid');
   if (!gallery) return;
 
@@ -758,13 +743,13 @@ function addPhotoToGallery(photoUrl, address, stopNum, noteText) {
 
   const timeStr = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
+  // Externe Links wurden hier entfernt, das Bild wird rein zur Vorschau angezeigt
   card.innerHTML = `
-    <img src="${photoUrl}" alt="Fotobeweis Stopp #${stopNum}">
+    <img src="${imageSrc}" alt="Fotobeweis Stopp #${stopNum}">
     <div class="proof-item-info">
       <strong>Stopp #${stopNum}: ${address}</strong>
       <span style="color: var(--text-muted);">Erfasst um ${timeStr} • GPS aktiv</span>
       ${noteText ? `<span style="color: var(--primary);">📝 Notiz: ${noteText}</span>` : ''}
-      <a href="${photoUrl}" target="_blank" class="proof-link-btn">🔗 Foto in neuem Tab öffnen</a>
     </div>
   `;
 
@@ -777,82 +762,109 @@ function addPhotoToGallery(photoUrl, address, stopNum, noteText) {
   }
 }
 
-async function confirmAndUploadProof() {
+// Sofortige lokale Speicherung (ohne Cloud-Upload während der Fahrt)
+function confirmProofLocally() {
   if (currentStopIndex >= tourStops.length) return;
 
-  const confirmBtn = document.getElementById('confirmProofBtn');
-  confirmBtn.disabled = true;
-  confirmBtn.innerText = "Wird hochgeladen...";
-
   const noteText = document.getElementById('modalProofNoteInput').value.trim();
-  tourStops[currentStopIndex].notes = noteText;
-
-  let publicPhotoUrl = null;
+  const current = tourStops[currentStopIndex];
+  current.notes = noteText;
+  current.localBlob = tempCanvasBlob;
 
   if (tempCanvasBlob) {
-    const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
-    const filePath = `tour_proofs/${fileName}`;
-
-    const { data: uploadData, error: uploadError } = await supabaseClient.storage
-      .from('proofs')
-      .upload(filePath, tempCanvasBlob, { contentType: 'image/jpeg' });
-
-    if (!uploadError) {
-      const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
-      publicPhotoUrl = urlData.publicUrl;
-    } else {
-      publicPhotoUrl = URL.createObjectURL(tempCanvasBlob);
-    }
-  }
-
-  if (publicPhotoUrl) {
-    addPhotoToGallery(
-      publicPhotoUrl, 
-      tourStops[currentStopIndex].address, 
-      currentStopIndex + 1, 
-      noteText
-    );
+    const localUrl = URL.createObjectURL(tempCanvasBlob);
+    addPhotoToGallery(localUrl, current.address, currentStopIndex + 1, noteText);
   }
 
   document.getElementById('proofPreviewModal').style.display = 'none';
-  confirmBtn.disabled = false;
-  confirmBtn.innerText = "Bestätigen & Nächster Stopp";
-
-  await completeCurrentStop(publicPhotoUrl);
+  completeCurrentStopLocally();
 }
 
-async function completeCurrentStop(photoUrl = null) {
+function completeCurrentStopLocally() {
   const current = tourStops[currentStopIndex];
   if (!current) return;
 
   current.done = true;
-
-  if (current.id && typeof current.id === 'string') {
-    const updatePayload = { 
-      status: 'erledigt', 
-      completed_at: new Date().toISOString(),
-      notes: current.notes || null 
-    };
-    if (photoUrl) updatePayload.photo_url = photoUrl;
-
-    await supabaseClient
-      .from('stops')
-      .update(updatePayload)
-      .eq('id', current.id);
-  }
-
   currentStopIndex++;
 
-  if (currentStopIndex >= tourStops.length) {
+  renderTourUI();
+}
+
+// Button "Zurück": Wechselt ins Menü, behält Daten im Speicher
+function goBackToSetup() {
+  document.getElementById('setup-view').style.display = 'block';
+  document.getElementById('tour-view').style.display = 'none';
+}
+
+// Button "Tour beenden": Lädt alle gespeicherten Bilder hoch & schließt die Tour in Supabase ab
+async function finishAndSaveTour() {
+  const btn = document.getElementById('finishTourBtn');
+  btn.disabled = true;
+  btn.innerText = "Speichere Tour...";
+
+  try {
+    for (let i = 0; i < tourStops.length; i++) {
+      const stop = tourStops[i];
+      if (!stop.done && !stop.localBlob) continue;
+
+      let publicPhotoUrl = stop.photo_url;
+
+      // Wenn ein neues Foto lokal vorliegt, erst jetzt in Supabase hochladen
+      if (stop.localBlob) {
+        const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+        const filePath = `tour_proofs/${fileName}`;
+
+        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+          .from('proofs')
+          .upload(filePath, stop.localBlob, { contentType: 'image/jpeg' });
+
+        if (!uploadError) {
+          const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
+          publicPhotoUrl = urlData.publicUrl;
+        }
+      }
+
+      // Stopp-Status in DB aktualisieren
+      if (stop.id && typeof stop.id === 'string') {
+        const updatePayload = {
+          status: 'erledigt',
+          completed_at: new Date().toISOString(),
+          notes: stop.notes || null
+        };
+        if (publicPhotoUrl) updatePayload.photo_url = publicPhotoUrl;
+
+        await supabaseClient.from('stops').update(updatePayload).eq('id', stop.id);
+      }
+    }
+
+    // Tour insgesamt auf erledigt setzen
     if (currentSupabaseTourId) {
       await supabaseClient
         .from('tours')
         .update({ status: 'erledigt' })
         .eq('id', currentSupabaseTourId);
     }
-  }
 
-  renderTourUI();
+    showModal("Erfolg", "Tour wurde erfolgreich beendet und alle Fotos/Notizen wurden gespeichert!");
+
+    // Tour-Daten im Frontend zurücksetzen
+    tourStops = [];
+    currentStopIndex = 0;
+    currentSupabaseTourId = null;
+    loadedChefStops = [];
+
+    clearPhotoGallery();
+    document.getElementById('addressInput').value = '';
+    document.getElementById('setup-view').style.display = 'block';
+    document.getElementById('tour-view').style.display = 'none';
+    await loadTourHistory();
+
+  } catch (err) {
+    showModal("Fehler", "Beim Speichern ist ein Fehler aufgetreten.");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "🏁 Tour beenden";
+  }
 }
 
 async function loadTourHistory() {
@@ -905,29 +917,6 @@ async function handleOcrImage(event) {
     showModal("Fehler", "OCR konnte nicht ausgeführt werden.");
   }
   event.target.value = '';
-}
-
-async function resetTour() {
-  if (currentSupabaseTourId && tourStops.length > 0) {
-    const allDone = tourStops.every(s => s.done);
-    if (allDone) {
-      await supabaseClient
-        .from('tours')
-        .update({ status: 'erledigt' })
-        .eq('id', currentSupabaseTourId);
-    }
-  }
-
-  tourStops = [];
-  currentStopIndex = 0;
-  currentSupabaseTourId = null;
-  loadedChefStops = [];
-
-  clearPhotoGallery();
-  document.getElementById('addressInput').value = '';
-  document.getElementById('setup-view').style.display = 'block';
-  document.getElementById('tour-view').style.display = 'none';
-  await loadTourHistory();
 }
 
 function showModal(title, body) {
