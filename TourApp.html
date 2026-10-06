@@ -351,7 +351,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
-<!-- NOTIZ EDITIEREN MODAL (FÜR DIREKTEN KLICK AUF STOPP-LISTE) -->
+<!-- NOTIZ EDITIEREN MODAL -->
 <div class="modal-overlay" id="noteEditModal">
   <div class="modal-box">
     <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;" id="noteModalTitle">Notiz eingeben</div>
@@ -511,36 +511,38 @@ function renderTourUI() {
     const isActive = idx === currentStopIndex && !stop.done;
     item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
     
-    // PER KLICK AUF DIE ADRESSE NUN ZUVERLÄSSIG DAS NOTIZ-MODAL ÖFFNEN
-    item.setAttribute('onclick', `openNoteModal(${idx})`);
+    // Klick-Event direkt auf dem Div definieren
+    item.onclick = function() {
+      openNoteModal(idx);
+    };
 
     item.innerHTML = `
       <div class="stop-name" style="pointer-events: none;">
         <strong>#${idx + 1}</strong> ${stop.address}
         ${stop.notes ? `<div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 4px;">📝 ${stop.notes}</div>` : ''}
       </div>
-      <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 70px;">
+      <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 80px;">
         ${stop.done ? '✓ Erledigt' : 'Offen'}<br>
-        <span style="font-size: 11px; color: var(--primary); font-weight: 700;">Notiz ✏️</span>
+        <span style="font-size: 11px; color: var(--primary); font-weight: 700; text-decoration: underline;">Notiz ✏️</span>
       </div>
     `;
     container.appendChild(item);
   });
 }
 
-/* NOTIZ MODAL STEUERUNG */
 function openNoteModal(index) {
   editingStopIndex = index;
   const stop = tourStops[index];
+  if (!stop) return;
+
   document.getElementById('noteModalTitle').innerText = `Notiz zu Stopp #${index + 1}`;
   document.getElementById('noteModalSub').innerText = stop.address;
   document.getElementById('noteModalInput').value = stop.notes || '';
   document.getElementById('noteEditModal').style.display = 'flex';
   
-  // Kurzer Focus auf das Textfeld
   setTimeout(() => {
     document.getElementById('noteModalInput').focus();
-  }, 100);
+  }, 150);
 }
 
 function saveStopNoteFromModal() {
@@ -572,7 +574,6 @@ async function handleProofCapture(event) {
   if (!file) return;
   tempCapturedFile = file;
 
-  // Notiz automatisch aus dem Stopp vorladen
   const current = tourStops[currentStopIndex];
   if (current && current.notes) {
     document.getElementById('modalProofNoteInput').value = current.notes;
