@@ -127,13 +127,13 @@
   async function redirectUser(userId) {
     const errorMsg = document.getElementById('errorMsg');
     
-    const { data: profile, error: profileError } = await supabaseClient
+    const { data: profile } = await supabaseClient
       .from('profiles')
       .select('role')
       .eq('id', userId)
       .maybeSingle();
 
-    if (profileError || !profile) {
+    if (!profile) {
       errorMsg.innerText = 'Profil konnte nicht geladen werden.';
       document.getElementById('submitBtn').disabled = false;
       return;
@@ -146,6 +146,5 @@
     }
   }
 </script>
-
 </body>
 </html>
