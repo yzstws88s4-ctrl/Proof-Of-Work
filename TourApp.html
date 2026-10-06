@@ -232,28 +232,56 @@ input:checked + .slider:before { transform: translateX(20px); }
 .stop-item.done .stop-name { text-decoration: line-through; }
 .stop-item.active { background: var(--card); font-weight: 600; color: var(--primary); }
 
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 8px;
-  max-height: 220px;
-  overflow-y: auto;
+/* ERWEITERTER FOTOSPEICHER UNTEN */
+.proof-gallery-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-.gallery-item {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  aspect-ratio: 1;
-  border: 1px solid var(--border);
+.proof-item-card {
   background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.gallery-item img {
+.proof-item-card img {
   width: 100%;
-  height: 100%;
+  max-height: 240px;
   object-fit: cover;
+  display: block;
+}
+
+.proof-item-info {
+  padding: 12px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.proof-item-info strong {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.proof-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.proof-link-btn:hover {
+  text-decoration: underline;
 }
 
 .modal-overlay {
@@ -335,7 +363,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     <button class="btn-primary" onclick="loadSupabaseTour()" style="margin-bottom: 10px;">🔄 Live-Tour vom Chef laden</button>
     <button class="btn-success" onclick="startManualTour()">Tour starten</button>
 
-    <!-- GEFAHRENE TOUREN & ARCHIV (UNTER DEM EMPFANGSBLOCK) -->
+    <!-- GEFAHRENE TOUREN & ARCHIV -->
     <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
       <div style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">Gefahrene Touren & Nachweise</div>
       <div id="tourHistoryContainer">
@@ -367,16 +395,23 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
     <div class="stop-list" id="stopListContainer"></div>
 
-    <div style="margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Erfasste Fotobeweise (<span id="photoCount">0</span>)</div>
-    <div class="gallery-grid" id="galleryGrid"></div>
+    <!-- SPEICHER FÜR FOTOBEWEISE GANZ UNTEN -->
+    <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+      <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+        Erfasste Fotobeweise (<span id="photoCount">0</span>)
+      </div>
+      <div class="proof-gallery-container" id="galleryGrid">
+        <p style="color: var(--text-muted); font-size: 12px; margin-top: 8px;">Noch keine Fotos für diese Tour erfasst.</p>
+      </div>
+    </div>
 
-    <button class="btn-danger" style="margin-top: 20px;" onclick="resetTour()">Tour beenden / Zurück</button>
+    <button class="btn-danger" style="margin-top: 24px;" onclick="resetTour()">Tour beenden / Zurück</button>
   </div>
 </div>
 
 <canvas id="proofCanvas" style="display:none;"></canvas>
 
-<!-- FOTO-VORSCHAU MODAL (MIT LIVE-NOTIZ & STEMPEL WIE AUF SCREENSHOT) -->
+<!-- FOTO-VORSCHAU MODAL -->
 <div class="modal-overlay" id="proofPreviewModal">
   <div class="modal-box" style="text-align: left;">
     <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Fotobeweis erfasst!</div>
@@ -394,7 +429,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
-<!-- NOTIZ EDIT MODAL (BEIM KLICK AUF EINELNEN STOPP) -->
+<!-- NOTIZ EDIT MODAL -->
 <div class="modal-overlay" id="stopNoteModal">
   <div class="modal-box">
     <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;" id="noteModalAddressText">Adresse</div>
@@ -443,7 +478,6 @@ window.onload = async () => {
 
   currentUser = session.user;
 
-  // Profil laden für Begrüßung
   const { data: profile } = await supabaseClient
     .from('profiles')
     .select('*')
@@ -475,6 +509,16 @@ function initGPS() {
   }
 }
 
+// ZURÜCKSETZEN DES FOTOSPEICHERS FÜR BILDER EINER NEUEN TOUR
+function clearPhotoGallery() {
+  const gallery = document.getElementById('galleryGrid');
+  if (gallery) {
+    gallery.innerHTML = '<p style="color: var(--text-muted); font-size: 12px; margin-top: 8px;">Noch keine Fotos für diese Tour erfasst.</p>';
+  }
+  const countEl = document.getElementById('photoCount');
+  if (countEl) countEl.innerText = '0';
+}
+
 async function loadSupabaseTour() {
   const { data: tours, error } = await supabaseClient
     .from('tours')
@@ -501,6 +545,8 @@ function startManualTour() {
   const input = document.getElementById('addressInput').value.trim();
   if (!input) return alert("Bitte gib mindestens eine Adresse ein.");
 
+  clearPhotoGallery();
+
   const lines = input.split('\n').map(l => l.trim()).filter(l => l.length > 2);
   
   if (currentSupabaseTourId && loadedChefStops.length > 0) {
@@ -522,6 +568,13 @@ function startManualTour() {
   const firstOpen = tourStops.findIndex(s => !s.done);
   currentStopIndex = firstOpen !== -1 ? firstOpen : 0;
 
+  // Bereits erfasste Supabase-Fotos der geladenen Tour in die Galerie laden
+  tourStops.forEach((stop, idx) => {
+    if (stop.photo_url) {
+      addPhotoToGallery(stop.photo_url, stop.address, idx + 1, stop.notes);
+    }
+  });
+
   document.getElementById('setup-view').style.display = 'none';
   document.getElementById('tour-view').style.display = 'block';
   renderTourUI();
@@ -539,7 +592,6 @@ function renderTourUI() {
     document.getElementById('stopCounter').innerText = `Stopp ${currentStopIndex + 1} von ${tourStops.length}`;
     document.getElementById('currentStopText').innerText = current.address;
     
-    // DIREKTSTART DER NAVIGATION (Google Maps vs Apple Maps)
     const mapType = document.getElementById('mapAppSelect').value;
     const navUrl = mapType === 'apple' 
       ? `http://maps.apple.com/?daddr=${encodeURIComponent(current.address)}&dirflg=d`
@@ -570,7 +622,6 @@ function renderTourUI() {
   });
 }
 
-// NOTIZ FÜR EINZELNEN STOPP ÖFFNEN / SPEICHERN
 function openNoteModal(idx) {
   editingStopIndex = idx;
   const stop = tourStops[idx];
@@ -606,7 +657,6 @@ function triggerCompleteStop() {
   }
 }
 
-// AUSLÖSEN NACH KAMERA-KLICK
 async function handleProofCapture(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -620,7 +670,6 @@ async function handleProofCapture(event) {
   event.target.value = '';
 }
 
-// ERZEUGT DAS GESTEMPTE BILD (LIVE CANVAS OVERLAY UNTEN LINKS)
 function refreshStampPreview() {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -695,7 +744,38 @@ function updateLiveStampNote() {
   }, 250);
 }
 
-// KLICK AUF "BESTÄTIGEN & NÄCHSTER STOPP"
+// DRUCKT EIN ELEMENT IN DEN FOTOSPEICHER UNTEN
+function addPhotoToGallery(photoUrl, address, stopNum, noteText) {
+  const gallery = document.getElementById('galleryGrid');
+  if (!gallery) return;
+
+  const placeholder = gallery.querySelector('p');
+  if (placeholder) placeholder.remove();
+
+  const card = document.createElement('div');
+  card.className = 'proof-item-card';
+
+  const timeStr = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+  card.innerHTML = `
+    <img src="${photoUrl}" alt="Fotobeweis Stopp #${stopNum}">
+    <div class="proof-item-info">
+      <strong>Stopp #${stopNum}: ${address}</strong>
+      <span style="color: var(--text-muted);">Erfasst um ${timeStr} • GPS aktiv</span>
+      ${noteText ? `<span style="color: var(--primary);">📝 Notiz: ${noteText}</span>` : ''}
+      <a href="${photoUrl}" target="_blank" class="proof-link-btn">🔗 Foto in neuem Tab öffnen</a>
+    </div>
+  `;
+
+  gallery.prepend(card);
+
+  const countEl = document.getElementById('photoCount');
+  if (countEl) {
+    const currentCount = gallery.querySelectorAll('.proof-item-card').length;
+    countEl.innerText = currentCount;
+  }
+}
+
 async function confirmAndUploadProof() {
   const confirmBtn = document.getElementById('confirmProofBtn');
   confirmBtn.disabled = true;
@@ -706,7 +786,7 @@ async function confirmAndUploadProof() {
 
   let publicPhotoUrl = null;
 
-  if (currentSupabaseTourId && tempCanvasBlob) {
+  if (tempCanvasBlob) {
     const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
     const filePath = `tour_proofs/${fileName}`;
 
@@ -717,18 +797,19 @@ async function confirmAndUploadProof() {
     if (!uploadError) {
       const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
       publicPhotoUrl = urlData.publicUrl;
+    } else {
+      // Fallback: Wenn Upload fehlschlägt, erzeuge ein lokales Vorschaubild
+      publicPhotoUrl = URL.createObjectURL(tempCanvasBlob);
     }
   }
 
-  if (tempCanvasBlob) {
-    const gallery = document.getElementById('galleryGrid');
-    const item = document.createElement('div');
-    item.className = 'gallery-item';
-    item.innerHTML = `<img src="${URL.createObjectURL(tempCanvasBlob)}">`;
-    gallery.appendChild(item);
-    
-    const countEl = document.getElementById('photoCount');
-    countEl.innerText = parseInt(countEl.innerText || '0') + 1;
+  if (publicPhotoUrl) {
+    addPhotoToGallery(
+      publicPhotoUrl, 
+      tourStops[currentStopIndex].address, 
+      currentStopIndex + 1, 
+      noteText
+    );
   }
 
   document.getElementById('proofPreviewModal').style.display = 'none';
@@ -765,7 +846,6 @@ async function completeCurrentStop(photoUrl = null) {
   renderTourUI();
 }
 
-// ARCHIV & GEFAHRENE TOUREN LADEN
 async function loadTourHistory() {
   const historyContainer = document.getElementById('tourHistoryContainer');
   if (!historyContainer) return;
@@ -819,6 +899,7 @@ async function handleOcrImage(event) {
 }
 
 function resetTour() {
+  clearPhotoGallery();
   document.getElementById('setup-view').style.display = 'block';
   document.getElementById('tour-view').style.display = 'none';
   loadTourHistory();
