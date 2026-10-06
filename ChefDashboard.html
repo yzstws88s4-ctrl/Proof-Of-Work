@@ -6,16 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Proof Of Work - Chef Dashboard</title>
 
-<!-- PDF Generator CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<!-- OCR Texterkennung für Bild-Uploads -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 :root {
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --primary: #2563eb;
-  --primary-hover: #1d4ed8;
   --success: #10b981;
   --danger: #ef4444;
   --warning: #f59e0b;
@@ -50,7 +47,6 @@ body {
   display: flex;
   justify-content: center;
   transition: background-color 0.2s, color 0.2s;
-  -webkit-font-smoothing: antialiased;
 }
 
 .container { width: 100%; max-width: 1000px; }
@@ -60,15 +56,9 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
-  gap: 12px;
 }
 
-.title-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
+.title-group { display: flex; align-items: center; gap: 10px; }
 .title { font-size: 24px; font-weight: 700; margin: 0; }
 .badge-boss {
   background: rgba(37, 99, 235, 0.15);
@@ -78,14 +68,9 @@ body {
   padding: 4px 8px;
   border-radius: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.header-actions { display: flex; align-items: center; gap: 8px; }
 
 .theme-toggle-btn, .logout-btn {
   background: var(--card);
@@ -97,8 +82,6 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  flex-shrink: 0;
   padding: 0 12px;
   font-size: 13px;
   font-weight: 600;
@@ -125,7 +108,6 @@ body {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s;
 }
 
 .tab-btn.active {
@@ -177,21 +159,15 @@ button {
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  font-family: inherit;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: opacity 0.2s;
 }
-
-button:active { opacity: 0.8; }
-button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-primary { background-color: var(--primary); color: white; }
 .btn-success { background-color: var(--success); color: white; }
-.btn-danger { background-color: var(--danger); color: white; }
 .btn-secondary { background-color: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
 
 .tour-monitor-card {
@@ -202,82 +178,15 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   margin-bottom: 12px;
 }
 
-.progress-bar-bg {
-  background: var(--border);
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 10px 0;
-}
+.progress-bar-bg { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+.progress-bar-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.3s ease; }
 
-.progress-bar-fill {
-  background: var(--success);
-  height: 100%;
-  width: 0%;
-  transition: width 0.3s ease;
-}
+.proof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.proof-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.proof-card img { width: 100%; height: 140px; object-fit: cover; display: block; }
+.proof-card-info { padding: 10px; font-size: 12px; }
 
-.scan-action-box {
-  background: var(--input-bg);
-  border: 2px dashed var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.scan-btn-group {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.scan-status {
-  font-size: 12px;
-  color: var(--success);
-  font-weight: 600;
-  margin-top: 8px;
-  display: none;
-}
-
-.table-responsive { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-th, td { padding: 12px; border-bottom: 1px solid var(--border); }
-th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-weight: 700; }
-
-.proof-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.proof-card {
-  background: var(--input-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.proof-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  display: block;
-}
-
-.proof-card-info {
-  padding: 10px;
-  font-size: 12px;
-}
-
-#pdfExportContainer {
-  background: white;
-  color: #0f172a;
-  padding: 30px;
-  border-radius: 8px;
-  font-family: sans-serif;
-}
+#pdfExportContainer { background: white; color: #0f172a; padding: 30px; border-radius: 8px; font-family: sans-serif; }
 </style>
 </head>
 <body>
@@ -289,9 +198,7 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
     <span class="badge-boss">Chef Dashboard</span>
   </div>
   <div class="header-actions">
-    <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
-      <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-    </button>
+    <button class="theme-toggle-btn" onclick="toggleTheme()"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
     <button class="logout-btn" onclick="logout()">Abmelden</button>
   </div>
 </div>
@@ -308,10 +215,9 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
 <div id="tab-live" class="tab-content active">
   <div class="card">
     <div class="card-title">
-      <span>Laufende Touren Heute</span>
+      <span>Touren & Fortschritt</span>
       <span style="font-size: 12px; color: var(--success); font-weight:600;">System Aktiv</span>
     </div>
-
     <div id="liveToursContainer">
       <p style="color: var(--text-muted); font-size: 14px;">Lade Touren aus Supabase...</p>
     </div>
@@ -339,19 +245,15 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
 
     <div class="card">
       <div class="card-title">Fahrerliste</div>
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Benutzername</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="employeeTableBody">
-          </tbody>
-        </table>
-      </div>
+      <table style="width:100%; font-size:14px;">
+        <thead>
+          <tr style="text-align:left;">
+            <th>Name</th>
+            <th>Benutzername</th>
+          </tr>
+        </thead>
+        <tbody id="employeeTableBody"></tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -360,32 +262,13 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
 <div id="tab-planer" class="tab-content">
   <div class="card">
     <div class="card-title">Neue Tour erstellen & zuweisen</div>
-
-    <div class="scan-action-box">
-      <div style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Tourplan fotografieren oder Bild hochladen</div>
-      <div class="scan-btn-group">
-        <button type="button" class="btn-secondary" onclick="document.getElementById('bossCameraInput').click()">
-          📷 Kamera
-        </button>
-        <button type="button" class="btn-secondary" onclick="document.getElementById('bossFileInput').click()">
-          📁 Foto / Datei
-        </button>
-      </div>
-
-      <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
-      <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
-
-      <div id="scanStatusMsg" class="scan-status">✓ Adressen eingelesen und eingefügt</div>
-    </div>
-
     <div class="grid-2">
       <div>
         <label style="font-size:12px; font-weight:600;">Tour-Bezeichnung</label>
         <input type="text" id="tourTitle" placeholder="z. B. Tour 1 - Wiehlmünden">
 
         <label style="font-size:12px; font-weight:600;">Fahrer auswählen</label>
-        <select id="tourAssignee">
-        </select>
+        <select id="tourAssignee"></select>
 
         <label style="font-size:12px; font-weight:600;">Adressen (zeilenweise)</label>
         <textarea id="tourAddresses" style="height:140px;" placeholder="Hauptstraße 12, Engelskirchen&#10;Bahnhofstraße 5, Engelskirchen"></textarea>
@@ -393,7 +276,7 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
 
       <div>
         <label style="font-size:12px; font-weight:600;">Hinweise / Vorgaben (Optional)</label>
-        <textarea id="tourNotes" style="height:120px;" placeholder="z. B. Besonderheiten bei Anfahrt oder Tonnenstandort"></textarea>
+        <textarea id="tourNotes" style="height:120px;" placeholder="Besonderheiten..."></textarea>
 
         <button class="btn-primary" onclick="createAndSendTour()" style="width: 100%; margin-top:20px;">
           Tour direkt an Fahrer übermitteln
@@ -406,10 +289,7 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
 <!-- TAB 4: NACHWEISE & GALERIE -->
 <div id="tab-proofs" class="tab-content">
   <div class="card">
-    <div class="card-title">
-      <span>Erfasste Fotobeweise</span>
-    </div>
-
+    <div class="card-title">Erfasste Fotobeweise</div>
     <div class="proof-grid" id="dashboardProofGrid">
       <p style="color: var(--text-muted); font-size: 14px;">Lade Fotobeweise...</p>
     </div>
@@ -420,16 +300,9 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
 <div id="tab-export" class="tab-content">
   <div class="card">
     <div class="card-title">Kunden-Leistungsnachweis (PDF)</div>
-    <p style="font-size:13px; color:var(--text-muted);">
-      Generieren Sie hier einen rechtssicheren PDF-Bericht mit allen gestempelten Fotobeweisen und Notizen.
-    </p>
-
-    <div style="display:flex; gap:10px; margin-bottom:20px;">
-      <button class="btn-success" onclick="generatePDF()">PDF Bericht Exportieren</button>
-    </div>
-
+    <button class="btn-success" onclick="generatePDF()" style="margin-bottom: 20px;">PDF Bericht Exportieren</button>
     <div id="pdfExportContainer">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #2563eb; padding-bottom:12px; margin-bottom:20px;">
+      <div style="display:flex; justify-between; align-items:center; border-bottom:2px solid #2563eb; padding-bottom:12px; margin-bottom:20px;">
         <div>
           <h2 style="margin:0; color:#2563eb; font-size:20px;">LEISTUNGSNACHWEIS</h2>
           <span style="font-size:12px; color:#64748b;">Proof of Work • Dokumentation</span>
@@ -439,20 +312,7 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
           Datum: <span id="pdfDate"></span>
         </div>
       </div>
-
-      <table style="width:100%; font-size:12px; margin-bottom:20px;">
-        <tr>
-          <td><strong>Status:</strong> Live Daten aktiv</td>
-          <td><strong>Berichtstyp:</strong> Gesamtbericht</td>
-          <td><strong>Erfüllung:</strong> 100%</td>
-        </tr>
-      </table>
-
-      <h3 style="font-size:14px; margin-bottom:10px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">Erfasste Nachweise & Vorkommnisse</h3>
-
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;" id="pdfProofList">
-        <p style="font-size:12px; color:#64748b;">Keine Einträge für den PDF-Export vorhanden.</p>
-      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;" id="pdfProofList"></div>
     </div>
   </div>
 </div>
@@ -485,36 +345,17 @@ window.onload = async () => {
     .maybeSingle();
 
   if (!profile || profile.role !== 'chef') {
-    alert('Zugriff verweigert: Nur Chefs haben Zugang zu diesem Dashboard.');
+    alert('Zugriff verweigert: Nur Chefs haben Zugang.');
     window.location.href = 'TourApp.html';
     return;
   }
 
   await loadDriversFromSupabase();
   await loadToursFromSupabase();
-  subscribeRealtime();
 };
 
-function subscribeRealtime() {
-  supabaseClient
-    .channel('public:stops')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'stops' }, () => {
-      loadToursFromSupabase();
-    })
-    .subscribe();
-}
-
 async function loadDriversFromSupabase() {
-  const { data: profiles, error } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('role', 'driver');
-
-  if (error) {
-    console.error('Fehler beim Laden der Fahrer:', error);
-    return;
-  }
-
+  const { data: profiles } = await supabaseClient.from('profiles').select('*').eq('role', 'driver');
   driversList = profiles || [];
   renderDriverList();
 }
@@ -526,32 +367,15 @@ function renderDriverList() {
   if (tbody) tbody.innerHTML = '';
   if (select) select.innerHTML = '';
 
-  if (driversList.length === 0) {
-    if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted);">Noch keine Fahrer angelegt.</td></tr>';
-    if (select) select.innerHTML = '<option value="">Keine Fahrer verfügbar</option>';
-    return;
-  }
-
   driversList.forEach(driver => {
-    const rawEmail = driver.email || '';
-    const cleanUsername = rawEmail.split('@')[0];
+    const cleanUsername = (driver.email || '').split('@')[0];
     const driverName = driver.full_name || cleanUsername;
 
     if (tbody) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${driverName}</strong></td>
-        <td>${cleanUsername}</td>
-        <td><span style="color:var(--success); font-weight:600;">Aktiv</span></td>
-      `;
-      tbody.appendChild(tr);
+      tbody.innerHTML += `<tr><td><strong>${driverName}</strong></td><td>${cleanUsername}</td></tr>`;
     }
-
     if (select) {
-      const option = document.createElement('option');
-      option.value = driver.id;
-      option.innerText = `${driverName} (${cleanUsername})`;
-      select.appendChild(option);
+      select.innerHTML += `<option value="${driver.id}">${driverName} (${cleanUsername})</option>`;
     }
   });
 }
@@ -559,21 +383,15 @@ function renderDriverList() {
 function switchTab(event, tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
   document.getElementById(tabId).classList.add('active');
   event.target.classList.add('active');
 }
 
 async function addEmployee(e) {
   e.preventDefault();
-  const btn = document.getElementById('addEmpBtn');
   const name = document.getElementById('empName').value.trim();
   let usernameInput = document.getElementById('empUsername').value.trim().toLowerCase();
   const password = document.getElementById('empPassword').value.trim();
-
-  if (!name || !usernameInput || !password) return;
-
-  btn.disabled = true;
 
   const emailForAuth = usernameInput.includes('@') ? usernameInput : `${usernameInput}@app.local`;
 
@@ -583,81 +401,32 @@ async function addEmployee(e) {
     driver_name: name
   });
 
-  if (error || (data && !data.success)) {
-    alert('Fehler beim Erstellen des Fahrers: ' + (error?.message || data?.error || 'Unbekannter Fehler'));
-    btn.disabled = false;
+  if (error) {
+    alert('Fehler: ' + error.message);
     return;
   }
 
-  alert(`Fahrer-Account für "${name}" wurde erfolgreich angelegt!`);
-
+  alert(`Fahrer "${name}" angelegt!`);
   document.getElementById('addWorkerForm').reset();
-  btn.disabled = false;
   await loadDriversFromSupabase();
-}
-
-async function processBossTourScan(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const statusMsg = document.getElementById('scanStatusMsg');
-  statusMsg.style.display = 'block';
-  statusMsg.style.color = 'var(--warning)';
-  statusMsg.innerText = '⏳ Bild wird analysiert (OCR)...';
-
-  try {
-    const result = await Tesseract.recognize(file, 'deu');
-    const rawTextFromPhoto = result.data.text;
-
-    let rawLines = rawTextFromPhoto.split(/\r?\n|;/);
-    let parsedAddresses = rawLines.map(line => line.replace(/^\s*\d+[\.\)\-]?\s*/, '').trim()).filter(line => line.length > 3);
-
-    if (parsedAddresses.length > 0) {
-      document.getElementById('tourAddresses').value = parsedAddresses.join('\n');
-      statusMsg.style.color = 'var(--success)';
-      statusMsg.innerText = '✓ ' + parsedAddresses.length + ' Adressen eingelesen';
-    } else {
-      statusMsg.style.color = 'var(--warning)';
-      statusMsg.innerText = '⚠ Kein eindeutiger Text erkannt. Bitte manuell eingeben.';
-    }
-
-    if (!document.getElementById('tourTitle').value) {
-      document.getElementById('tourTitle').value = "Tour " + new Date().toLocaleDateString('de-DE');
-    }
-  } catch (err) {
-    console.error('OCR Fehler:', err);
-    statusMsg.style.color = 'var(--danger)';
-    statusMsg.innerText = '❌ Fehler beim Auslesen des Bildes';
-  }
-
-  setTimeout(() => { statusMsg.style.display = 'none'; }, 5000);
-  event.target.value = '';
 }
 
 async function createAndSendTour() {
   const title = document.getElementById('tourTitle').value.trim() || 'Tour ' + new Date().toLocaleDateString('de-DE');
   const driverId = document.getElementById('tourAssignee').value;
   const addressText = document.getElementById('tourAddresses').value.trim();
-  const notes = document.getElementById('tourNotes').value.trim();
 
-  if (!driverId) return alert('Bitte wähle zuerst einen Fahrer aus!');
-  if (!addressText) return alert('Bitte gib mindestens eine Adresse ein!');
+  if (!driverId || !addressText) return alert('Bitte Fahrer und Adressen angeben.');
 
   const addresses = addressText.split('\n').map(a => a.trim()).filter(a => a.length > 2);
 
   const { data: tourData, error: tourError } = await supabaseClient
     .from('tours')
-    .insert([{ 
-      title: title, 
-      assigned_to: driverId, 
-      created_by: currentChef.id,
-      notes: notes,
-      status: 'geplant' 
-    }])
+    .insert([{ title, assigned_to: driverId, created_by: currentChef.id, status: 'geplant' }])
     .select('*')
     .single();
 
-  if (tourError) return alert('Fehler beim Erstellen der Tour: ' + tourError.message);
+  if (tourError) return alert('Fehler: ' + tourError.message);
 
   const stopsToInsert = addresses.map((addr, idx) => ({
     tour_id: tourData.id,
@@ -666,28 +435,19 @@ async function createAndSendTour() {
     status: 'offen'
   }));
 
-  const { error: stopsError } = await supabaseClient.from('stops').insert(stopsToInsert);
+  await supabaseClient.from('stops').insert(stopsToInsert);
 
-  if (stopsError) return alert('Fehler beim Speichern der Stopps: ' + stopsError.message);
-
-  alert('Tour wurde erfolgreich erstellt und zugewiesen!');
-
+  alert('Tour erfolgreich erstellt!');
   document.getElementById('tourAddresses').value = '';
-  document.getElementById('tourNotes').value = '';
   document.getElementById('tourTitle').value = '';
 
   await loadToursFromSupabase();
 }
 
 async function loadToursFromSupabase() {
-  const { data: tours, error } = await supabaseClient
+  const { data: tours } = await supabaseClient
     .from('tours')
     .select('*, stops(*), profiles:assigned_to(full_name, email)');
-
-  if (error) {
-    console.error('Fehler beim Laden der Touren:', error);
-    return;
-  }
 
   renderTours(tours || []);
   extractAndRenderProofs(tours || []);
@@ -698,33 +458,28 @@ function renderTours(tours) {
   if (!container) return;
 
   if (tours.length === 0) {
-    container.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">Keine aktiven Touren vorhanden.</p>';
+    container.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">Keine Touren vorhanden.</p>';
     return;
   }
 
   container.innerHTML = '';
   tours.forEach(tour => {
-    const totalStops = tour.stops ? tour.stops.length : 0;
-    const completedStops = tour.stops ? tour.stops.filter(s => s.status === 'erledigt').length : 0;
-    const progressPercent = totalStops > 0 ? Math.round((completedStops / totalStops) * 100) : 0;
+    const total = tour.stops ? tour.stops.length : 0;
+    const completed = tour.stops ? tour.stops.filter(s => s.status === 'erledigt').length : 0;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
     const driverName = tour.profiles?.full_name || tour.profiles?.email?.split('@')[0] || 'Unzugewiesen';
 
     const card = document.createElement('div');
     card.className = 'tour-monitor-card';
     card.innerHTML = `
-      <div style="display:flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong>${driverName}</strong> 
-          <span style="color: var(--text-muted); font-size:13px;">(${tour.title})</span>
-        </div>
+      <div style="display:flex; justify-content: space-between;">
+        <strong>${driverName} - ${tour.title}</strong>
         <span style="font-size:12px; color:var(--success); font-weight:600;">${tour.status}</span>
       </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
-      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${percent}%;"></div></div>
       <div style="display:flex; justify-content: space-between; font-size:12px; color: var(--text-muted);">
-        <span>Fortschritt: ${completedStops} von ${totalStops} Stopps</span>
-        <span>${progressPercent}% abgeschlossen</span>
+        <span>${completed} von ${total} Stopps</span>
+        <span>${percent}%</span>
       </div>
     `;
     container.appendChild(card);
@@ -735,69 +490,47 @@ function extractAndRenderProofs(tours) {
   const proofGrid = document.getElementById('dashboardProofGrid');
   const pdfProofList = document.getElementById('pdfProofList');
 
-  const completedStopsWithPhotos = [];
-
+  const proofs = [];
   tours.forEach(tour => {
     if (tour.stops) {
       tour.stops.forEach(stop => {
-        if (stop.photo_url || stop.status === 'erledigt') {
-          completedStopsWithPhotos.push({ ...stop, tourTitle: tour.title });
-        }
+        if (stop.photo_url) proofs.push({ ...stop, tourTitle: tour.title });
       });
     }
   });
 
   if (proofGrid) {
-    if (completedStopsWithPhotos.length === 0) {
-      proofGrid.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">Keine Nachweise vorhanden.</p>';
-    } else {
-      proofGrid.innerHTML = completedStopsWithPhotos.map(s => `
+    proofGrid.innerHTML = proofs.length === 0 
+      ? '<p style="color: var(--text-muted); font-size: 14px;">Keine Fotobeweise vorhanden.</p>'
+      : proofs.map(s => `
         <div class="proof-card">
-          ${s.photo_url ? `<img src="${s.photo_url}" alt="Beweisfoto">` : '<div style="height:140px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#64748b;">Kein Foto</div>'}
+          <img src="${s.photo_url}">
           <div class="proof-card-info">
             <strong>${s.address}</strong><br>
-            <span style="color:var(--text-muted); font-size:11px;">Status: ${s.status}</span>
+            <span style="color:var(--text-muted);">${s.tourTitle}</span>
           </div>
         </div>
       `).join('');
-    }
   }
 
   if (pdfProofList) {
-    if (completedStopsWithPhotos.length === 0) {
-      pdfProofList.innerHTML = '<p style="font-size:12px; color:#64748b;">Keine Einträge für den PDF-Export vorhanden.</p>';
-    } else {
-      pdfProofList.innerHTML = completedStopsWithPhotos.map(s => `
-        <div style="border:1px solid #e2e8f0; padding:10px; border-radius:6px; font-size:11px;">
-          <strong>${s.address}</strong><br>
-          <span style="color:#64748b;">Tour: ${s.tourTitle}</span><br>
-          <span style="color:#10b981;">✓ ${s.status}</span>
-        </div>
-      `).join('');
-    }
+    pdfProofList.innerHTML = proofs.map(s => `
+      <div style="border:1px solid #e2e8f0; padding:10px; border-radius:6px; font-size:11px;">
+        <strong>${s.address}</strong><br>
+        <span style="color:#64748b;">Tour: ${s.tourTitle}</span>
+      </div>
+    `).join('');
   }
 }
 
 function generatePDF() {
   const element = document.getElementById('pdfExportContainer');
-  const opt = {
-    margin: 10,
-    filename: 'Leistungsnachweis_ProofOfWork.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(element).save();
+  html2pdf().set({ margin: 10, filename: 'Leistungsnachweis.pdf' }).from(element).save();
 }
 
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
-  if (current === 'dark') {
-    document.documentElement.removeAttribute('data-theme');
-  } else {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
+  document.documentElement.setAttribute('data-theme', current === 'dark' ? '' : 'dark');
 }
 
 async function logout() {
