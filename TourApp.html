@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -370,6 +371,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
 
+    <!-- EINZELNER DYNAMISCHER STRUKTUR-BUTTON -->
     <button class="btn-success" id="manualCompleteBtn" onclick="triggerCompleteStop()">
       Ankunft bestätigen / Nächster Stopp
     </button>
@@ -389,10 +391,14 @@ input:checked + .slider:before { transform: translateX(20px); }
       </div>
     </div>
 
-    <!-- GETRENNTE BUTTONS FÜR ZURÜCK UND TOUR BEENDEN -->
-    <div class="btn-grid" style="margin-top: 24px;">
-      <button class="btn-secondary" onclick="goBackToSetup()">⬅ Zurück</button>
-      <button class="btn-danger" id="finishTourBtn" onclick="finishAndSaveTour()">🏁 Tour beenden</button>
+    <!-- ZWEI EIGENSTÄNDIGE BUTTONS UNTEN -->
+    <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+      <button class="btn-danger" id="finishTourBtn" onclick="finishAndSaveTour()" style="margin-bottom: 0;">
+        🏁 Tour beenden & Speichern
+      </button>
+      <button class="btn-secondary" onclick="goBackToSetup()" style="margin-bottom: 0;">
+        ⬅ Ohne Speichern zurück zum Menü
+      </button>
     </div>
   </div>
 </div>
@@ -529,7 +535,7 @@ async function loadSupabaseTour() {
   }
 }
 
-function startManualTour() {
+async function startManualTour() {
   const input = document.getElementById('addressInput').value.trim();
   if (!input) return alert("Bitte gib mindestens eine Adresse ein.");
 
@@ -541,7 +547,7 @@ function startManualTour() {
     tourStops = lines.map((addr, idx) => {
       const match = loadedChefStops.find(s => s.address === addr);
       return {
-        id: match ? match.id : idx,
+        id: match ? match.id : null,
         address: addr,
         notes: match ? match.notes || '' : '',
         done: match ? match.status === 'erledigt' : false,
@@ -550,8 +556,45 @@ function startManualTour() {
       };
     });
   } else {
-    tourStops = lines.map((addr, idx) => ({ id: idx, address: addr, notes: '', done: false, photo_url: null, localBlob: null }));
-    currentSupabaseTourId = null;
+    // Wenn eine eigene Tour direkt eingegeben wird, erstellen wir sofort einen DB-Eintrag dafür
+    const { data: newTour, error: tourErr } = await supabaseClient
+      .from('tours')
+      .insert({
+        title: `Eigene Tour (${new Date().toLocaleDateString('de-DE')})`,
+        assigned_to: currentUser.id,
+        status: 'in_bearbeitung'
+      })
+      .select()
+      .single();
+
+    if (!tourErr && newTour) {
+      currentSupabaseTourId = newTour.id;
+      const stopsToInsert = lines.map((addr, idx) => ({
+        tour_id: newTour.id,
+        address: addr,
+        sequence: idx + 1,
+        status: 'offen'
+      }));
+
+      const { data: insertedStops } = await supabaseClient
+        .from('stops')
+        .insert(stopsToInsert)
+        .select();
+
+      if (insertedStops) {
+        tourStops = insertedStops.map(s => ({
+          id: s.id,
+          address: s.address,
+          notes: '',
+          done: false,
+          photo_url: null,
+          localBlob: null
+        }));
+      }
+    } else {
+      // Fallback falls Offline/keine DB-Verbindung
+      tourStops = lines.map((addr, idx) => ({ id: null, address: addr, notes: '', done: false, photo_url: null, localBlob: null }));
+    }
   }
 
   const firstOpen = tourStops.findIndex(s => !s.done);
@@ -592,7 +635,7 @@ function renderTourUI() {
     document.getElementById('stopCounter').innerText = "Geschafft!";
     document.getElementById('currentStopText').innerText = "🎉 Alle Stopps erledigt!";
     document.getElementById('navDirectBtn').style.display = 'none';
-    document.getElementById('manualCompleteBtn').style.display = 'none'; // Verhindert weitere Fotos nach dem letzten Stopp
+    document.getElementById('manualCompleteBtn').style.display = 'none'; // Blendet Foto/Ankunft aus
   }
 
   tourStops.forEach((stop, idx) => {
@@ -640,7 +683,7 @@ function triggerCompleteStop() {
   if (isProofRequired) {
     document.getElementById('proofCameraInput').click();
   } else {
-    completeCurrentStopLocally(null);
+    completeCurrentStopLocally();
   }
 }
 
@@ -743,7 +786,6 @@ function addPhotoToGallery(imageSrc, address, stopNum, noteText) {
 
   const timeStr = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
-  // Externe Links wurden hier entfernt, das Bild wird rein zur Vorschau angezeigt
   card.innerHTML = `
     <img src="${imageSrc}" alt="Fotobeweis Stopp #${stopNum}">
     <div class="proof-item-info">
@@ -762,7 +804,6 @@ function addPhotoToGallery(imageSrc, address, stopNum, noteText) {
   }
 }
 
-// Sofortige lokale Speicherung (ohne Cloud-Upload während der Fahrt)
 function confirmProofLocally() {
   if (currentStopIndex >= tourStops.length) return;
 
@@ -790,17 +831,17 @@ function completeCurrentStopLocally() {
   renderTourUI();
 }
 
-// Button "Zurück": Wechselt ins Menü, behält Daten im Speicher
+// NUR Menüwechsel ohne Datenupload
 function goBackToSetup() {
   document.getElementById('setup-view').style.display = 'block';
   document.getElementById('tour-view').style.display = 'none';
 }
 
-// Button "Tour beenden": Lädt alle gespeicherten Bilder hoch & schließt die Tour in Supabase ab
+// Lädt wirklich alle Fotos & Stopp-Ergebnisse in Supabase hoch
 async function finishAndSaveTour() {
   const btn = document.getElementById('finishTourBtn');
   btn.disabled = true;
-  btn.innerText = "Speichere Tour...";
+  btn.innerText = "Speichere Tour in Cloud...";
 
   try {
     for (let i = 0; i < tourStops.length; i++) {
@@ -809,7 +850,7 @@ async function finishAndSaveTour() {
 
       let publicPhotoUrl = stop.photo_url;
 
-      // Wenn ein neues Foto lokal vorliegt, erst jetzt in Supabase hochladen
+      // 1. Foto nach Supabase Storage hochladen falls lokal vorhanden
       if (stop.localBlob) {
         const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
         const filePath = `tour_proofs/${fileName}`;
@@ -824,8 +865,8 @@ async function finishAndSaveTour() {
         }
       }
 
-      // Stopp-Status in DB aktualisieren
-      if (stop.id && typeof stop.id === 'string') {
+      // 2. Stopp in DB als erledigt markieren
+      if (stop.id) {
         const updatePayload = {
           status: 'erledigt',
           completed_at: new Date().toISOString(),
@@ -837,7 +878,7 @@ async function finishAndSaveTour() {
       }
     }
 
-    // Tour insgesamt auf erledigt setzen
+    // 3. Tour-Status in DB aktualisieren
     if (currentSupabaseTourId) {
       await supabaseClient
         .from('tours')
@@ -845,9 +886,9 @@ async function finishAndSaveTour() {
         .eq('id', currentSupabaseTourId);
     }
 
-    showModal("Erfolg", "Tour wurde erfolgreich beendet und alle Fotos/Notizen wurden gespeichert!");
+    showModal("Erfolg", "Tour wurde vollständig abgeschlossen und alle Nachweise gespeichert!");
 
-    // Tour-Daten im Frontend zurücksetzen
+    // Tour-Daten zurücksetzen
     tourStops = [];
     currentStopIndex = 0;
     currentSupabaseTourId = null;
@@ -860,10 +901,10 @@ async function finishAndSaveTour() {
     await loadTourHistory();
 
   } catch (err) {
-    showModal("Fehler", "Beim Speichern ist ein Fehler aufgetreten.");
+    showModal("Fehler", "Beim Speichern der Tour ist ein Fehler aufgetreten.");
   } finally {
     btn.disabled = false;
-    btn.innerText = "🏁 Tour beenden";
+    btn.innerText = "🏁 Tour beenden & Speichern";
   }
 }
 
