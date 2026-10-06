@@ -475,13 +475,6 @@ function initGPS() {
   }
 }
 
-function clearGalleryUI() {
-  const gallery = document.getElementById('galleryGrid');
-  if (gallery) gallery.innerHTML = '';
-  const photoCount = document.getElementById('photoCount');
-  if (photoCount) photoCount.innerText = '0';
-}
-
 async function loadSupabaseTour() {
   const { data: tours, error } = await supabaseClient
     .from('tours')
@@ -504,11 +497,9 @@ async function loadSupabaseTour() {
   }
 }
 
-async function startManualTour() {
+function startManualTour() {
   const input = document.getElementById('addressInput').value.trim();
   if (!input) return alert("Bitte gib mindestens eine Adresse ein.");
-
-  clearGalleryUI(); // Galerie für die neue Tour zurücksetzen
 
   const lines = input.split('\n').map(l => l.trim()).filter(l => l.length > 2);
   
@@ -524,47 +515,8 @@ async function startManualTour() {
       };
     });
   } else {
-    // Wenn es keine Chef-Tour ist, eine neue Tour in Supabase anlegen, damit Nachweise gespeichert werden
-    const { data: newTour, error } = await supabaseClient
-      .from('tours')
-      .insert([{
-        title: `Eigene Tour (${new Date().toLocaleDateString('de-DE')})`,
-        assigned_to: currentUser.id,
-        created_at: new Date().toISOString()
-      }])
-      .select()
-      .single();
-
-    if (!error && newTour) {
-      currentSupabaseTourId = newTour.id;
-      
-      // Stopps in Supabase anlegen
-      const stopsToInsert = lines.map((addr, idx) => ({
-        tour_id: newTour.id,
-        address: addr,
-        sequence: idx,
-        status: 'offen'
-      }));
-
-      const { data: createdStops } = await supabaseClient
-        .from('stops')
-        .insert(stopsToInsert)
-        .select();
-
-      if (createdStops) {
-        tourStops = createdStops.map(s => ({
-          id: s.id,
-          address: s.address,
-          notes: s.notes || '',
-          done: false
-        }));
-      } else {
-        tourStops = lines.map((addr, idx) => ({ id: idx, address: addr, notes: '', done: false }));
-      }
-    } else {
-      tourStops = lines.map((addr, idx) => ({ id: idx, address: addr, notes: '', done: false }));
-      currentSupabaseTourId = null;
-    }
+    tourStops = lines.map((addr, idx) => ({ id: idx, address: addr, notes: '', done: false }));
+    currentSupabaseTourId = null;
   }
 
   const firstOpen = tourStops.findIndex(s => !s.done);
@@ -838,8 +790,8 @@ async function loadTourHistory() {
     const card = document.createElement('div');
     card.className = 'history-card';
     card.innerHTML = `
-      <div style="display:flex; justify-content:between; align-items:center; font-weight:700; font-size:13px;">
-        <span>${tour.title || 'Gefahrene Tour'}</span>
+      <div style="display:flex; justify-between; align-items:center; font-weight:700; font-size:13px;">
+        <span>${tour.title}</span>
         <span style="color:var(--text-muted); font-size:11px;">${dateStr}</span>
       </div>
       <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
@@ -867,12 +819,6 @@ async function handleOcrImage(event) {
 }
 
 function resetTour() {
-  clearGalleryUI(); // Galerie leeren, damit bei der nächsten Tour wieder bei 0 gestartet wird
-  currentSupabaseTourId = null;
-  loadedChefStops = [];
-  tourStops = [];
-  currentStopIndex = 0;
-
   document.getElementById('setup-view').style.display = 'block';
   document.getElementById('tour-view').style.display = 'none';
   loadTourHistory();
