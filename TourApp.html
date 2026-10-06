@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -182,7 +181,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 .gps-status { font-size: 12px; color: var(--success); margin-top: 8px; }
 
 .stop-list {
-  max-height: 220px;
+  max-height: 250px;
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -198,8 +197,10 @@ input:checked + .slider:before { transform: translateX(20px); }
   justify-content: space-between;
   font-size: 14px;
   cursor: pointer;
+  user-select: none;
 }
 
+.stop-item:last-child { border-bottom: none; }
 .stop-item.done { opacity: 0.6; }
 .stop-item.done .stop-name { text-decoration: line-through; }
 .stop-item.active { background: var(--card); font-weight: 600; color: var(--primary); }
@@ -327,7 +328,6 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="proof-gallery-container" id="galleryGrid"></div>
     </div>
 
-    <!-- DIE ZWEI ANGEFORDERTEN BUTTONS -->
     <button class="btn-success" style="margin-top: 24px;" id="finishTourBtn" onclick="finishAndSaveTour()">
       🏁 Tour beenden & Speichern
     </button>
@@ -468,7 +468,7 @@ function startManualTour() {
   tourStops = lines.map((addr, idx) => ({
     id: (loadedChefStops[idx] && loadedChefStops[idx].id) ? loadedChefStops[idx].id : null,
     address: addr,
-    notes: '',
+    notes: (loadedChefStops[idx] && loadedChefStops[idx].notes) ? loadedChefStops[idx].notes : '',
     done: false,
     photo_url: null,
     blob: null
@@ -511,17 +511,17 @@ function renderTourUI() {
     const isActive = idx === currentStopIndex && !stop.done;
     item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
     
-    // Bei Klick auf Stopp in der Liste Notiz-Modal öffnen
-    item.onclick = () => openNoteModal(idx);
+    // PER KLICK AUF DIE ADRESSE NUN ZUVERLÄSSIG DAS NOTIZ-MODAL ÖFFNEN
+    item.setAttribute('onclick', `openNoteModal(${idx})`);
 
     item.innerHTML = `
-      <div class="stop-name">
+      <div class="stop-name" style="pointer-events: none;">
         <strong>#${idx + 1}</strong> ${stop.address}
-        ${stop.notes ? `<div style="font-size: 11px; color: var(--primary); font-weight: normal; margin-top: 2px;">📝 ${stop.notes}</div>` : ''}
+        ${stop.notes ? `<div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 4px;">📝 ${stop.notes}</div>` : ''}
       </div>
-      <div style="font-size: 12px; color: var(--text-muted); text-align: right;">
+      <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 70px;">
         ${stop.done ? '✓ Erledigt' : 'Offen'}<br>
-        <span style="font-size: 10px; color: var(--primary);">Notiz ✏️</span>
+        <span style="font-size: 11px; color: var(--primary); font-weight: 700;">Notiz ✏️</span>
       </div>
     `;
     container.appendChild(item);
@@ -536,6 +536,11 @@ function openNoteModal(index) {
   document.getElementById('noteModalSub').innerText = stop.address;
   document.getElementById('noteModalInput').value = stop.notes || '';
   document.getElementById('noteEditModal').style.display = 'flex';
+  
+  // Kurzer Focus auf das Textfeld
+  setTimeout(() => {
+    document.getElementById('noteModalInput').focus();
+  }, 100);
 }
 
 function saveStopNoteFromModal() {
@@ -558,7 +563,7 @@ function triggerCompleteStop() {
   if (isProofRequired) {
     document.getElementById('proofCameraInput').click();
   } else {
-    completeCurrentStop(null, null);
+    completeCurrentStop(null, null, tourStops[currentStopIndex].notes || '');
   }
 }
 
@@ -567,7 +572,7 @@ async function handleProofCapture(event) {
   if (!file) return;
   tempCapturedFile = file;
 
-  // Vorbelegung der Notiz aus der Listenansicht (falls vorher schon eine eingegeben wurde)
+  // Notiz automatisch aus dem Stopp vorladen
   const current = tourStops[currentStopIndex];
   if (current && current.notes) {
     document.getElementById('modalProofNoteInput').value = current.notes;
@@ -680,7 +685,6 @@ function completeCurrentStop(localUrl, blob, noteText = '') {
   renderTourUI();
 }
 
-/* 1. EINZELNER BUTTON: TOUR BEENDEN (SPEICHERT ALLES IN SUPABASE) */
 async function finishAndSaveTour() {
   const btn = document.getElementById('finishTourBtn');
   btn.disabled = true;
@@ -753,7 +757,6 @@ async function finishAndSaveTour() {
   }
 }
 
-/* 2. EINZELNER BUTTON: ZURÜCK (OHNE BILDER / ÄNDERUNGEN ZU SPEICHERN) */
 function cancelAndReturn() {
   tourStops = [];
   currentSupabaseTourId = null;
@@ -815,7 +818,7 @@ function openTourDetails(tour, number) {
       box.innerHTML = `
         <strong>Stopp #${s.sequence}: ${s.address}</strong><br>
         <span style="color:var(--text-muted);">Status: ${s.status}</span>
-        ${s.notes ? `<br><span>Notiz: ${s.notes}</span>` : ''}
+        ${s.notes ? `<br><span style="color:var(--primary); font-weight:600;">📝 Notiz: ${s.notes}</span>` : ''}
         ${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:8px; margin-top:8px; max-height:180px; object-fit:cover;">` : ''}
       `;
       container.appendChild(box);
