@@ -232,7 +232,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 .stop-item.done .stop-name { text-decoration: line-through; }
 .stop-item.active { background: var(--card); font-weight: 600; color: var(--primary); }
 
-/* ERWEITERTER FOTOSPEICHER UNTEN */
 .proof-gallery-container {
   display: flex;
   flex-direction: column;
@@ -509,7 +508,6 @@ function initGPS() {
   }
 }
 
-// ZURÜCKSETZEN DES FOTOSPEICHERS FÜR BILDER EINER NEUEN TOUR
 function clearPhotoGallery() {
   const gallery = document.getElementById('galleryGrid');
   if (gallery) {
@@ -524,10 +522,11 @@ async function loadSupabaseTour() {
     .from('tours')
     .select('*, stops(*)')
     .eq('assigned_to', currentUser.id)
+    .neq('status', 'erledigt')
     .order('created_at', { ascending: false });
 
   if (error || !tours || tours.length === 0) {
-    showModal("Info", "Keine neue zugewiesene Live-Tour gefunden.");
+    showModal("Info", "Keine neue offene Tour gefunden.");
     return;
   }
 
@@ -566,9 +565,8 @@ function startManualTour() {
   }
 
   const firstOpen = tourStops.findIndex(s => !s.done);
-  currentStopIndex = firstOpen !== -1 ? firstOpen : 0;
+  currentStopIndex = firstOpen !== -1 ? firstOpen : tourStops.length;
 
-  // Bereits erfasste Supabase-Fotos der geladenen Tour in die Galerie laden
   tourStops.forEach((stop, idx) => {
     if (stop.photo_url) {
       addPhotoToGallery(stop.photo_url, stop.address, idx + 1, stop.notes);
@@ -588,7 +586,7 @@ function renderTourUI() {
 
   const current = tourStops[currentStopIndex];
 
-  if (current && !current.done) {
+  if (currentStopIndex < tourStops.length && current && !current.done) {
     document.getElementById('stopCounter').innerText = `Stopp ${currentStopIndex + 1} von ${tourStops.length}`;
     document.getElementById('currentStopText').innerText = current.address;
     
@@ -599,10 +597,12 @@ function renderTourUI() {
     
     document.getElementById('navDirectBtn').href = navUrl;
     document.getElementById('navDirectBtn').style.display = 'flex';
+    document.getElementById('manualCompleteBtn').style.display = 'flex';
   } else {
     document.getElementById('stopCounter').innerText = "Geschafft!";
     document.getElementById('currentStopText').innerText = "🎉 Alle Stopps erledigt!";
     document.getElementById('navDirectBtn').style.display = 'none';
+    document.getElementById('manualCompleteBtn').style.display = 'none';
   }
 
   tourStops.forEach((stop, idx) => {
@@ -649,6 +649,8 @@ async function saveStopNote() {
 }
 
 function triggerCompleteStop() {
+  if (currentStopIndex >= tourStops.length) return;
+  
   const isProofRequired = document.getElementById('photoProofToggle').checked;
   if (isProofRequired) {
     document.getElementById('proofCameraInput').click();
@@ -659,7 +661,7 @@ function triggerCompleteStop() {
 
 async function handleProofCapture(event) {
   const file = event.target.files[0];
-  if (!file) return;
+  if (!file || currentStopIndex >= tourStops.length) return;
 
   tempCapturedFile = file;
   document.getElementById('modalProofNoteInput').value = tourStops[currentStopIndex].notes || '';
@@ -744,7 +746,6 @@ function updateLiveStampNote() {
   }, 250);
 }
 
-// DRUCKT EIN ELEMENT IN DEN FOTOSPEICHER UNTEN
 function addPhotoToGallery(photoUrl, address, stopNum, noteText) {
   const gallery = document.getElementById('galleryGrid');
   if (!gallery) return;
@@ -777,6 +778,8 @@ function addPhotoToGallery(photoUrl, address, stopNum, noteText) {
 }
 
 async function confirmAndUploadProof() {
+  if (currentStopIndex >= tourStops.length) return;
+
   const confirmBtn = document.getElementById('confirmProofBtn');
   confirmBtn.disabled = true;
   confirmBtn.innerText = "Wird hochgeladen...";
@@ -798,7 +801,6 @@ async function confirmAndUploadProof() {
       const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
       publicPhotoUrl = urlData.publicUrl;
     } else {
-      // Fallback: Wenn Upload fehlschlägt, erzeuge ein lokales Vorschaubild
       publicPhotoUrl = URL.createObjectURL(tempCanvasBlob);
     }
   }
@@ -839,8 +841,15 @@ async function completeCurrentStop(photoUrl = null) {
       .eq('id', current.id);
   }
 
-  if (currentStopIndex < tourStops.length - 1) {
-    currentStopIndex++;
+  currentStopIndex++;
+
+  if (currentStopIndex >= tourStops.length) {
+    if (currentSupabaseTourId) {
+      await supabaseClient
+        .from('tours')
+        .update({ status: 'erledigt' })
+        .eq('id', currentSupabaseTourId);
+    }
   }
 
   renderTourUI();
@@ -870,12 +879,12 @@ async function loadTourHistory() {
     const card = document.createElement('div');
     card.className = 'history-card';
     card.innerHTML = `
-      <div style="display:flex; justify-between; align-items:center; font-weight:700; font-size:13px;">
+      <div style="display:flex; justify-content: space-between; align-items:center; font-weight:700; font-size:13px;">
         <span>${tour.title}</span>
         <span style="color:var(--text-muted); font-size:11px;">${dateStr}</span>
       </div>
       <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-        Fortschritt: ${doneCount} / ${total} Stopps erledigt
+        Fortschritt: ${doneCount} / ${total} Stopps erledigt (${tour.status})
       </div>
     `;
     historyContainer.appendChild(card);
@@ -898,11 +907,27 @@ async function handleOcrImage(event) {
   event.target.value = '';
 }
 
-function resetTour() {
+async function resetTour() {
+  if (currentSupabaseTourId && tourStops.length > 0) {
+    const allDone = tourStops.every(s => s.done);
+    if (allDone) {
+      await supabaseClient
+        .from('tours')
+        .update({ status: 'erledigt' })
+        .eq('id', currentSupabaseTourId);
+    }
+  }
+
+  tourStops = [];
+  currentStopIndex = 0;
+  currentSupabaseTourId = null;
+  loadedChefStops = [];
+
   clearPhotoGallery();
+  document.getElementById('addressInput').value = '';
   document.getElementById('setup-view').style.display = 'block';
   document.getElementById('tour-view').style.display = 'none';
-  loadTourHistory();
+  await loadTourHistory();
 }
 
 function showModal(title, body) {
