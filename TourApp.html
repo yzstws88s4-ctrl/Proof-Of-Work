@@ -327,7 +327,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="proof-gallery-container" id="galleryGrid"></div>
     </div>
 
-    <!-- DIE ZWEI ANENGEFORDERTEN BUTTONS -->
+    <!-- DIE ZWEI ANGEFORDERTEN BUTTONS -->
     <button class="btn-success" style="margin-top: 24px;" id="finishTourBtn" onclick="finishAndSaveTour()">
       🏁 Tour beenden & Speichern
     </button>
@@ -348,6 +348,19 @@ input:checked + .slider:before { transform: translateX(20px); }
       <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 280px; object-fit: contain;">
     </div>
     <button class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()">Bestätigen & Weiter</button>
+  </div>
+</div>
+
+<!-- NOTIZ EDITIEREN MODAL (FÜR DIREKTEN KLICK AUF STOPP-LISTE) -->
+<div class="modal-overlay" id="noteEditModal">
+  <div class="modal-box">
+    <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;" id="noteModalTitle">Notiz eingeben</div>
+    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;" id="noteModalSub">Stopp-Details</div>
+    <textarea id="noteModalInput" placeholder="z. B. Tonne stand hinter dem Tor, Abgabe beim Nachbarn..."></textarea>
+    <div style="display: flex; gap: 10px;">
+      <button class="btn-success" style="margin-bottom:0;" onclick="saveStopNoteFromModal()">Speichern</button>
+      <button class="btn-secondary" style="margin-bottom:0;" onclick="closeNoteModal()">Abbrechen</button>
+    </div>
   </div>
 </div>
 
@@ -384,6 +397,7 @@ let currentGPSCoords = "GPS wird ermittelt...";
 
 let tempCapturedFile = null;
 let tempCanvasBlob = null;
+let editingStopIndex = null;
 
 window.onload = async () => {
   const { data: { session } } = await supabaseClient.auth.getSession();
@@ -496,12 +510,46 @@ function renderTourUI() {
     const item = document.createElement('div');
     const isActive = idx === currentStopIndex && !stop.done;
     item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
+    
+    // Bei Klick auf Stopp in der Liste Notiz-Modal öffnen
+    item.onclick = () => openNoteModal(idx);
+
     item.innerHTML = `
-      <div class="stop-name"><strong>#${idx + 1}</strong> ${stop.address}</div>
-      <div style="font-size: 12px; color: var(--text-muted);">${stop.done ? '✓ Erledigt' : 'Offen'}</div>
+      <div class="stop-name">
+        <strong>#${idx + 1}</strong> ${stop.address}
+        ${stop.notes ? `<div style="font-size: 11px; color: var(--primary); font-weight: normal; margin-top: 2px;">📝 ${stop.notes}</div>` : ''}
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted); text-align: right;">
+        ${stop.done ? '✓ Erledigt' : 'Offen'}<br>
+        <span style="font-size: 10px; color: var(--primary);">Notiz ✏️</span>
+      </div>
     `;
     container.appendChild(item);
   });
+}
+
+/* NOTIZ MODAL STEUERUNG */
+function openNoteModal(index) {
+  editingStopIndex = index;
+  const stop = tourStops[index];
+  document.getElementById('noteModalTitle').innerText = `Notiz zu Stopp #${index + 1}`;
+  document.getElementById('noteModalSub').innerText = stop.address;
+  document.getElementById('noteModalInput').value = stop.notes || '';
+  document.getElementById('noteEditModal').style.display = 'flex';
+}
+
+function saveStopNoteFromModal() {
+  if (editingStopIndex !== null && tourStops[editingStopIndex]) {
+    const text = document.getElementById('noteModalInput').value.trim();
+    tourStops[editingStopIndex].notes = text;
+    renderTourUI();
+  }
+  closeNoteModal();
+}
+
+function closeNoteModal() {
+  editingStopIndex = null;
+  document.getElementById('noteEditModal').style.display = 'none';
 }
 
 function triggerCompleteStop() {
@@ -518,6 +566,15 @@ async function handleProofCapture(event) {
   const file = event.target.files[0];
   if (!file) return;
   tempCapturedFile = file;
+
+  // Vorbelegung der Notiz aus der Listenansicht (falls vorher schon eine eingegeben wurde)
+  const current = tourStops[currentStopIndex];
+  if (current && current.notes) {
+    document.getElementById('modalProofNoteInput').value = current.notes;
+  } else {
+    document.getElementById('modalProofNoteInput').value = '';
+  }
+
   await refreshStampPreview();
   document.getElementById('proofPreviewModal').style.display = 'flex';
   event.target.value = '';
@@ -598,7 +655,7 @@ function completeCurrentStop(localUrl, blob, noteText = '') {
   if (!current) return;
 
   current.done = true;
-  current.notes = noteText;
+  if (noteText) current.notes = noteText;
   current.blob = blob;
   current.photo_url = localUrl;
 
@@ -610,7 +667,7 @@ function completeCurrentStop(localUrl, blob, noteText = '') {
       <img src="${localUrl}">
       <div class="proof-item-info">
         <strong>Stopp #${currentStopIndex + 1}: ${current.address}</strong>
-        ${noteText ? `<span>📝 ${noteText}</span>` : ''}
+        ${current.notes ? `<span>📝 ${current.notes}</span>` : ''}
       </div>
     `;
     gallery.prepend(card);
