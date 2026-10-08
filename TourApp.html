@@ -130,18 +130,18 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   font-size: 14px;
 }
 
-/* Prominenter Navigationsbutton (ca. doppelt so groß) */
+/* Prominenter Navigationsbutton */
 .btn-navigate {
-  min-height: 80px;            /* Höhe deutlich erhöht (vorher 56px) */
-  font-size: 22px;             /* Größere Schrift (vorher 16px) */
-  padding: 20px 24px;          /* Viel mehr Innenabstand oben/unten & seitlich */
+  min-height: 80px;
+  font-size: 22px;
+  padding: 20px 24px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   background-color: var(--primary);
   color: #ffffff;
-  border-radius: 16px;         /* Etwas stärker abgerundete Ecken für die neue Größe */
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35); /* Etwas prägnanterer Schatten */
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
   margin-bottom: 20px;
 }
 
@@ -356,7 +356,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="gps-status" id="gpsStatusText">GPS wird initialisiert...</div>
     </div>
 
-    <!-- PROMINENTER NAVIGATION S-BUTTON -->
+    <!-- PROMINENTER NAVIGATIONS-BUTTON -->
     <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
       <svg class="icon-svg" style="width:20px; height:20px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       JETZT NAVIGIEREN
@@ -479,6 +479,20 @@ window.onload = async () => {
   initGPS();
   await loadTourHistory();
 };
+
+function toggleTheme() {
+  const body = document.body;
+  if (body.getAttribute('data-theme') === 'dark') {
+    body.removeAttribute('data-theme');
+  } else {
+    body.setAttribute('data-theme', 'dark');
+  }
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  window.location.href = 'Login.html';
+}
 
 function initGPS() {
   if ("geolocation" in navigator) {
@@ -635,10 +649,22 @@ function closeNoteModal() {
 function triggerCompleteStop() {
   if (currentStopIndex >= tourStops.length) return;
   const isProofRequired = document.getElementById('photoProofToggle').checked;
+  const current = tourStops[currentStopIndex];
+
   if (isProofRequired) {
-    document.getElementById('proofCameraInput').click();
+    const hasPhoto = current.photo_url || current.blob;
+    if (hasPhoto) {
+      const takeNew = confirm("Ein Fotobeweis ist für diesen Stopp bereits vorhanden.\n\nKlicke 'OK' um den Stopp direkt abzuschließen, oder 'Abbrechen' um ein neues Foto aufzunehmen.");
+      if (takeNew) {
+        completeCurrentStop(current.photo_url, current.blob, current.notes || '');
+      } else {
+        document.getElementById('proofCameraInput').click();
+      }
+    } else {
+      document.getElementById('proofCameraInput').click();
+    }
   } else {
-    completeCurrentStop(null, null, tourStops[currentStopIndex].notes || '');
+    completeCurrentStop(current.photo_url || null, current.blob || null, current.notes || '');
   }
 }
 
@@ -736,7 +762,7 @@ function completeCurrentStop(localUrl, blob, noteText = '') {
   current.done = true;
   if (noteText) current.notes = noteText;
   current.blob = blob;
-  current.photo_url = localUrl;
+  if (localUrl) current.photo_url = localUrl;
 
   if (localUrl) {
     const gallery = document.getElementById('galleryGrid');
@@ -928,16 +954,6 @@ function showModal(title, body) {
 
 function closeModal() {
   document.getElementById('customModal').style.display = 'none';
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  document.documentElement.setAttribute('data-theme', current === 'dark' ? '' : 'dark');
-}
-
-async function logout() {
-  await supabaseClient.auth.signOut();
-  window.location.href = 'Login.html';
 }
 </script>
 </body>
