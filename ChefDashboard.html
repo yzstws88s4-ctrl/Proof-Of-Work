@@ -169,6 +169,26 @@ input[type="text"], input[type="password"], input[type="date"], input[type="emai
   font-family: inherit;
   font-size: 14px;
   margin-bottom: 12px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* FIX FÜR MOBILE DATUMSFELDER (iOS/Safari Fix) */
+input[type="date"] {
+  min-height: 46px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1.2em;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.5);
 }
 
 button {
