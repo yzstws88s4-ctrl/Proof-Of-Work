@@ -14,6 +14,7 @@
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --success: #10b981;
+  --success-hover: #059669;
   --danger: #ef4444;
 
   --bg: #f8fafc;
@@ -57,7 +58,7 @@ body {
   margin-bottom: 20px;
 }
 
-.title { font-size: 20px; font-weight: 700; margin: 0; }
+.title { font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
 .driver-badge { font-size: 13px; color: var(--primary); font-weight: 600; }
 
 .header-actions { display: flex; gap: 8px; }
@@ -78,7 +79,7 @@ body {
 }
 
 .theme-toggle-btn { width: 40px; padding: 0; }
-.theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
+.theme-toggle-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
 .card {
   background: var(--card);
@@ -104,17 +105,44 @@ button, .nav-link-btn {
   margin-bottom: 12px;
   text-decoration: none;
   box-sizing: border-box;
+  transition: background-color 0.15s, opacity 0.15s;
 }
 
-button:disabled { opacity: 0.6; cursor: not-allowed; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-primary { background-color: var(--primary); color: white; }
+.btn-primary:hover { background-color: var(--primary-hover); }
 .btn-success { background-color: var(--success); color: white; }
+.btn-success:hover { background-color: var(--success-hover); }
 .btn-danger { background-color: var(--danger); color: white; }
 .btn-secondary { background-color: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
 
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .btn-grid button { margin-bottom: 0; padding: 12px 8px; font-size: 14px; }
+
+/* Spezielles Layout für die Buttons der Touransicht */
+.action-nav-btn {
+  min-height: 54px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+}
+
+.split-action-row {
+  display: grid;
+  grid-template-columns: 22% 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.split-action-row button {
+  margin-bottom: 0;
+  min-height: 52px;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px 8px;
+}
 
 textarea, input[type="text"] {
   width: 100%;
@@ -176,9 +204,9 @@ input:checked + .slider:before { transform: translateX(20px); }
   text-align: center;
 }
 
-.dest-label { font-size: 12px; text-transform: uppercase; color: var(--primary); font-weight: 700; }
+.dest-label { font-size: 11px; text-transform: uppercase; color: var(--primary); font-weight: 700; letter-spacing: 0.05em; }
 .dest-text { font-size: 18px; font-weight: 700; margin-top: 6px; word-break: break-word; }
-.gps-status { font-size: 12px; color: var(--success); margin-top: 8px; }
+.gps-status { font-size: 12px; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
 
 .stop-list {
   max-height: 250px;
@@ -201,7 +229,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .stop-item:last-child { border-bottom: none; }
-.stop-item.done { opacity: 0.6; }
+.stop-item.done { opacity: 0.55; }
 .stop-item.done .stop-name { text-decoration: line-through; }
 .stop-item.active { background: var(--card); font-weight: 600; color: var(--primary); }
 
@@ -214,8 +242,8 @@ input:checked + .slider:before { transform: translateX(20px); }
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
   z-index: 999;
   align-items: center;
   justify-content: center;
@@ -225,7 +253,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 .modal-box {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 20px;
   width: 100%;
   max-width: 480px;
@@ -261,8 +289,8 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="card" id="setup-view">
     <div style="font-weight: 600; margin-bottom: 12px; font-size: 14px;">Neue Tour erstellen oder einlesen</div>
     <div class="btn-grid">
-      <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">📷 Kamera (OCR)</button>
-      <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">📁 Aus Galerie</button>
+      <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">Kamera (OCR)</button>
+      <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">Aus Galerie</button>
     </div>
 
     <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
@@ -286,7 +314,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <option value="apple">Apple Maps</option>
     </select>
 
-    <button class="btn-primary" onclick="loadSupabaseTour()" style="margin-bottom: 10px;">🔄 Live-Tour vom Chef laden</button>
+    <button class="btn-primary" onclick="loadSupabaseTour()" style="margin-bottom: 10px;">Live-Tour vom Chef laden</button>
     <button class="btn-success" onclick="startManualTour()">Tour starten</button>
 
     <!-- ARCHIV VERGANGENER TOUREN -->
@@ -303,36 +331,43 @@ input:checked + .slider:before { transform: translateX(20px); }
     <div class="current-destination">
       <div class="dest-label" id="stopCounter">Stopp 1</div>
       <div class="dest-text" id="currentStopText">Lade Stopps...</div>
-      <div class="gps-status" id="gpsStatusText">📍 GPS wird initialisiert...</div>
+      <div class="gps-status" id="gpsStatusText">GPS wird initialisiert...</div>
     </div>
 
-    <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-primary" style="padding: 16px; font-size: 16px;">
-      🚀 JETZT NAVIGIEREN
+    <!-- HAUPT-BUTTON: JETZT NAVIGIEREN -->
+    <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-primary action-nav-btn">
+      JETZT NAVIGIEREN
     </a>
 
     <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
 
-    <button class="btn-success" id="manualCompleteBtn" onclick="triggerCompleteStop()">
-      Ankunft bestätigen / Nächster Stopp
-    </button>
+    <!-- ZWEIGETEILTE AKTIONSLEISTE (20% ZURÜCK / 80% WEITER) -->
+    <div class="split-action-row">
+      <button class="btn-secondary" id="prevStopBtn" onclick="previousStop()" title="Vorheriger Stopp">
+        Zurück
+      </button>
+      <button class="btn-success" id="manualCompleteBtn" onclick="triggerCompleteStop()">
+        Weiter / Ankunft bestätigen
+      </button>
+    </div>
 
-    <div style="margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">
+    <div style="margin-top: 16px; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
       Tourübersicht (Tippen für Notizen)
     </div>
     <div class="stop-list" id="stopListContainer"></div>
 
     <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
-      <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+      <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
         Erfasste Fotobeweise (<span id="photoCount">0</span>)
       </div>
       <div class="proof-gallery-container" id="galleryGrid"></div>
     </div>
 
     <button class="btn-success" style="margin-top: 24px;" id="finishTourBtn" onclick="finishAndSaveTour()">
-      🏁 Tour beenden & Speichern
+      Tour beenden & Speichern
     </button>
     <button class="btn-secondary" style="margin-top: 8px;" onclick="cancelAndReturn()">
-      ⬅ Zurück (ohne Speichern)
+      Zurück zum Hauptmenü (ohne Speichern)
     </button>
   </div>
 </div>
@@ -426,11 +461,11 @@ function initGPS() {
     navigator.geolocation.watchPosition(
       (pos) => {
         currentGPSCoords = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-        document.getElementById('gpsStatusText').innerText = `📍 GPS Aktiv (${currentGPSCoords})`;
+        document.getElementById('gpsStatusText').innerText = `GPS Aktiv (${currentGPSCoords})`;
       },
       () => {
         currentGPSCoords = "GPS nicht verfügbar";
-        document.getElementById('gpsStatusText').innerText = "⚠ GPS deaktiviert";
+        document.getElementById('gpsStatusText').innerText = "GPS deaktiviert";
       },
       { enableHighAccuracy: true }
     );
@@ -488,6 +523,12 @@ function renderTourUI() {
   container.innerHTML = '';
 
   const current = tourStops[currentStopIndex];
+  const prevBtn = document.getElementById('prevStopBtn');
+
+  // Zurück-Button aktivieren/deaktivieren je nach Stopp-Index
+  if (prevBtn) {
+    prevBtn.disabled = (currentStopIndex === 0);
+  }
 
   if (current && !current.done) {
     document.getElementById('stopCounter').innerText = `Stopp ${currentStopIndex + 1} von ${tourStops.length}`;
@@ -501,8 +542,8 @@ function renderTourUI() {
     document.getElementById('navDirectBtn').href = navUrl;
     document.getElementById('navDirectBtn').style.display = 'flex';
   } else {
-    document.getElementById('stopCounter').innerText = "Geschafft!";
-    document.getElementById('currentStopText').innerText = "🎉 Alle Stopps erledigt!";
+    document.getElementById('stopCounter').innerText = "Status";
+    document.getElementById('currentStopText').innerText = "Alle Stopps erledigt";
     document.getElementById('navDirectBtn').style.display = 'none';
   }
 
@@ -511,7 +552,6 @@ function renderTourUI() {
     const isActive = idx === currentStopIndex && !stop.done;
     item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
     
-    // Klick-Event direkt auf dem Div definieren
     item.onclick = function() {
       openNoteModal(idx);
     };
@@ -519,15 +559,24 @@ function renderTourUI() {
     item.innerHTML = `
       <div class="stop-name" style="pointer-events: none;">
         <strong>#${idx + 1}</strong> ${stop.address}
-        ${stop.notes ? `<div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 4px;">📝 ${stop.notes}</div>` : ''}
+        ${stop.notes ? `<div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 4px;">Notiz: ${stop.notes}</div>` : ''}
       </div>
       <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 80px;">
-        ${stop.done ? '✓ Erledigt' : 'Offen'}<br>
-        <span style="font-size: 11px; color: var(--primary); font-weight: 700; text-decoration: underline;">Notiz ✏️</span>
+        ${stop.done ? 'Erledigt' : 'Offen'}<br>
+        <span style="font-size: 11px; color: var(--primary); font-weight: 600; text-decoration: underline;">Notiz bearbeiten</span>
       </div>
     `;
     container.appendChild(item);
   });
+}
+
+function previousStop() {
+  if (currentStopIndex > 0) {
+    currentStopIndex--;
+    // Vorherigen Stopp wieder als unvollständig markieren
+    tourStops[currentStopIndex].done = false;
+    renderTourUI();
+  }
 }
 
 function openNoteModal(index) {
@@ -620,7 +669,7 @@ function refreshStampPreview() {
         const boxH = (lines.length * fontSize * 1.3) + padding;
         const yPos = canvas.height - boxH - padding;
 
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
         ctx.fillRect(padding, yPos, boxW, boxH);
 
         lines.forEach((line, i) => {
@@ -673,7 +722,7 @@ function completeCurrentStop(localUrl, blob, noteText = '') {
       <img src="${localUrl}">
       <div class="proof-item-info">
         <strong>Stopp #${currentStopIndex + 1}: ${current.address}</strong>
-        ${current.notes ? `<span>📝 ${current.notes}</span>` : ''}
+        ${current.notes ? `<span>Notiz: ${current.notes}</span>` : ''}
       </div>
     `;
     gallery.prepend(card);
@@ -689,7 +738,7 @@ function completeCurrentStop(localUrl, blob, noteText = '') {
 async function finishAndSaveTour() {
   const btn = document.getElementById('finishTourBtn');
   btn.disabled = true;
-  btn.innerText = "⏳ Speichere Tour in Supabase...";
+  btn.innerText = "Speichere Tour in Supabase...";
 
   try {
     let tourId = currentSupabaseTourId;
@@ -754,7 +803,7 @@ async function finishAndSaveTour() {
     alert("Fehler beim Speichern: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerText = "🏁 Tour beenden & Speichern";
+    btn.innerText = "Tour beenden & Speichern";
   }
 }
 
@@ -819,7 +868,7 @@ function openTourDetails(tour, number) {
       box.innerHTML = `
         <strong>Stopp #${s.sequence}: ${s.address}</strong><br>
         <span style="color:var(--text-muted);">Status: ${s.status}</span>
-        ${s.notes ? `<br><span style="color:var(--primary); font-weight:600;">📝 Notiz: ${s.notes}</span>` : ''}
+        ${s.notes ? `<br><span style="color:var(--primary); font-weight:600;">Notiz: ${s.notes}</span>` : ''}
         ${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:8px; margin-top:8px; max-height:180px; object-fit:cover;">` : ''}
       `;
       container.appendChild(box);
