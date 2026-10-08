@@ -130,18 +130,19 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   font-size: 14px;
 }
 
-/* Prominenter Navigationsbutton */
+/* Prominenter Navigationsbutton (ca. doppelt so groß) */
 .btn-navigate {
-  min-height: 68px;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  min-height: 80px;            /* Höhe deutlich erhöht (vorher 56px) */
+  font-size: 22px;             /* Größere Schrift (vorher 16px) */
+  padding: 20px 24px;          /* Viel mehr Innenabstand oben/unten & seitlich */
+  font-weight: 800;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   background-color: var(--primary);
   color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-  margin-bottom: 16px;
+  border-radius: 16px;         /* Etwas stärker abgerundete Ecken für die neue Größe */
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35); /* Etwas prägnanterer Schatten */
+  margin-bottom: 20px;
 }
 
 textarea, input[type="text"] {
