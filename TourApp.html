@@ -562,7 +562,6 @@ function renderTourUI() {
 
   const current = tourStops[currentStopIndex];
 
-  // Vorheriger Stopp Button Deaktivieren/Aktivieren
   const prevBtn = document.getElementById('prevStopBtn');
   if (prevBtn) {
     prevBtn.disabled = (currentStopIndex <= 0);
@@ -611,7 +610,6 @@ function renderTourUI() {
 function previousStop() {
   if (currentStopIndex > 0) {
     currentStopIndex--;
-    // Setze den zurückgesetzten Stopp wieder auf unerledigt
     tourStops[currentStopIndex].done = false;
     renderTourUI();
   }
@@ -935,20 +933,30 @@ function closeDetailModal() {
 async function handleOcrImage(event) {
   const file = event.target.files[0];
   if (!file) return;
-  showModal("OCR Scan", "Scanner liest Adressen...");
+
+  showModal("OCR Erkennung", "Bild wird analysiert, bitte einen Moment Geduld...");
+
   try {
-    const res = await Tesseract.recognize(file, 'deu');
-    const lines = res.data.text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 3);
-    document.getElementById('addressInput').value = lines.join('\n');
-    closeModal();
+    const worker = await Tesseract.createWorker('deu');
+    const ret = await worker.recognize(file);
+    await worker.terminate();
+
+    const text = ret.data.text;
+    if (text) {
+      const existing = document.getElementById('addressInput').value;
+      document.getElementById('addressInput').value = existing ? existing + '\n' + text : text;
+      showModal("Erfolg", "Text erfolgreich aus Bild extrahiert und eingefügt!");
+    } else {
+      showModal("Hinweis", "Es konnte kein Text im Bild erkannt werden.");
+    }
   } catch (err) {
-    showModal("Fehler", "OCR fehlgeschlagen.");
+    showModal("Fehler", "OCR-Fehler: " + err.message);
   }
 }
 
-function showModal(title, body) {
+function showModal(title, bodyText) {
   document.getElementById('modalTitle').innerText = title;
-  document.getElementById('modalBody').innerText = body;
+  document.getElementById('modalBody').innerText = bodyText;
   document.getElementById('customModal').style.display = 'flex';
 }
 
