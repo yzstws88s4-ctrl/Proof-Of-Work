@@ -14,7 +14,6 @@
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --success: #10b981;
-  --success-hover: #059669;
   --danger: #ef4444;
 
   --bg: #f8fafc;
@@ -79,7 +78,7 @@ body {
 }
 
 .theme-toggle-btn { width: 40px; padding: 0; }
-.theme-toggle-btn svg { width: 18px; height: 18px; fill: currentColor; }
+.theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
 .card {
   background: var(--card);
@@ -105,43 +104,44 @@ button, .nav-link-btn {
   margin-bottom: 12px;
   text-decoration: none;
   box-sizing: border-box;
-  transition: background-color 0.15s, opacity 0.15s;
 }
 
-button:disabled { opacity: 0.5; cursor: not-allowed; }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-primary { background-color: var(--primary); color: white; }
 .btn-primary:hover { background-color: var(--primary-hover); }
 .btn-success { background-color: var(--success); color: white; }
-.btn-success:hover { background-color: var(--success-hover); }
 .btn-danger { background-color: var(--danger); color: white; }
 .btn-secondary { background-color: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
 
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .btn-grid button { margin-bottom: 0; padding: 12px 8px; font-size: 14px; }
 
-/* Spezielles Layout für die Buttons der Touransicht */
-.action-nav-btn {
-  min-height: 54px;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  margin-bottom: 12px;
-}
-
-.split-action-row {
+/* 20% / 80% Action Bar Layout */
+.stop-actions-grid {
   display: grid;
-  grid-template-columns: 22% 1fr;
-  gap: 10px;
+  grid-template-columns: 22% 75%;
+  gap: 3%;
   margin-bottom: 16px;
 }
-
-.split-action-row button {
+.stop-actions-grid button {
   margin-bottom: 0;
-  min-height: 52px;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 12px 8px;
+  height: 52px;
+  font-size: 14px;
+}
+
+/* Prominenter Navigationsbutton */
+.btn-navigate {
+  min-height: 56px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background-color: var(--primary);
+  color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  margin-bottom: 16px;
 }
 
 textarea, input[type="text"] {
@@ -204,9 +204,9 @@ input:checked + .slider:before { transform: translateX(20px); }
   text-align: center;
 }
 
-.dest-label { font-size: 11px; text-transform: uppercase; color: var(--primary); font-weight: 700; letter-spacing: 0.05em; }
+.dest-label { font-size: 12px; text-transform: uppercase; color: var(--primary); font-weight: 700; letter-spacing: 0.05em; }
 .dest-text { font-size: 18px; font-weight: 700; margin-top: 6px; word-break: break-word; }
-.gps-status { font-size: 12px; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
+.gps-status { font-size: 12px; color: var(--success); margin-top: 8px; font-weight: 500; }
 
 .stop-list {
   max-height: 250px;
@@ -229,7 +229,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .stop-item:last-child { border-bottom: none; }
-.stop-item.done { opacity: 0.55; }
+.stop-item.done { opacity: 0.6; }
 .stop-item.done .stop-name { text-decoration: line-through; }
 .stop-item.active { background: var(--card); font-weight: 600; color: var(--primary); }
 
@@ -242,8 +242,8 @@ input:checked + .slider:before { transform: translateX(20px); }
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
   z-index: 999;
   align-items: center;
   justify-content: center;
@@ -253,7 +253,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 .modal-box {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 20px;
   width: 100%;
   max-width: 480px;
@@ -266,6 +266,18 @@ input:checked + .slider:before { transform: translateX(20px); }
   padding: 12px;
   margin-bottom: 10px;
   cursor: pointer;
+}
+
+.icon-svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: inline-block;
+  vertical-align: middle;
 }
 </style>
 </head>
@@ -289,8 +301,14 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="card" id="setup-view">
     <div style="font-weight: 600; margin-bottom: 12px; font-size: 14px;">Neue Tour erstellen oder einlesen</div>
     <div class="btn-grid">
-      <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">Kamera (OCR)</button>
-      <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">Aus Galerie</button>
+      <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Kamera (OCR)
+      </button>
+      <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Aus Galerie
+      </button>
     </div>
 
     <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
@@ -314,7 +332,10 @@ input:checked + .slider:before { transform: translateX(20px); }
       <option value="apple">Apple Maps</option>
     </select>
 
-    <button class="btn-primary" onclick="loadSupabaseTour()" style="margin-bottom: 10px;">Live-Tour vom Chef laden</button>
+    <button class="btn-primary" onclick="loadSupabaseTour()" style="margin-bottom: 10px;">
+      <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Live-Tour vom Chef laden
+    </button>
     <button class="btn-success" onclick="startManualTour()">Tour starten</button>
 
     <!-- ARCHIV VERGANGENER TOUREN -->
@@ -334,30 +355,32 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="gps-status" id="gpsStatusText">GPS wird initialisiert...</div>
     </div>
 
-    <!-- HAUPT-BUTTON: JETZT NAVIGIEREN -->
-    <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-primary action-nav-btn">
+    <!-- PROMINENTER NAVIGATION S-BUTTON -->
+    <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
+      <svg class="icon-svg" style="width:20px; height:20px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       JETZT NAVIGIEREN
     </a>
 
     <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
 
-    <!-- ZWEIGETEILTE AKTIONSLEISTE (20% ZURÜCK / 80% WEITER) -->
-    <div class="split-action-row">
+    <!-- 20% / 80% LAYOUT -->
+    <div class="stop-actions-grid">
       <button class="btn-secondary" id="prevStopBtn" onclick="previousStop()" title="Vorheriger Stopp">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         Zurück
       </button>
       <button class="btn-success" id="manualCompleteBtn" onclick="triggerCompleteStop()">
-        Weiter / Ankunft bestätigen
+        Ankunft bestätigen / Nächster Stopp
       </button>
     </div>
 
-    <div style="margin-top: 16px; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
+    <div style="margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
       Tourübersicht (Tippen für Notizen)
     </div>
     <div class="stop-list" id="stopListContainer"></div>
 
     <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
-      <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
+      <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
         Erfasste Fotobeweise (<span id="photoCount">0</span>)
       </div>
       <div class="proof-gallery-container" id="galleryGrid"></div>
@@ -367,7 +390,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       Tour beenden & Speichern
     </button>
     <button class="btn-secondary" style="margin-top: 8px;" onclick="cancelAndReturn()">
-      Zurück zum Hauptmenü (ohne Speichern)
+      Zurück (ohne Speichern)
     </button>
   </div>
 </div>
@@ -523,11 +546,11 @@ function renderTourUI() {
   container.innerHTML = '';
 
   const current = tourStops[currentStopIndex];
-  const prevBtn = document.getElementById('prevStopBtn');
 
-  // Zurück-Button aktivieren/deaktivieren je nach Stopp-Index
+  // Vorheriger Stopp Button Deaktivieren/Aktivieren
+  const prevBtn = document.getElementById('prevStopBtn');
   if (prevBtn) {
-    prevBtn.disabled = (currentStopIndex === 0);
+    prevBtn.disabled = (currentStopIndex <= 0);
   }
 
   if (current && !current.done) {
@@ -542,8 +565,8 @@ function renderTourUI() {
     document.getElementById('navDirectBtn').href = navUrl;
     document.getElementById('navDirectBtn').style.display = 'flex';
   } else {
-    document.getElementById('stopCounter').innerText = "Status";
-    document.getElementById('currentStopText').innerText = "Alle Stopps erledigt";
+    document.getElementById('stopCounter').innerText = "Geschafft!";
+    document.getElementById('currentStopText').innerText = "Alle Stopps erledigt!";
     document.getElementById('navDirectBtn').style.display = 'none';
   }
 
@@ -563,7 +586,7 @@ function renderTourUI() {
       </div>
       <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 80px;">
         ${stop.done ? 'Erledigt' : 'Offen'}<br>
-        <span style="font-size: 11px; color: var(--primary); font-weight: 600; text-decoration: underline;">Notiz bearbeiten</span>
+        <span style="font-size: 11px; color: var(--primary); font-weight: 700; text-decoration: underline;">Notiz bearbeiten</span>
       </div>
     `;
     container.appendChild(item);
@@ -573,7 +596,7 @@ function renderTourUI() {
 function previousStop() {
   if (currentStopIndex > 0) {
     currentStopIndex--;
-    // Vorherigen Stopp wieder als unvollständig markieren
+    // Setze den zurückgesetzten Stopp wieder auf unerledigt
     tourStops[currentStopIndex].done = false;
     renderTourUI();
   }
@@ -669,7 +692,7 @@ function refreshStampPreview() {
         const boxH = (lines.length * fontSize * 1.3) + padding;
         const yPos = canvas.height - boxH - padding;
 
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
         ctx.fillRect(padding, yPos, boxW, boxH);
 
         lines.forEach((line, i) => {
