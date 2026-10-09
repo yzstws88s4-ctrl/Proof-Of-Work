@@ -230,7 +230,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .stop-item:last-child { border-bottom: none; }
-.stop-item.done { opacity: 0.6; }
+.stop-item.done { opacity: 0.7; }
 .stop-item.done .stop-name { text-decoration: line-through; }
 .stop-item.active { background: var(--card); font-weight: 600; color: var(--primary); }
 
@@ -362,9 +362,9 @@ input:checked + .slider:before { transform: translateX(20px); }
       JETZT NAVIGIEREN
     </a>
 
-    <!-- Input für reguläre Fotoerfassung während der Tour -->
+    <!-- Input für reguläre Fotoerfassung beim regulären Stopp-Abschluss -->
     <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
-    <!-- Input speziell für das Ersetzen/Neuaufnehmen im Notiz-Modal -->
+    <!-- Input speziell für das Ändern/Neuaufnehmen im Notiz-/Stopp-Modal -->
     <input type="file" id="modalReplaceCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleModalReplaceCapture(event)">
 
     <!-- 20% / 80% LAYOUT -->
@@ -379,7 +379,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
 
     <div style="margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
-      Tourübersicht (Tippen für Notizen & Foto-Korrektur)
+      Tourübersicht (Tippen für Notizen & Foto-Optionen)
     </div>
     <div class="stop-list" id="stopListContainer"></div>
 
@@ -401,7 +401,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 <canvas id="proofCanvas" style="display:none;"></canvas>
 
-<!-- FOTO MODAL (BEIM ERSTEN ERFASSEN) -->
+<!-- FOTO MODAL (BEIM REGULÄREN ERFASSEN) -->
 <div class="modal-overlay" id="proofPreviewModal">
   <div class="modal-box">
     <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Fotobeweis erfasst</div>
@@ -413,7 +413,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
-<!-- NOTIZ EDITIEREN & FOTO KORRIGIEREN MODAL -->
+<!-- STOPP BEARBEITEN MODAL (NOTIZ + FOTO) -->
 <div class="modal-overlay" id="noteEditModal">
   <div class="modal-box" style="max-height: 85vh; overflow-y: auto;">
     <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;" id="noteModalTitle">Stopp bearbeiten</div>
@@ -421,10 +421,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     
     <textarea id="noteModalInput" placeholder="z. B. Tonne stand hinter dem Tor, Abgabe beim Nachbarn..."></textarea>
     
-    <!-- Button für separates Neufotografieren direkt im Modal -->
+    <!-- Button, um direkt aus der Adressliste heraus ein Foto aufzunehmen oder zu ersetzen -->
     <button class="btn-secondary" onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 12px;">
       <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Neues Foto für diesen Stopp aufnehmen
+      Foto aufnehmen / ersetzen
     </button>
 
     <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 12px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border);">
@@ -500,7 +500,7 @@ function toggleTheme() {
   if (body.getAttribute('data-theme') === 'dark') {
     body.removeAttribute('data-theme');
   } else {
-    body.removeAttribute('data-theme', 'dark');
+    body.setAttribute('data-theme', 'dark');
   }
 }
 
@@ -604,13 +604,15 @@ function renderTourUI() {
     const isActive = idx === currentStopIndex && !stop.done;
     item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
     
+    // Klick auf Listeneintrag öffnet das Bearbeiten-Modal für Notiz & Foto
     item.onclick = function() {
       openNoteModal(idx);
     };
 
+    const hasPhotoBadge = stop.photo_url ? ' 📷' : '';
     item.innerHTML = `
       <div class="stop-name" style="pointer-events: none;">
-        <strong>#${idx + 1}</strong> ${stop.address}
+        <strong>#${idx + 1}</strong> ${stop.address}${hasPhotoBadge}
         ${stop.notes ? `<div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 4px;">Notiz: ${stop.notes}</div>` : ''}
       </div>
       <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 80px;">
@@ -678,8 +680,8 @@ function triggerCompleteStop() {
   if (isProofRequired) {
     const hasPhoto = current.photo_url || current.blob;
     if (hasPhoto) {
-      // Wenn bereits ein Foto existiert (z.B. weil man zurückgesprungen ist), 
-      // OHNE Nachfrage einfach direkt abschließen und zum nächsten Stopp springen!
+      // Wenn bereits ein Foto existiert (z.B. durch Zurückspringen), 
+      // OHNE Nachfrage oder Kamera direkt weitergehen!
       completeCurrentStop(current.photo_url, current.blob, current.notes || '');
     } else {
       document.getElementById('proofCameraInput').click();
@@ -706,14 +708,13 @@ async function handleProofCapture(event) {
   event.target.value = '';
 }
 
-// Handler speziell für das Neufotografieren im Notiz-Modal
+// Handler für Direkt-Fotoaufnahme aus dem Stopp-Bearbeiten-Modal
 async function handleModalReplaceCapture(event) {
   const file = event.target.files[0];
   if (!file || editingStopIndex === null) return;
   
   const stop = tourStops[editingStopIndex];
   
-  // Bild mit Stempel versehen
   const reader = new FileReader();
   reader.onload = (e) => {
     const img = new Image();
@@ -757,6 +758,7 @@ async function handleModalReplaceCapture(event) {
         const localUrl = URL.createObjectURL(blob);
         stop.blob = blob;
         stop.photo_url = localUrl;
+        stop.done = true; // Direkt als erledigt markieren
 
         // Vorschau im Modal aktualisieren
         const imgPrevContainer = document.getElementById('modalStopPhotoPreviewContainer');
@@ -764,6 +766,7 @@ async function handleModalReplaceCapture(event) {
         imgPrev.src = localUrl;
         imgPrevContainer.style.display = 'block';
 
+        updateGalleryGrid();
         renderTourUI();
       }, 'image/jpeg', 0.88);
     };
@@ -852,7 +855,6 @@ function completeCurrentStop(localUrl, blob, noteText = '') {
   if (blob) current.blob = blob;
   if (localUrl) current.photo_url = localUrl;
 
-  // Galerie-Anzeige aktualisieren
   updateGalleryGrid();
 
   if (currentStopIndex < tourStops.length) {
