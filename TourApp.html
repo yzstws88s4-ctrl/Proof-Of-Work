@@ -588,7 +588,7 @@ function renderTourUI() {
 
     const mapType = document.getElementById('mapAppSelect').value;
     const navUrl = mapType === 'apple' 
-      ? `http://maps.apple.com/?daddr=${encodeURIComponent(current.address)}&dirflg=d&t=m`
+      ? `http://maps.apple.com/?saddr=Current+Location&daddr=${encodeURIComponent(current.address)}&dirflg=d`
       : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(current.address)}&travelmode=driving&dir_action=navigate`;
 
     document.getElementById('navDirectBtn').href = navUrl;
