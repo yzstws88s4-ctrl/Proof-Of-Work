@@ -25,7 +25,7 @@
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-[data-theme="dark"] {
+html[data-theme="dark"] {
   --bg: #0f172a;
   --card: #1e293b;
   --text: #f8fafc;
@@ -496,11 +496,11 @@ window.onload = async () => {
 };
 
 function toggleTheme() {
-  const body = document.body;
-  if (body.getAttribute('data-theme') === 'dark') {
-    body.removeAttribute('data-theme');
+  const htmlEl = document.documentElement;
+  if (htmlEl.getAttribute('data-theme') === 'dark') {
+    htmlEl.removeAttribute('data-theme');
   } else {
-    body.setAttribute('data-theme', 'dark');
+    htmlEl.setAttribute('data-theme', 'dark');
   }
 }
 
@@ -588,7 +588,7 @@ function renderTourUI() {
 
     const mapType = document.getElementById('mapAppSelect').value;
     const navUrl = mapType === 'apple' 
-      ? `http://maps.apple.com/?daddr=${encodeURIComponent(current.address)}&dirflg=d`
+      ? `http://maps.apple.com/?daddr=${encodeURIComponent(current.address)}&dirflg=d&t=m`
       : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(current.address)}&travelmode=driving&dir_action=navigate`;
 
     document.getElementById('navDirectBtn').href = navUrl;
@@ -604,7 +604,6 @@ function renderTourUI() {
     const isActive = idx === currentStopIndex && !stop.done;
     item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
     
-    // Klick auf Listeneintrag öffnet das Bearbeiten-Modal für Notiz & Foto
     item.onclick = function() {
       openNoteModal(idx);
     };
@@ -680,8 +679,6 @@ function triggerCompleteStop() {
   if (isProofRequired) {
     const hasPhoto = current.photo_url || current.blob;
     if (hasPhoto) {
-      // Wenn bereits ein Foto existiert (z.B. durch Zurückspringen), 
-      // OHNE Nachfrage oder Kamera direkt weitergehen!
       completeCurrentStop(current.photo_url, current.blob, current.notes || '');
     } else {
       document.getElementById('proofCameraInput').click();
@@ -708,7 +705,6 @@ async function handleProofCapture(event) {
   event.target.value = '';
 }
 
-// Handler für Direkt-Fotoaufnahme aus dem Stopp-Bearbeiten-Modal
 async function handleModalReplaceCapture(event) {
   const file = event.target.files[0];
   if (!file || editingStopIndex === null) return;
@@ -758,9 +754,8 @@ async function handleModalReplaceCapture(event) {
         const localUrl = URL.createObjectURL(blob);
         stop.blob = blob;
         stop.photo_url = localUrl;
-        stop.done = true; // Direkt als erledigt markieren
+        stop.done = true;
 
-        // Vorschau im Modal aktualisieren
         const imgPrevContainer = document.getElementById('modalStopPhotoPreviewContainer');
         const imgPrev = document.getElementById('modalStopPhotoImg');
         imgPrev.src = localUrl;
@@ -1037,8 +1032,6 @@ async function handleOcrImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  showModal("OCR Erkennung", "Bild wird analysiert, bitte einen Moment Geduld...");
-
   try {
     const worker = await Tesseract.createWorker('deu');
     const ret = await worker.recognize(file);
@@ -1048,12 +1041,9 @@ async function handleOcrImage(event) {
     if (text) {
       const existing = document.getElementById('addressInput').value;
       document.getElementById('addressInput').value = existing ? existing + '\n' + text : text;
-      showModal("Erfolg", "Text erfolgreich aus Bild extrahiert und eingefügt!");
-    } else {
-      showModal("Hinweis", "Es konnte kein Text im Bild erkannt werden.");
     }
   } catch (err) {
-    showModal("Fehler", "OCR-Fehler: " + err.message);
+    console.error("OCR-Fehler: " + err.message);
   }
 }
 
