@@ -604,6 +604,7 @@ function renderTourUI() {
     const isActive = idx === currentStopIndex && !stop.done;
     item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
     
+    // Klick auf Listeneintrag öffnet das Bearbeiten-Modal für Notiz & Foto
     item.onclick = function() {
       openNoteModal(idx);
     };
@@ -679,6 +680,8 @@ function triggerCompleteStop() {
   if (isProofRequired) {
     const hasPhoto = current.photo_url || current.blob;
     if (hasPhoto) {
+      // Wenn bereits ein Foto existiert (z.B. durch Zurückspringen), 
+      // OHNE Nachfrage oder Kamera direkt weitergehen!
       completeCurrentStop(current.photo_url, current.blob, current.notes || '');
     } else {
       document.getElementById('proofCameraInput').click();
@@ -705,6 +708,7 @@ async function handleProofCapture(event) {
   event.target.value = '';
 }
 
+// Handler für Direkt-Fotoaufnahme aus dem Stopp-Bearbeiten-Modal
 async function handleModalReplaceCapture(event) {
   const file = event.target.files[0];
   if (!file || editingStopIndex === null) return;
@@ -754,8 +758,9 @@ async function handleModalReplaceCapture(event) {
         const localUrl = URL.createObjectURL(blob);
         stop.blob = blob;
         stop.photo_url = localUrl;
-        stop.done = true;
+        stop.done = true; // Direkt als erledigt markieren
 
+        // Vorschau im Modal aktualisieren
         const imgPrevContainer = document.getElementById('modalStopPhotoPreviewContainer');
         const imgPrev = document.getElementById('modalStopPhotoImg');
         imgPrev.src = localUrl;
