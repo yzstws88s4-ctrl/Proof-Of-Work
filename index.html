@@ -13,6 +13,14 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest.json">
 
+  <!-- Sofortiges Laden des Dark Modes im Head, um jegliches Aufblitzen zu verhindern -->
+  <script>
+    if (!localStorage.getItem('veribase_theme')) {
+      localStorage.setItem('veribase_theme', 'dark');
+    }
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -42,6 +50,7 @@
       color: var(--text);
       margin: 0; padding: 20px;
       display: flex; justify-content: center; align-items: center; min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
     .login-container { width: 100%; max-width: 400px; position: relative; }
     .theme-toggle-btn {
@@ -57,6 +66,7 @@
       border-radius: 16px;
       padding: 28px;
       box-shadow: var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .title-group { text-align: center; margin-bottom: 24px; }
@@ -80,7 +90,7 @@
       background: var(--card);
     }
 
-    /* Der sanfte, geschwungene Lichtstreifen nur im Logo */
+    /* Der geschwungene Lichtstreifen (Ping-Pong-Effekt im Logo) */
     .logo-wrapper::after {
       content: '';
       position: absolute;
@@ -90,22 +100,23 @@
       height: 200%;
       background: linear-gradient(
         45deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.45) 50%,
-        transparent 60%
+        transparent 35%,
+        rgba(255, 255, 255, 0.65) 50%,
+        transparent 65%
       );
       transform: rotate(25deg);
       pointer-events: none;
     }
 
+    /* Sofortige Aktivierung der Ping-Pong-Animation */
     .logo-wrapper.glow-active::after {
-      animation: logoShineSweep 1.8s ease-in-out forwards;
+      animation: logoShinePingPong 1.4s ease-in-out forwards !important;
     }
 
-    @keyframes logoShineSweep {
+    @keyframes logoShinePingPong {
       0% { left: -150%; }
       50% { left: 100%; }
-      100% { left: 150%; }
+      100% { left: -150%; }
     }
 
     .title { font-size: 24px; font-weight: 700; margin: 0 0 6px 0; }
@@ -160,19 +171,26 @@
 
   function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme');
-    document.documentElement.setAttribute('data-theme', current === 'dark' ? '' : 'dark');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('veribase_theme', next);
   }
 
   async function handleLogin(e) {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     const errorMsg = document.getElementById('errorMsg');
+    const logoWrapper = document.getElementById('logoWrapper');
     
     let identifier = document.getElementById('username').value.trim().toLowerCase();
     const password = document.getElementById('password').value;
 
-    errorMsg.innerText = 'Prüfe Zugangsdaten...';
     btn.disabled = true;
+
+    // Animation SOFORT beim Klick starten, ohne Verzögerung
+    logoWrapper.classList.add('glow-active');
+    errorMsg.style.color = 'var(--primary)';
+    errorMsg.innerText = 'Anmeldung läuft...';
 
     if (!identifier.includes('@')) {
       identifier = `${identifier}@app.local`;
@@ -184,21 +202,19 @@
     });
 
     if (authError) {
+      logoWrapper.classList.remove('glow-active'); // Animation bei Fehler stoppen
+      errorMsg.style.color = '#ef4444';
       errorMsg.innerText = 'Login fehlgeschlagen: Zugangsdaten ungültig.';
       btn.disabled = false;
       return;
     }
 
-    // Sanfter, eleganter Glow-Effekt direkt auf dem Logo
-    const logoWrapper = document.getElementById('logoWrapper');
-    errorMsg.style.color = 'var(--primary)';
     errorMsg.innerText = 'Login erfolgreich!';
-    logoWrapper.classList.add('glow-active');
 
-    // Etwas längere Verzögerung (1,6 Sek.), damit der edle Effekt sauber durchlaufen kann
+    // Kurz warten, bis der Ping-Pong-Effekt sauber durchgelaufen ist, dann weiterleiten
     setTimeout(async () => {
       await redirectUser(authData.user.id);
-    }, 1600);
+    }, 1200);
   }
 
   async function redirectUser(userId) {
@@ -227,3 +243,4 @@
 
 </body>
 </html>
+
