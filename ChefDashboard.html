@@ -4,7 +4,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Proof Of Work - Chef Dashboard</title>
+<title>Veribase - Chef Dashboard</title>
+
+<!-- PWA & Homescreen Settings (iOS & Android) -->
+<meta name="apple-mobile-web-app-title" content="Veribase">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="manifest" href="manifest.json">
 
 <!-- PDF Generator CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -425,7 +433,7 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
 <div class="container">
 <div class="header">
   <div class="title-group">
-    <h1 class="title">Proof Of Work</h1>
+    <h1 class="title">Veribase</h1>
     <span class="badge-boss">Chef Dashboard</span>
   </div>
   <div class="header-actions">
@@ -690,7 +698,7 @@ let companyLogoBase64 = '';
 window.onload = async () => {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session || !session.user) {
-    window.location.href = 'Login.html';
+    window.location.href = 'index.html';
     return;
   }
 
@@ -1368,7 +1376,7 @@ function toggleTheme() {
 
 async function logout() {
   await supabaseClient.auth.signOut();
-  window.location.href = 'Login.html';
+  window.location.href = 'index.html';
 }
 </script>
 </body>
