@@ -27,11 +27,6 @@
 <style>
 :root {
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  --success-gradient: linear-gradient(135deg, #10b981 0%, #047857 100%);
-  --primary-glow: rgba(37, 99, 235, 0.35);
-  --success-glow: rgba(16, 185, 129, 0.35);
-
   --bg: #f8fafc;
   --card: #ffffff;
   --text: #0f172a;
@@ -108,12 +103,12 @@ body {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* HIGH-END BUTTON STYLES */
+/* BASIS BUTTON STYLES */
 button, .nav-link-btn {
   width: 100%;
-  padding: 15px 18px;
+  padding: 14px 16px;
   border: none;
-  border-radius: 14px;
+  border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -124,42 +119,40 @@ button, .nav-link-btn {
   margin-bottom: 12px;
   text-decoration: none;
   box-sizing: border-box;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
 }
 
 button:active, .nav-link-btn:active { transform: scale(0.98); }
-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-/* Primär Button (Chef Tour laden) - Elegantes Apple Blue Gradient */
+/* CLEAN & PROFESSIONAL PRIMARY BUTTON (Blau) */
 .btn-primary {
-  background: var(--primary-gradient);
+  background-color: #2563eb;
   color: #ffffff;
-  box-shadow: 0 6px 16px var(--primary-glow);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
+.btn-primary:hover { background-color: #1d4ed8; }
 
-/* Erfolg Button (Tour starten) - Edles Emerald Green Gradient */
+/* CLEAN & PROFESSIONAL SUCCESS BUTTON (Grün) */
 .btn-success {
-  background: var(--success-gradient);
+  background-color: #0d9488;
   color: #ffffff;
-  box-shadow: 0 6px 16px var(--success-glow);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
 }
+.btn-success:hover { background-color: #0f766e; }
 
 .btn-danger { background-color: #ef4444; color: white; }
 
-/* Sekundär Button (OCR / Galerie) - Subtle Glassy Pill Look */
+/* SECONDARY BUTTON (OCR / Galerie / Zurück) */
 .btn-secondary {
   background: var(--input-bg);
   color: var(--text);
   border: 1px solid var(--border);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 .btn-secondary:hover { background: var(--border); }
 
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.btn-grid button { margin-bottom: 0; padding: 13px 10px; font-size: 14px; border-radius: 12px; }
+.btn-grid button { margin-bottom: 0; padding: 12px 10px; font-size: 14px; }
 
 /* 20% / 80% Action Bar Layout */
 .stop-actions-grid {
@@ -182,31 +175,29 @@ button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow
   font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  background: var(--primary-gradient);
+  background-color: #2563eb;
   color: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 8px 24px var(--primary-glow);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
   margin-bottom: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 textarea, input[type="text"] {
   width: 100%;
   background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 16px;
   color: var(--text);
   font-family: inherit;
   font-size: 14px;
   margin-bottom: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s;
 }
 
 textarea:focus, input[type="text"]:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #2563eb;
 }
 textarea { height: 110px; resize: vertical; }
 
@@ -215,7 +206,7 @@ select {
   padding: 14px;
   background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   color: var(--text);
   font-size: 14px;
   margin-bottom: 16px;
@@ -229,7 +220,7 @@ select {
   justify-content: space-between;
   background: var(--input-bg);
   padding: 14px 18px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   margin-bottom: 16px;
 }
@@ -245,7 +236,7 @@ select {
   background-color: white; transition: .25s; border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-input:checked + .slider { background-color: #10b981; }
+input:checked + .slider { background-color: #0d9488; }
 input:checked + .slider:before { transform: translateX(20px); }
 
 #tour-view { display: none; }
@@ -253,21 +244,21 @@ input:checked + .slider:before { transform: translateX(20px); }
 .current-destination {
   background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 18px;
   margin-bottom: 16px;
   text-align: center;
 }
 
-.dest-label { font-size: 12px; text-transform: uppercase; color: #3b82f6; font-weight: 800; letter-spacing: 0.06em; }
-.dest-text { font-size: 19px; font-weight: 700; margin-top: 6px; word-break: break-word; }
-.gps-status { font-size: 12px; color: #10b981; margin-top: 8px; font-weight: 500; }
+.dest-label { font-size: 12px; text-transform: uppercase; color: #2563eb; font-weight: 800; letter-spacing: 0.06em; }
+.dest-text { font-size: 18px; font-weight: 700; margin-top: 6px; word-break: break-word; }
+.gps-status { font-size: 12px; color: #0d9488; margin-top: 8px; font-weight: 500; }
 
 .stop-list {
   max-height: 250px;
   overflow-y: auto;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   margin-bottom: 16px;
   background: var(--input-bg);
 }
@@ -286,10 +277,10 @@ input:checked + .slider:before { transform: translateX(20px); }
 .stop-item:last-child { border-bottom: none; }
 .stop-item.done { opacity: 0.6; }
 .stop-item.done .stop-name { text-decoration: line-through; }
-.stop-item.active { background: var(--card); font-weight: 600; color: #3b82f6; }
+.stop-item.active { background: var(--card); font-weight: 600; color: #2563eb; }
 
 .proof-gallery-container { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-.proof-item-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.proof-item-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .proof-item-card img { width: 100%; max-height: 200px; object-fit: cover; display: block; }
 .proof-item-info { padding: 12px; font-size: 12px; display: flex; flex-direction: column; gap: 4px; }
 
@@ -298,7 +289,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   z-index: 999;
   align-items: center;
   justify-content: center;
@@ -308,8 +299,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 .modal-box {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 22px;
-  padding: 22px;
+  border-radius: 18px;
+  padding: 20px;
   width: 100%;
   max-width: 480px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
@@ -318,20 +309,20 @@ input:checked + .slider:before { transform: translateX(20px); }
 .history-card {
   border: 1px solid var(--border);
   background: var(--input-bg);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s;
 }
-.history-card:active { transform: scale(0.98); }
+.history-card:hover { border-color: #2563eb; }
 
 .icon-svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.2;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
   display: inline-block;
@@ -357,7 +348,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
   <!-- SETUP VIEW (STARTSEITE) -->
   <div class="card" id="setup-view">
-    <div style="font-weight: 700; margin-bottom: 14px; font-size: 15px; letter-spacing: -0.01em;">Neue Tour erstellen oder einlesen</div>
+    <div style="font-weight: 700; margin-bottom: 14px; font-size: 15px;">Neue Tour erstellen oder einlesen</div>
     <div class="btn-grid">
       <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">
         <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -400,7 +391,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     </button>
 
     <!-- ARCHIV VERGANGENER TOUREN -->
-    <div style="margin-top: 26px; border-top: 1px solid var(--border); padding-top: 18px;">
+    <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
       <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Gespeicherte Touren & Details</div>
       <div id="tourHistoryContainer">
         <p style="color: var(--text-muted); font-size: 13px;">Lade Archiv...</p>
@@ -418,13 +409,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- PROMINENTER NAVIGATIONS-BUTTON -->
     <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
-      <svg class="icon-svg" style="width:22px; height:22px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      <svg class="icon-svg" style="width:20px; height:20px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       JETZT NAVIGIEREN
     </a>
 
-    <!-- Input für reguläre Fotoerfassung beim regulären Stopp-Abschluss -->
     <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
-    <!-- Input speziell für das Ändern/Neuaufnehmen im Notiz-/Stopp-Modal -->
     <input type="file" id="modalReplaceCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleModalReplaceCapture(event)">
 
     <!-- 20% / 80% LAYOUT -->
@@ -461,19 +450,19 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 <canvas id="proofCanvas" style="display:none;"></canvas>
 
-<!-- FOTO MODAL (BEIM REGULÄREN ERFASSEN) -->
+<!-- FOTO MODAL -->
 <div class="modal-overlay" id="proofPreviewModal">
   <div class="modal-box">
     <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Fotobeweis erfasst</div>
     <input type="text" id="modalProofNoteInput" placeholder="Notiz zum Stopp..." oninput="updateLiveStampNote()">
-    <div style="border-radius: 14px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border); background: #000;">
+    <div style="border-radius: 12px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border); background: #000;">
       <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 280px; object-fit: contain;">
     </div>
     <button class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()">Bestätigen & Weiter</button>
   </div>
 </div>
 
-<!-- STOPP BEARBEITEN MODAL (NOTIZ + FOTO) -->
+<!-- STOPP BEARBEITEN MODAL -->
 <div class="modal-overlay" id="noteEditModal">
   <div class="modal-box" style="max-height: 85vh; overflow-y: auto;">
     <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;" id="noteModalTitle">Stopp bearbeiten</div>
@@ -486,7 +475,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       Foto aufnehmen / ersetzen
     </button>
 
-    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 12px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 12px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border);">
       <img id="modalStopPhotoImg" src="" style="width: 100%; max-height: 180px; object-fit: cover; display: block;">
     </div>
 
@@ -497,7 +486,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
-<!-- DETAILS MODAL FÜR GEFAHRENE TOUREN -->
+<!-- DETAILS MODAL -->
 <div class="modal-overlay" id="tourDetailModal">
   <div class="modal-box" style="max-height: 85vh; overflow-y: auto;">
     <h3 id="detailTourTitle" style="margin-top:0;">Tour Details</h3>
@@ -672,11 +661,11 @@ function renderTourUI() {
     item.innerHTML = `
       <div class="stop-name" style="pointer-events: none;">
         <strong>#${idx + 1}</strong> ${stop.address}${hasPhotoBadge}
-        ${stop.notes ? `<div style="font-size: 12px; color: #3b82f6; font-weight: 600; margin-top: 4px;">Notiz: ${stop.notes}</div>` : ''}
+        ${stop.notes ? `<div style="font-size: 12px; color: #2563eb; font-weight: 600; margin-top: 4px;">Notiz: ${stop.notes}</div>` : ''}
       </div>
       <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 80px;">
         ${stop.done ? 'Erledigt' : 'Offen'}<br>
-        <span style="font-size: 11px; color: #3b82f6; font-weight: 700; text-decoration: underline;">Bearbeiten</span>
+        <span style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">Bearbeiten</span>
       </div>
     `;
     container.appendChild(item);
@@ -806,7 +795,7 @@ async function handleModalReplaceCapture(event) {
       ctx.fillRect(padding, yPos, boxW, boxH);
 
       lines.forEach((line, i) => {
-        ctx.fillStyle = i === 0 ? '#10b981' : '#ffffff';
+        ctx.fillStyle = i === 0 ? '#0d9488' : '#ffffff';
         ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
       });
 
@@ -869,7 +858,7 @@ function refreshStampPreview() {
         ctx.fillRect(padding, yPos, boxW, boxH);
 
         lines.forEach((line, i) => {
-          ctx.fillStyle = i === 0 ? '#10b981' : '#ffffff';
+          ctx.fillStyle = i === 0 ? '#0d9488' : '#ffffff';
           ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
         });
 
@@ -1074,7 +1063,7 @@ function openTourDetails(tour, number) {
       box.innerHTML = `
         <strong>Stopp #${s.sequence}: ${s.address}</strong><br>
         <span style="color:var(--text-muted);">Status: ${s.status}</span>
-        ${s.notes ? `<br><span style="color:#3b82f6; font-weight:600;">Notiz: ${s.notes}</span>` : ''}
+        ${s.notes ? `<br><span style="color:#2563eb; font-weight:600;">Notiz: ${s.notes}</span>` : ''}
         ${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:8px; margin-top:8px; max-height:180px; object-fit:cover;">` : ''}
       `;
       container.appendChild(box);
