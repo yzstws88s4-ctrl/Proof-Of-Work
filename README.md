@@ -1,1 +1,1 @@
-# Proof-Of-Work
+Veribase
