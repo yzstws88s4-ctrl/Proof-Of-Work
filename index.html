@@ -42,7 +42,6 @@
       color: var(--text);
       margin: 0; padding: 20px;
       display: flex; justify-content: center; align-items: center; min-height: 100vh;
-      transition: background-color 0.3s ease, color 0.3s ease;
     }
     .login-container { width: 100%; max-width: 400px; position: relative; }
     .theme-toggle-btn {
@@ -58,7 +57,6 @@
       border-radius: 16px;
       padding: 28px;
       box-shadow: var(--shadow);
-      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .title-group { text-align: center; margin-bottom: 24px; }
@@ -82,7 +80,7 @@
       background: var(--card);
     }
 
-    /* Der geschwungene Lichtstreifen (Ping-Pong-Effekt im Logo) */
+    /* Der sanfte, geschwungene Lichtstreifen nur im Logo */
     .logo-wrapper::after {
       content: '';
       position: absolute;
@@ -92,22 +90,22 @@
       height: 200%;
       background: linear-gradient(
         45deg,
-        transparent 35%,
-        rgba(255, 255, 255, 0.6) 50%,
-        transparent 65%
+        transparent 40%,
+        rgba(255, 255, 255, 0.45) 50%,
+        transparent 60%
       );
       transform: rotate(25deg);
       pointer-events: none;
     }
 
     .logo-wrapper.glow-active::after {
-      animation: logoShinePingPong 1.6s ease-in-out forwards;
+      animation: logoShineSweep 1.8s ease-in-out forwards;
     }
 
-    @keyframes logoShinePingPong {
+    @keyframes logoShineSweep {
       0% { left: -150%; }
       50% { left: 100%; }
-      100% { left: -150%; }
+      100% { left: 150%; }
     }
 
     .title { font-size: 24px; font-weight: 700; margin: 0 0 6px 0; }
@@ -149,13 +147,6 @@
 </div>
 
 <script>
-  // Sofort beim Laden Dark Mode erzwingen, falls noch nicht gesetzt
-  if (!localStorage.getItem('veribase_theme')) {
-    localStorage.setItem('veribase_theme', 'dark');
-  }
-  const savedTheme = localStorage.getItem('veribase_theme');
-  document.documentElement.setAttribute('data-theme', savedTheme);
-
   const SUPABASE_URL = 'https://cvfbkxzhpxopbkaymvvf.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_EK07XF7umKLsdfbRK9p6gQ_0-5AkSjb';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -169,9 +160,7 @@
 
   function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('veribase_theme', next);
+    document.documentElement.setAttribute('data-theme', current === 'dark' ? '' : 'dark');
   }
 
   async function handleLogin(e) {
@@ -200,13 +189,13 @@
       return;
     }
 
-    // Logo-Glow-Effekt auslösen (Hin- und Her-Sweep)
+    // Sanfter, eleganter Glow-Effekt direkt auf dem Logo
     const logoWrapper = document.getElementById('logoWrapper');
     errorMsg.style.color = 'var(--primary)';
     errorMsg.innerText = 'Login erfolgreich!';
     logoWrapper.classList.add('glow-active');
 
-    // 1,6 Sekunden warten, damit der Ping-Pong-Effekt komplett durchläuft
+    // Etwas längere Verzögerung (1,6 Sek.), damit der edle Effekt sauber durchlaufen kann
     setTimeout(async () => {
       await redirectUser(authData.user.id);
     }, 1600);
