@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Veribase - Login</title>
+  <title>Veribase</title>
 
   <!-- PWA & Homescreen Settings (iOS & Android) -->
   <meta name="apple-mobile-web-app-title" content="Veribase">
@@ -50,8 +50,58 @@
       width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
     .theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; box-shadow: var(--shadow); }
+
+    /* Card mit Glow-Effekt Container */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animierter Edel-Glowstreifen */
+    .card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        60deg,
+        transparent 45%,
+        rgba(37, 99, 235, 0.12) 50%,
+        transparent 55%
+      );
+      transform: translateX(-100%) translateY(-100%);
+      pointer-events: none;
+    }
+
+    .card.glow-active::after {
+      animation: shineGlow 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes shineGlow {
+      0% { transform: translateX(-100%) translateY(-100%); }
+      100% { transform: translateX(100%) translateY(100%); }
+    }
+
     .title-group { text-align: center; margin-bottom: 24px; }
+    
+    /* Logo Styling im Login */
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      border-radius: 14px;
+      margin: 0 auto 12px auto;
+      display: block;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
     .title { font-size: 24px; font-weight: 700; margin: 0 0 6px 0; }
     .subtitle { font-size: 13px; color: var(--text-muted); margin: 0; }
     label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
@@ -68,8 +118,9 @@
     <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
   </button>
 
-  <div class="card">
+  <div class="card" id="loginCard">
     <div class="title-group">
+      <img src="logo.png" alt="Veribase Logo" class="login-logo">
       <h1 class="title">Veribase</h1>
       <p class="subtitle">Anmeldung für Chefs & Fahrer</p>
     </div>
@@ -130,7 +181,16 @@
       return;
     }
 
-    await redirectUser(authData.user.id);
+    // Edler Glow-Effekt bei erfolgreichem Login
+    const card = document.getElementById('loginCard');
+    errorMsg.style.color = 'var(--primary)';
+    errorMsg.innerText = 'Login erfolgreich! Lade App...';
+    card.classList.add('glow-active');
+
+    // Kurze Verzögerung für die Animation bevor die Weiterleitung greift
+    setTimeout(async () => {
+      await redirectUser(authData.user.id);
+    }, 900);
   }
 
   async function redirectUser(userId) {
@@ -143,6 +203,7 @@
       .maybeSingle();
 
     if (profileError || !profile) {
+      errorMsg.style.color = '#ef4444';
       errorMsg.innerText = 'Profil konnte nicht geladen werden.';
       document.getElementById('submitBtn').disabled = false;
       return;
