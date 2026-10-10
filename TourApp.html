@@ -110,7 +110,7 @@ button, .nav-link-btn {
   border: none;
   border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -123,27 +123,35 @@ button, .nav-link-btn {
 }
 
 button:active, .nav-link-btn:active { transform: scale(0.98); }
-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-/* CLEAN & PROFESSIONAL PRIMARY BUTTON (Blau) */
+/* APPLE SAAS LOOK: PRIMARY BUTTON (Subtiles, edles Dark-Blue-Glass) */
 .btn-primary {
-  background-color: #2563eb;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  font-weight: 600;
 }
-.btn-primary:hover { background-color: #1d4ed8; }
+.btn-primary:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+}
 
-/* CLEAN & PROFESSIONAL SUCCESS BUTTON (Grün) */
+/* APPLE SAAS LOOK: SUCCESS BUTTON (Subtiles, edles Dark-Teal/Green-Glass) */
 .btn-success {
-  background-color: #0d9488;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf;
+  border: 1px solid rgba(20, 184, 166, 0.25);
+  font-weight: 600;
 }
-.btn-success:hover { background-color: #0f766e; }
+.btn-success:hover {
+  background: rgba(20, 184, 166, 0.2);
+  border-color: rgba(20, 184, 166, 0.4);
+}
 
-.btn-danger { background-color: #ef4444; color: white; }
+.btn-danger { background-color: #ef4444; color: white; border: none; }
 
-/* SECONDARY BUTTON (OCR / Galerie / Zurück) */
+/* SECONDARY BUTTON */
 .btn-secondary {
   background: var(--input-bg);
   color: var(--text);
@@ -170,16 +178,19 @@ button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 /* Prominenter Navigationsbutton */
 .btn-navigate {
   min-height: 76px;
-  font-size: 20px;
+  font-size: 18px;
   padding: 18px 22px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  background-color: #2563eb;
-  color: #ffffff;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
   border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   margin-bottom: 20px;
+}
+.btn-navigate:hover {
+  background: rgba(59, 130, 246, 0.25);
 }
 
 textarea, input[type="text"] {
@@ -197,7 +208,7 @@ textarea, input[type="text"] {
 
 textarea:focus, input[type="text"]:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: #3b82f6;
 }
 textarea { height: 110px; resize: vertical; }
 
@@ -236,7 +247,7 @@ select {
   background-color: white; transition: .25s; border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-input:checked + .slider { background-color: #0d9488; }
+input:checked + .slider { background-color: #14b8a6; }
 input:checked + .slider:before { transform: translateX(20px); }
 
 #tour-view { display: none; }
@@ -250,9 +261,9 @@ input:checked + .slider:before { transform: translateX(20px); }
   text-align: center;
 }
 
-.dest-label { font-size: 12px; text-transform: uppercase; color: #2563eb; font-weight: 800; letter-spacing: 0.06em; }
+.dest-label { font-size: 12px; text-transform: uppercase; color: #60a5fa; font-weight: 800; letter-spacing: 0.06em; }
 .dest-text { font-size: 18px; font-weight: 700; margin-top: 6px; word-break: break-word; }
-.gps-status { font-size: 12px; color: #0d9488; margin-top: 8px; font-weight: 500; }
+.gps-status { font-size: 12px; color: #2dd4bf; margin-top: 8px; font-weight: 500; }
 
 .stop-list {
   max-height: 250px;
@@ -275,9 +286,9 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .stop-item:last-child { border-bottom: none; }
-.stop-item.done { opacity: 0.6; }
+.stop-item.done { opacity: 0.5; }
 .stop-item.done .stop-name { text-decoration: line-through; }
-.stop-item.active { background: var(--card); font-weight: 600; color: #2563eb; }
+.stop-item.active { background: var(--card); font-weight: 600; color: #60a5fa; }
 
 .proof-gallery-container { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
 .proof-item-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
@@ -315,7 +326,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   cursor: pointer;
   transition: border-color 0.2s;
 }
-.history-card:hover { border-color: #2563eb; }
+.history-card:hover { border-color: #3b82f6; }
 
 .icon-svg {
   width: 18px;
@@ -661,11 +672,11 @@ function renderTourUI() {
     item.innerHTML = `
       <div class="stop-name" style="pointer-events: none;">
         <strong>#${idx + 1}</strong> ${stop.address}${hasPhotoBadge}
-        ${stop.notes ? `<div style="font-size: 12px; color: #2563eb; font-weight: 600; margin-top: 4px;">Notiz: ${stop.notes}</div>` : ''}
+        ${stop.notes ? `<div style="font-size: 12px; color: #60a5fa; font-weight: 600; margin-top: 4px;">Notiz: ${stop.notes}</div>` : ''}
       </div>
       <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 80px;">
         ${stop.done ? 'Erledigt' : 'Offen'}<br>
-        <span style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">Bearbeiten</span>
+        <span style="font-size: 11px; color: #60a5fa; font-weight: 700; text-decoration: underline;">Bearbeiten</span>
       </div>
     `;
     container.appendChild(item);
@@ -795,7 +806,7 @@ async function handleModalReplaceCapture(event) {
       ctx.fillRect(padding, yPos, boxW, boxH);
 
       lines.forEach((line, i) => {
-        ctx.fillStyle = i === 0 ? '#0d9488' : '#ffffff';
+        ctx.fillStyle = i === 0 ? '#2dd4bf' : '#ffffff';
         ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
       });
 
@@ -858,7 +869,7 @@ function refreshStampPreview() {
         ctx.fillRect(padding, yPos, boxW, boxH);
 
         lines.forEach((line, i) => {
-          ctx.fillStyle = i === 0 ? '#0d9488' : '#ffffff';
+          ctx.fillStyle = i === 0 ? '#2dd4bf' : '#ffffff';
           ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
         });
 
@@ -1063,7 +1074,7 @@ function openTourDetails(tour, number) {
       box.innerHTML = `
         <strong>Stopp #${s.sequence}: ${s.address}</strong><br>
         <span style="color:var(--text-muted);">Status: ${s.status}</span>
-        ${s.notes ? `<br><span style="color:#2563eb; font-weight:600;">Notiz: ${s.notes}</span>` : ''}
+        ${s.notes ? `<br><span style="color:#60a5fa; font-weight:600;">Notiz: ${s.notes}</span>` : ''}
         ${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:8px; margin-top:8px; max-height:180px; object-fit:cover;">` : ''}
       `;
       container.appendChild(box);
