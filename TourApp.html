@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="dark">
 <head>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
@@ -14,6 +14,14 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="manifest.json">
 
+<!-- Sofortiges Laden des Dark Modes im Head, um jegliches Aufblitzen zu verhindern -->
+<script>
+  if (!localStorage.getItem('veribase_theme')) {
+    localStorage.setItem('veribase_theme', 'dark');
+  }
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
@@ -22,6 +30,7 @@
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --success: #10b981;
+  --success-hover: #059669;
   --danger: #ef4444;
 
   --bg: #f8fafc;
@@ -53,7 +62,7 @@ body {
   padding: 16px;
   display: flex;
   justify-content: center;
-  transition: background-color 0.2s, color 0.2s;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container { width: 100%; max-width: 500px; }
@@ -75,14 +84,16 @@ body {
   border: 1px solid var(--border);
   color: var(--text);
   height: 40px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 0 12px;
+  padding: 0 14px;
   font-size: 13px;
   font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  transition: all 0.2s ease;
 }
 
 .theme-toggle-btn { width: 40px; padding: 0; }
@@ -95,13 +106,14 @@ body {
   padding: 20px;
   margin-bottom: 16px;
   box-shadow: var(--shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 button, .nav-link-btn {
   width: 100%;
   padding: 14px 16px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -112,18 +124,24 @@ button, .nav-link-btn {
   margin-bottom: 12px;
   text-decoration: none;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
-button:disabled { opacity: 0.6; cursor: not-allowed; }
+button:active { transform: scale(0.98); }
+button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-.btn-primary { background-color: var(--primary); color: white; }
+.btn-primary { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
 .btn-primary:hover { background-color: var(--primary-hover); }
-.btn-success { background-color: var(--success); color: white; }
+
+.btn-success { background-color: var(--success); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+.btn-success:hover { background-color: var(--success-hover); }
+
 .btn-danger { background-color: var(--danger); color: white; }
 .btn-secondary { background-color: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); }
 
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.btn-grid button { margin-bottom: 0; padding: 12px 8px; font-size: 14px; }
+.btn-grid button { margin-bottom: 0; padding: 12px 8px; font-size: 14px; border-radius: 12px; }
 
 /* 20% / 80% Action Bar Layout */
 .stop-actions-grid {
@@ -157,14 +175,16 @@ textarea, input[type="text"] {
   width: 100%;
   background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 16px;
   color: var(--text);
   font-family: inherit;
   font-size: 14px;
   margin-bottom: 12px;
+  transition: border-color 0.2s;
 }
 
+textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--primary); }
 textarea { height: 120px; resize: vertical; }
 
 select {
@@ -172,10 +192,11 @@ select {
   padding: 12px 14px;
   background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   color: var(--text);
   font-size: 14px;
   margin-bottom: 16px;
+  font-family: inherit;
 }
 
 .toggle-box {
@@ -184,7 +205,7 @@ select {
   justify-content: space-between;
   background: var(--input-bg);
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   margin-bottom: 16px;
 }
@@ -221,7 +242,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   max-height: 250px;
   overflow-y: auto;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 16px;
   background: var(--input-bg);
 }
@@ -271,11 +292,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 .history-card {
   border: 1px solid var(--border);
   background: var(--input-bg);
-  border-radius: 10px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: 14px;
   margin-bottom: 10px;
   cursor: pointer;
+  transition: border-color 0.2s;
 }
+.history-card:hover { border-color: var(--primary); }
 
 .icon-svg {
   width: 18px;
@@ -482,6 +505,9 @@ let tempCanvasBlob = null;
 let editingStopIndex = null;
 
 window.onload = async () => {
+  const savedTheme = localStorage.getItem('veribase_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) {
     window.location.href = 'index.html';
@@ -505,11 +531,9 @@ window.onload = async () => {
 
 function toggleTheme() {
   const htmlEl = document.documentElement;
-  if (htmlEl.getAttribute('data-theme') === 'dark') {
-    htmlEl.removeAttribute('data-theme');
-  } else {
-    htmlEl.setAttribute('data-theme', 'dark');
-  }
+  const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  htmlEl.setAttribute('data-theme', next);
+  localStorage.setItem('veribase_theme', next);
 }
 
 async function logout() {
@@ -612,7 +636,6 @@ function renderTourUI() {
     const isActive = idx === currentStopIndex && !stop.done;
     item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
     
-    // Klick auf Listeneintrag öffnet das Bearbeiten-Modal für Notiz & Foto
     item.onclick = function() {
       openNoteModal(idx);
     };
@@ -688,8 +711,6 @@ function triggerCompleteStop() {
   if (isProofRequired) {
     const hasPhoto = current.photo_url || current.blob;
     if (hasPhoto) {
-      // Wenn bereits ein Foto existiert (z.B. durch Zurückspringen), 
-      // OHNE Nachfrage oder Kamera direkt weitergehen!
       completeCurrentStop(current.photo_url, current.blob, current.notes || '');
     } else {
       document.getElementById('proofCameraInput').click();
@@ -716,7 +737,6 @@ async function handleProofCapture(event) {
   event.target.value = '';
 }
 
-// Handler für Direkt-Fotoaufnahme aus dem Stopp-Bearbeiten-Modal
 async function handleModalReplaceCapture(event) {
   const file = event.target.files[0];
   if (!file || editingStopIndex === null) return;
@@ -766,9 +786,8 @@ async function handleModalReplaceCapture(event) {
         const localUrl = URL.createObjectURL(blob);
         stop.blob = blob;
         stop.photo_url = localUrl;
-        stop.done = true; // Direkt als erledigt markieren
+        stop.done = true;
 
-        // Vorschau im Modal aktualisieren
         const imgPrevContainer = document.getElementById('modalStopPhotoPreviewContainer');
         const imgPrev = document.getElementById('modalStopPhotoImg');
         imgPrev.src = localUrl;
