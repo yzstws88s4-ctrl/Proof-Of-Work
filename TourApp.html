@@ -106,11 +106,11 @@ body {
 /* BASIS BUTTON STYLES */
 button, .nav-link-btn {
   width: 100%;
-  padding: 14px 16px;
+  padding: 15px 18px;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -119,34 +119,35 @@ button, .nav-link-btn {
   margin-bottom: 12px;
   text-decoration: none;
   box-sizing: border-box;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.01em;
 }
 
 button:active, .nav-link-btn:active { transform: scale(0.98); }
-button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-/* APPLE SAAS LOOK: PRIMARY BUTTON (Subtiles, edles Dark-Blue-Glass) */
+/* HIGH-END APPLE SaaS LOOK: PRIMARY BUTTON (Brillantes, sauberes Tech-Blau mit feinem Glow) */
 .btn-primary {
-  background: rgba(59, 130, 246, 0.12);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  font-weight: 600;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 .btn-primary:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
 }
 
-/* APPLE SAAS LOOK: SUCCESS BUTTON (Subtiles, edles Dark-Teal/Green-Glass) */
+/* HIGH-END APPLE SaaS LOOK: SUCCESS BUTTON (Edles, tiefes Smaragdgrün mit Tiefe) */
 .btn-success {
-  background: rgba(20, 184, 166, 0.12);
-  color: #2dd4bf;
-  border: 1px solid rgba(20, 184, 166, 0.25);
-  font-weight: 600;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 .btn-success:hover {
-  background: rgba(20, 184, 166, 0.2);
-  border-color: rgba(20, 184, 166, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
 }
 
 .btn-danger { background-color: #ef4444; color: white; border: none; }
@@ -160,7 +161,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .btn-secondary:hover { background: var(--border); }
 
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.btn-grid button { margin-bottom: 0; padding: 12px 10px; font-size: 14px; }
+.btn-grid button { margin-bottom: 0; padding: 12px 10px; font-size: 14px; border-radius: 12px; }
 
 /* 20% / 80% Action Bar Layout */
 .stop-actions-grid {
@@ -178,37 +179,36 @@ button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 /* Prominenter Navigationsbutton */
 .btn-navigate {
   min-height: 76px;
-  font-size: 18px;
+  font-size: 19px;
   padding: 18px 22px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 800;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
   border-radius: 16px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   margin-bottom: 20px;
-}
-.btn-navigate:hover {
-  background: rgba(59, 130, 246, 0.25);
 }
 
 textarea, input[type="text"] {
   width: 100%;
   background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 16px;
   color: var(--text);
   font-family: inherit;
   font-size: 14px;
   margin-bottom: 14px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 textarea:focus, input[type="text"]:focus {
   outline: none;
   border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 textarea { height: 110px; resize: vertical; }
 
@@ -217,7 +217,7 @@ select {
   padding: 14px;
   background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--text);
   font-size: 14px;
   margin-bottom: 16px;
@@ -231,7 +231,7 @@ select {
   justify-content: space-between;
   background: var(--input-bg);
   padding: 14px 18px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--border);
   margin-bottom: 16px;
 }
@@ -247,7 +247,7 @@ select {
   background-color: white; transition: .25s; border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-input:checked + .slider { background-color: #14b8a6; }
+input:checked + .slider { background-color: #10b981; }
 input:checked + .slider:before { transform: translateX(20px); }
 
 #tour-view { display: none; }
@@ -255,21 +255,21 @@ input:checked + .slider:before { transform: translateX(20px); }
 .current-destination {
   background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px;
+  border-radius: 16px;
+  padding: 20px;
   margin-bottom: 16px;
   text-align: center;
 }
 
-.dest-label { font-size: 12px; text-transform: uppercase; color: #60a5fa; font-weight: 800; letter-spacing: 0.06em; }
-.dest-text { font-size: 18px; font-weight: 700; margin-top: 6px; word-break: break-word; }
-.gps-status { font-size: 12px; color: #2dd4bf; margin-top: 8px; font-weight: 500; }
+.dest-label { font-size: 12px; text-transform: uppercase; color: #3b82f6; font-weight: 800; letter-spacing: 0.06em; }
+.dest-text { font-size: 19px; font-weight: 700; margin-top: 6px; word-break: break-word; }
+.gps-status { font-size: 12px; color: #10b981; margin-top: 8px; font-weight: 500; }
 
 .stop-list {
   max-height: 250px;
   overflow-y: auto;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   margin-bottom: 16px;
   background: var(--input-bg);
 }
@@ -288,10 +288,10 @@ input:checked + .slider:before { transform: translateX(20px); }
 .stop-item:last-child { border-bottom: none; }
 .stop-item.done { opacity: 0.5; }
 .stop-item.done .stop-name { text-decoration: line-through; }
-.stop-item.active { background: var(--card); font-weight: 600; color: #60a5fa; }
+.stop-item.active { background: var(--card); font-weight: 600; color: #3b82f6; }
 
 .proof-gallery-container { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-.proof-item-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.proof-item-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
 .proof-item-card img { width: 100%; max-height: 200px; object-fit: cover; display: block; }
 .proof-item-info { padding: 12px; font-size: 12px; display: flex; flex-direction: column; gap: 4px; }
 
@@ -300,7 +300,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
   z-index: 999;
   align-items: center;
   justify-content: center;
@@ -310,8 +310,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 .modal-box {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 20px;
+  border-radius: 22px;
+  padding: 22px;
   width: 100%;
   max-width: 480px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
@@ -320,20 +320,20 @@ input:checked + .slider:before { transform: translateX(20px); }
 .history-card {
   border: 1px solid var(--border);
   background: var(--input-bg);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 14px 16px;
   margin-bottom: 10px;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 .history-card:hover { border-color: #3b82f6; }
 
 .icon-svg {
-  width: 18px;
-  height: 18px;
+  width: 19px;
+  height: 19px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
   display: inline-block;
@@ -359,7 +359,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
   <!-- SETUP VIEW (STARTSEITE) -->
   <div class="card" id="setup-view">
-    <div style="font-weight: 700; margin-bottom: 14px; font-size: 15px;">Neue Tour erstellen oder einlesen</div>
+    <div style="font-weight: 700; margin-bottom: 14px; font-size: 15px; letter-spacing: -0.01em;">Neue Tour erstellen oder einlesen</div>
     <div class="btn-grid">
       <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">
         <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -402,7 +402,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     </button>
 
     <!-- ARCHIV VERGANGENER TOUREN -->
-    <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+    <div style="margin-top: 26px; border-top: 1px solid var(--border); padding-top: 18px;">
       <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Gespeicherte Touren & Details</div>
       <div id="tourHistoryContainer">
         <p style="color: var(--text-muted); font-size: 13px;">Lade Archiv...</p>
@@ -420,7 +420,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- PROMINENTER NAVIGATIONS-BUTTON -->
     <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
-      <svg class="icon-svg" style="width:20px; height:20px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      <svg class="icon-svg" style="width:22px; height:22px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       JETZT NAVIGIEREN
     </a>
 
@@ -466,7 +466,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="modal-box">
     <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Fotobeweis erfasst</div>
     <input type="text" id="modalProofNoteInput" placeholder="Notiz zum Stopp..." oninput="updateLiveStampNote()">
-    <div style="border-radius: 12px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border); background: #000;">
+    <div style="border-radius: 14px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border); background: #000;">
       <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 280px; object-fit: contain;">
     </div>
     <button class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()">Bestätigen & Weiter</button>
@@ -486,7 +486,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       Foto aufnehmen / ersetzen
     </button>
 
-    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 12px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border);">
+    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 12px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
       <img id="modalStopPhotoImg" src="" style="width: 100%; max-height: 180px; object-fit: cover; display: block;">
     </div>
 
@@ -672,11 +672,11 @@ function renderTourUI() {
     item.innerHTML = `
       <div class="stop-name" style="pointer-events: none;">
         <strong>#${idx + 1}</strong> ${stop.address}${hasPhotoBadge}
-        ${stop.notes ? `<div style="font-size: 12px; color: #60a5fa; font-weight: 600; margin-top: 4px;">Notiz: ${stop.notes}</div>` : ''}
+        ${stop.notes ? `<div style="font-size: 12px; color: #3b82f6; font-weight: 600; margin-top: 4px;">Notiz: ${stop.notes}</div>` : ''}
       </div>
       <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 80px;">
         ${stop.done ? 'Erledigt' : 'Offen'}<br>
-        <span style="font-size: 11px; color: #60a5fa; font-weight: 700; text-decoration: underline;">Bearbeiten</span>
+        <span style="font-size: 11px; color: #3b82f6; font-weight: 700; text-decoration: underline;">Bearbeiten</span>
       </div>
     `;
     container.appendChild(item);
@@ -806,7 +806,7 @@ async function handleModalReplaceCapture(event) {
       ctx.fillRect(padding, yPos, boxW, boxH);
 
       lines.forEach((line, i) => {
-        ctx.fillStyle = i === 0 ? '#2dd4bf' : '#ffffff';
+        ctx.fillStyle = i === 0 ? '#10b981' : '#ffffff';
         ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
       });
 
@@ -869,7 +869,7 @@ function refreshStampPreview() {
         ctx.fillRect(padding, yPos, boxW, boxH);
 
         lines.forEach((line, i) => {
-          ctx.fillStyle = i === 0 ? '#2dd4bf' : '#ffffff';
+          ctx.fillStyle = i === 0 ? '#10b981' : '#ffffff';
           ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
         });
 
@@ -1074,7 +1074,7 @@ function openTourDetails(tour, number) {
       box.innerHTML = `
         <strong>Stopp #${s.sequence}: ${s.address}</strong><br>
         <span style="color:var(--text-muted);">Status: ${s.status}</span>
-        ${s.notes ? `<br><span style="color:#60a5fa; font-weight:600;">Notiz: ${s.notes}</span>` : ''}
+        ${s.notes ? `<br><span style="color:#3b82f6; font-weight:600;">Notiz: ${s.notes}</span>` : ''}
         ${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:8px; margin-top:8px; max-height:180px; object-fit:cover;">` : ''}
       `;
       container.appendChild(box);
