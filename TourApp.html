@@ -4,7 +4,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Proof Of Work - Touren App</title>
+<title>Veribase - Touren App</title>
+
+<!-- PWA & Homescreen Settings (iOS & Android) -->
+<meta name="apple-mobile-web-app-title" content="Veribase">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="manifest" href="manifest.json">
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -287,7 +295,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 <div class="container">
   <div class="header">
     <div class="title-group">
-      <h1 class="title">Proof Of Work</h1>
+      <h1 class="title">Veribase</h1>
       <span class="driver-badge" id="driverWelcomeDisplay">Hallo ...</span>
     </div>
     <div class="header-actions">
@@ -476,7 +484,7 @@ let editingStopIndex = null;
 window.onload = async () => {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) {
-    window.location.href = 'Login.html';
+    window.location.href = 'index.html';
     return;
   }
   currentUser = session.user;
@@ -506,7 +514,7 @@ function toggleTheme() {
 
 async function logout() {
   await supabaseClient.auth.signOut();
-  window.location.href = 'Login.html';
+  window.location.href = 'index.html';
 }
 
 function initGPS() {
@@ -732,7 +740,7 @@ async function handleModalReplaceCapture(event) {
       const fontSize = Math.max(18, Math.floor(canvas.width / 26));
       const padding = fontSize;
       const lines = [
-        `PROOF OF WORK - STOPP #${editingStopIndex + 1}`,
+        `VERIBASE - STOPP #${editingStopIndex + 1}`,
         `Adresse: ${stop.address}`,
         `${now} - GPS: ${currentGPSCoords}`,
         userNote ? `Notiz: ${userNote}` : null
@@ -796,7 +804,7 @@ function refreshStampPreview() {
         const fontSize = Math.max(18, Math.floor(canvas.width / 26));
         const padding = fontSize;
         const lines = [
-          `PROOF OF WORK - STOPP #${currentStopIndex + 1}`,
+          `VERIBASE - STOPP #${currentStopIndex + 1}`,
           `Adresse: ${currentStop.address}`,
           `${now} - GPS: ${currentGPSCoords}`,
           userNote ? `Notiz: ${userNote}` : null
