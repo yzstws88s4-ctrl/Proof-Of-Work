@@ -163,7 +163,14 @@ html[data-theme="light"] .btn-success:hover {
   background: #1e293b;
 }
 
-.btn-danger { background-color: #ef4444; color: white; border: none; }
+.btn-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
 
 /* SECONDARY BUTTON */
 .btn-secondary {
@@ -350,6 +357,8 @@ input:checked + .slider:before { transform: translateX(20px); }
   width: 100%;
   max-width: 480px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
 .history-card {
@@ -532,12 +541,18 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
-<!-- DETAILS MODAL -->
+<!-- DETAILS MODAL (MIT 2 STICKY BUTTONS) -->
 <div class="modal-overlay" id="tourDetailModal">
-  <div class="modal-box" style="max-height: 85vh; overflow-y: auto;">
-    <h3 id="detailTourTitle" style="margin-top:0;">Tour Details</h3>
-    <div id="detailStopsContainer"></div>
-    <button class="btn-secondary" style="margin-top: 16px; margin-bottom:0;" onclick="closeDetailModal()">Schließen</button>
+  <div class="modal-box" style="max-height: 85vh;">
+    <h3 id="detailTourTitle" style="margin-top:0; margin-bottom: 12px; flex-shrink: 0;">Tour Details</h3>
+    
+    <div id="detailStopsContainer" style="overflow-y: auto; flex-grow: 1; margin-bottom: 16px; padding-right: 4px;"></div>
+    
+    <!-- FIXIERTE BUTTONS UNTEN IM MODAL -->
+    <div style="display: flex; gap: 10px; flex-shrink: 0; border-top: 1px solid var(--border); padding-top: 14px; background: var(--card);">
+      <button class="btn-danger" style="margin-bottom:0;" onclick="deleteCurrentDetailTour()">Tour löschen</button>
+      <button class="btn-secondary" style="margin-bottom:0;" onclick="closeDetailModal()">Zurück</button>
+    </div>
   </div>
 </div>
 
@@ -566,6 +581,7 @@ let currentGPSCoords = "GPS wird ermittelt...";
 let tempCapturedFile = null;
 let tempCanvasBlob = null;
 let editingStopIndex = null;
+let activeDetailTourId = null;
 
 window.onload = async () => {
   const savedTheme = localStorage.getItem('veribase_theme') || 'dark';
@@ -1081,7 +1097,7 @@ async function loadTourHistory() {
 
     const card = document.createElement('div');
     card.className = 'history-card';
-    card.onclick = () => openTourDetails(tour, idx + 1);
+    card.onclick = () => openTourDetails(tour);
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; font-weight:700; font-size:14px;">
         <span>Tour ${tours.length - idx} (${tour.title})</span>
@@ -1095,7 +1111,8 @@ async function loadTourHistory() {
   });
 }
 
-function openTourDetails(tour, number) {
+function openTourDetails(tour) {
+  activeDetailTourId = tour.id;
   document.getElementById('detailTourTitle').innerText = `Tour Details - ${tour.title}`;
   const container = document.getElementById('detailStopsContainer');
   container.innerHTML = '';
@@ -1120,7 +1137,28 @@ function openTourDetails(tour, number) {
 }
 
 function closeDetailModal() {
+  activeDetailTourId = null;
   document.getElementById('tourDetailModal').style.display = 'none';
+}
+
+async function deleteCurrentDetailTour() {
+  if (!activeDetailTourId) return;
+  if (!confirm("Möchtest du diese Tour und alle zugehörigen Stopps wirklich unwiderruflich löschen?")) return;
+
+  try {
+    // Erst die Stopps zur Tour löschen
+    await supabaseClient.from('stops').delete().eq('tour_id', activeDetailTourId);
+    // Dann die Tour selbst löschen
+    const { error } = await supabaseClient.from('tours').delete().eq('id', activeDetailTourId);
+    
+    if (error) throw error;
+
+    closeDetailModal();
+    loadTourHistory();
+    showModal("Erfolg", "Tour wurde erfolgreich gelöscht.");
+  } catch (err) {
+    showModal("Fehler", "Tour konnte nicht gelöscht werden: " + err.message);
+  }
 }
 
 async function handleOcrImage(event) {
