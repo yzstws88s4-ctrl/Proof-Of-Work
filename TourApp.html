@@ -34,6 +34,7 @@
   --border: #e2e8f0;
   --input-bg: #f1f5f9;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --switch-active: #10b981;
 }
 
 html[data-theme="dark"] {
@@ -44,6 +45,7 @@ html[data-theme="dark"] {
   --border: #334155;
   --input-bg: #0f172a;
   --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  --switch-active: #3b82f6;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -69,7 +71,7 @@ body {
 }
 
 .title { font-size: 22px; font-weight: 800; margin: 0; letter-spacing: -0.03em; }
-.driver-badge { font-size: 13px; color: #94a3b8; font-weight: 500; margin-top: 2px; display: block; }
+.driver-badge { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-top: 2px; display: block; }
 
 .header-actions { display: flex; gap: 8px; }
 
@@ -139,7 +141,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow
   border-color: #64748b;
 }
 
-/* HIGH-END VERCEL/APPLE LOOK: SUCCESS BUTTON (Tour starten -> Ultimativer High-Contrast Fokus Button) */
+/* HIGH-END VERCEL/APPLE LOOK: SUCCESS BUTTON (Tour starten) */
 html[data-theme="dark"] .btn-success {
   background: #ffffff;
   color: #0f172a;
@@ -151,7 +153,6 @@ html[data-theme="dark"] .btn-success:hover {
   box-shadow: 0 6px 24px rgba(255, 255, 255, 0.25);
 }
 
-/* Light Mode Fallback für den Start-Button */
 html[data-theme="light"] .btn-success {
   background: #0f172a;
   color: #ffffff;
@@ -188,23 +189,41 @@ html[data-theme="light"] .btn-success:hover {
   font-size: 14px;
 }
 
-/* Prominenter Navigationsbutton (Invertierter High-End Look) */
-.btn-navigate {
+/* JETZT NAVIGIEREN BUTTON (DYNAMISCH JE NACH THEME) */
+html[data-theme="dark"] .btn-navigate {
   min-height: 76px;
   font-size: 19px;
   padding: 18px 22px;
   font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  background: #ffffff;
-  color: #0f172a;
+  background: rgba(37, 99, 235, 0.18);
+  color: #60a5fa;
   border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
-  border: none;
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.25);
+  border: 1px solid rgba(96, 165, 250, 0.35);
   margin-bottom: 20px;
 }
-.btn-navigate:hover {
-  background: #f1f5f9;
+html[data-theme="dark"] .btn-navigate:hover {
+  background: rgba(37, 99, 235, 0.28);
+}
+
+html[data-theme="light"] .btn-navigate {
+  min-height: 76px;
+  font-size: 19px;
+  padding: 18px 22px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  margin-bottom: 20px;
+}
+html[data-theme="light"] .btn-navigate:hover {
+  background: rgba(16, 185, 129, 0.22);
 }
 
 textarea, input[type="text"] {
@@ -261,7 +280,9 @@ select {
   background-color: white; transition: .25s; border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-input:checked + .slider { background-color: #0f172a; }
+
+/* TOGGLE-BUTTON FIX (DEUTLICH ERKENNBAR WENN AKTIV) */
+input:checked + .slider { background-color: var(--switch-active) !important; }
 input:checked + .slider:before { transform: translateX(20px); }
 
 #tour-view { display: none; }
