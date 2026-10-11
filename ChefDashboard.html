@@ -1398,7 +1398,7 @@ function exportSelectedProofsPDF() {
 function downloadSingleProofPDF() {
   if (!activeModalProof) return;
   
-  The element = document.createElement('div');
+  const element = document.createElement('div');
   element.innerHTML = generatePDFHTML([activeModalProof], `Einzel-Leistungsnachweis`);
 
   const opt = {
