@@ -541,16 +541,15 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
-<!-- DETAILS MODAL (MIT 2 STICKY BUTTONS) -->
+<!-- DETAILS MODAL -->
 <div class="modal-overlay" id="tourDetailModal">
   <div class="modal-box" style="max-height: 85vh;">
     <h3 id="detailTourTitle" style="margin-top:0; margin-bottom: 12px; flex-shrink: 0;">Tour Details</h3>
     
     <div id="detailStopsContainer" style="overflow-y: auto; flex-grow: 1; margin-bottom: 16px; padding-right: 4px;"></div>
     
-    <!-- FIXIERTE BUTTONS UNTEN IM MODAL -->
     <div style="display: flex; gap: 10px; flex-shrink: 0; border-top: 1px solid var(--border); padding-top: 14px; background: var(--card);">
-      <button class="btn-danger" style="margin-bottom:0;" onclick="deleteCurrentDetailTour()">Tour löschen</button>
+      <button class="btn-danger" style="margin-bottom:0;" onclick="archiveCurrentDetailTour()">Aus Übersicht entfernen</button>
       <button class="btn-secondary" style="margin-bottom:0;" onclick="closeDetailModal()">Zurück</button>
     </div>
   </div>
@@ -1007,7 +1006,8 @@ async function finishAndSaveTour() {
           title: "Tour " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
           assigned_to: currentUser.id,
           status: 'beendet',
-          ended_at: new Date().toISOString()
+          ended_at: new Date().toISOString(),
+          archived_by_driver: false
         }])
         .select('*')
         .single();
@@ -1017,7 +1017,11 @@ async function finishAndSaveTour() {
     } else {
       await supabaseClient
         .from('tours')
-        .update({ status: 'beendet', ended_at: new Date().toISOString() })
+        .update({ 
+          status: 'beendet', 
+          ended_at: new Date().toISOString(),
+          archived_by_driver: false
+        })
         .eq('id', tourId);
     }
 
@@ -1078,10 +1082,12 @@ async function loadTourHistory() {
   const container = document.getElementById('tourHistoryContainer');
   if (!container) return;
 
+  // Nur Touren laden, die der Fahrer NICHT archiviert hat (archived_by_driver = false)
   const { data: tours } = await supabaseClient
     .from('tours')
     .select('*, stops(*)')
     .eq('assigned_to', currentUser.id)
+    .eq('archived_by_driver', false)
     .order('created_at', { ascending: false });
 
   if (!tours || tours.length === 0) {
@@ -1141,23 +1147,24 @@ function closeDetailModal() {
   document.getElementById('tourDetailModal').style.display = 'none';
 }
 
-async function deleteCurrentDetailTour() {
+async function archiveCurrentDetailTour() {
   if (!activeDetailTourId) return;
-  if (!confirm("Möchtest du diese Tour und alle zugehörigen Stopps wirklich unwiderruflich löschen?")) return;
+  if (!confirm("Möchtest du diese Tour aus deiner Ansicht entfernen? (Sie bleibt im Chef-Dashboard zur Auswertung erhalten).")) return;
 
   try {
-    // Erst die Stopps zur Tour löschen
-    await supabaseClient.from('stops').delete().eq('tour_id', activeDetailTourId);
-    // Dann die Tour selbst löschen
-    const { error } = await supabaseClient.from('tours').delete().eq('id', activeDetailTourId);
+    // Nur das Flag setzen, für den Chef bleibt die Tour in der DB erhalten!
+    const { error } = await supabaseClient
+      .from('tours')
+      .update({ archived_by_driver: true })
+      .eq('id', activeDetailTourId);
     
     if (error) throw error;
 
     closeDetailModal();
     loadTourHistory();
-    showModal("Erfolg", "Tour wurde erfolgreich gelöscht.");
+    showModal("Erfolg", "Tour wurde aus deiner Ansicht ausgeblendet.");
   } catch (err) {
-    showModal("Fehler", "Tour konnte nicht gelöscht werden: " + err.message);
+    showModal("Fehler", "Tour konnte nicht archiviert werden: " + err.message);
   }
 }
 
