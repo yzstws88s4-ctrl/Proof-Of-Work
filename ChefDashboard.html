@@ -468,12 +468,12 @@ th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-
 <div id="tab-live" class="tab-content active">
   <div class="card">
     <div class="card-title">
-      <span>Laufende Touren Aktiver Fahrer</span>
+      <span>Echte Live-Touren Aktiver Fahrer</span>
       <span style="font-size: 12px; color: var(--success); font-weight:600;">● Live</span>
     </div>
 
     <div id="liveToursContainer">
-      <p style="color: var(--text-muted); font-size: 14px;">Lade Touren aus Supabase...</p>
+      <p style="color: var(--text-muted); font-size: 14px;">Lade Live-Daten aus Supabase...</p>
     </div>
   </div>
 </div>
@@ -739,6 +739,13 @@ function subscribeRealtime() {
   supabaseClient
     .channel('public:stops')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'stops' }, () => {
+      loadToursFromSupabase();
+    })
+    .subscribe();
+
+  supabaseClient
+    .channel('public:tours')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'tours' }, () => {
       loadToursFromSupabase();
     })
     .subscribe();
@@ -1040,7 +1047,6 @@ async function createAndSendTour() {
 }
 
 async function loadToursFromSupabase() {
-  // Lade alle Touren mitsamt Stopps und Fahrer-Profil (auch inaktive, da wir sie für Nachweise brauchen)
   const { data: tours, error } = await supabaseClient
     .from('tours')
     .select('*, stops(*), profiles:assigned_to(full_name, email, is_active)');
@@ -1050,16 +1056,14 @@ async function loadToursFromSupabase() {
     return;
   }
 
-  // 1. Für den LIVE-MONITOR: Nur Touren von AKTIVEN Fahrern, die noch GEPLANT oder LAUFEND sind (nicht 'beendet')
+  // Live-Monitor Filter: NUR aktive Fahrer und NUR Touren, die NICHT beendet sind
   const activeLiveTours = (tours || []).filter(t => {
-    const isDriverActive = t.profiles ? t.profiles.is_active !== false : false;
-    const isLiveStatus = t.status === 'geplant' || t.status === 'in_bearbeitung' || t.status === 'aktiv';
-    return isDriverActive && isLiveStatus;
+    const isDriverActive = t.profiles && t.profiles.is_active === true;
+    const isNotFinished = t.status !== 'beendet';
+    return isDriverActive && isNotFinished;
   });
 
   renderTours(activeLiveTours);
-
-  // 2. Für NACHWEISE: Alle Stopps/Fotobeweise sammeln (auch von gelöschten/inaktiven Fahrern!)
   extractAndProcessProofs(tours || []);
 }
 
@@ -1394,7 +1398,7 @@ function exportSelectedProofsPDF() {
 function downloadSingleProofPDF() {
   if (!activeModalProof) return;
   
-  const element = document.createElement('div');
+  The element = document.createElement('div');
   element.innerHTML = generatePDFHTML([activeModalProof], `Einzel-Leistungsnachweis`);
 
   const opt = {
