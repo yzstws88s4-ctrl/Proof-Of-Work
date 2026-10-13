@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="dark">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Veribase – Enterprise Cloud Auth</title>
+  <title>Veribase - Login</title>
 
+  <!-- PWA & Homescreen Settings (iOS & Android) -->
   <meta name="apple-mobile-web-app-title" content="Veribase">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,132 +13,52 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest.json">
 
-  <script>
-    if (!localStorage.getItem('veribase_theme')) {
-      localStorage.setItem('veribase_theme', 'dark');
-    }
-    document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
-  </script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     :root {
-      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --primary: #3b82f6;
-      --primary-glow: rgba(59, 130, 246, 0.35);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --primary: #2563eb;
       --bg: #f8fafc;
-      --card: rgba(255, 255, 255, 0.85);
+      --card: #ffffff;
       --text: #0f172a;
       --text-muted: #64748b;
-      --border: rgba(226, 232, 240, 0.8);
+      --border: #e2e8f0;
       --input-bg: #f1f5f9;
-      --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
     [data-theme="dark"] {
-      --bg: #030712;
-      --card: rgba(15, 23, 42, 0.75);
+      --bg: #0f172a;
+      --card: #1e293b;
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --border: rgba(51, 65, 85, 0.6);
-      --input-bg: rgba(2, 6, 23, 0.6);
-      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      --border: #334155;
+      --input-bg: #0f172a;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; }
     body {
       font-family: var(--font-family);
       background-color: var(--bg);
       color: var(--text);
       margin: 0; padding: 20px;
       display: flex; justify-content: center; align-items: center; min-height: 100vh;
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
-      background-attachment: fixed;
-      transition: background-color 0.4s ease, color 0.4s ease;
     }
-    .login-container { width: 100%; max-width: 420px; position: relative; }
-    
+    .login-container { width: 100%; max-width: 400px; position: relative; }
     .theme-toggle-btn {
-      position: absolute; top: -70px; right: 0;
+      position: absolute; top: -60px; right: 0;
       background: var(--card); border: 1px solid var(--border); color: var(--text);
-      width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;
-      backdrop-filter: blur(12px); box-shadow: var(--shadow); transition: all 0.25s ease;
+      width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
-    .theme-toggle-btn:hover { border-color: var(--primary); transform: translateY(-2px); }
     .theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
-
-    .card {
-      background: var(--card);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 36px 32px;
-      box-shadow: var(--shadow);
-      transition: all 0.3s ease;
-    }
-
-    .title-group { text-align: center; margin-bottom: 28px; }
-    
-    .logo-wrapper {
-      position: relative;
-      width: 76px;
-      height: 76px;
-      margin: 0 auto 16px auto;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px -5px var(--primary-glow);
-      border: 1px solid var(--border);
-    }
-
-    .login-logo {
-      width: 100%; height: 100%; object-fit: contain; display: block; background: var(--card);
-    }
-
-    .logo-wrapper::after {
-      content: '';
-      position: absolute; top: -50%; left: -150%; width: 200%; height: 200%;
-      background: linear-gradient(45deg, transparent 35%, rgba(255, 255, 255, 0.7) 50%, transparent 65%);
-      transform: rotate(25deg); pointer-events: none;
-    }
-
-    .logo-wrapper.glow-active::after {
-      animation: logoShinePingPong 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-    }
-
-    @keyframes logoShinePingPong {
-      0% { left: -150%; }
-      50% { left: 100%; }
-      100% { left: -150%; }
-    }
-
-    .title { font-size: 24px; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.03em; }
-    .subtitle { font-size: 13px; color: var(--text-muted); margin: 0; font-weight: 500; }
-    
-    label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
-    
-    input {
-      width: 100%; background: var(--input-bg); border: 1px solid var(--border);
-      border-radius: 14px; padding: 14px 16px; color: var(--text); font-family: inherit; font-size: 14px;
-      margin-bottom: 20px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); background: var(--card); }
-
-    button.submit-btn {
-      width: 100%; padding: 15px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700;
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; cursor: pointer;
-      box-shadow: 0 8px 20px -4px var(--primary-glow); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      letter-spacing: -0.01em;
-    }
-    button.submit-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-    button.submit-btn:active { transform: scale(0.98); }
-    button.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-    
-    .error { color: #ef4444; font-size: 13px; margin-top: 16px; text-align: center; font-weight: 600; min-height: 20px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; box-shadow: var(--shadow); }
+    .title-group { text-align: center; margin-bottom: 24px; }
+    .title { font-size: 24px; font-weight: 700; margin: 0 0 6px 0; }
+    .subtitle { font-size: 13px; color: var(--text-muted); margin: 0; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+    input { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); font-size: 14px; margin-bottom: 16px; }
+    button.submit-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; background: var(--primary); color: white; cursor: pointer; }
+    button.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error { color: #ef4444; font-size: 13px; margin-top: 12px; text-align: center; font-weight: 500; min-height: 18px; }
   </style>
 </head>
 <body>
@@ -147,13 +68,10 @@
     <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
   </button>
 
-  <div class="card" id="loginCard">
+  <div class="card">
     <div class="title-group">
-      <div class="logo-wrapper" id="logoWrapper">
-        <img src="logo.png" alt="Veribase Logo" class="login-logo">
-      </div>
       <h1 class="title">Veribase</h1>
-      <p class="subtitle">Enterprise Cloud Management</p>
+      <p class="subtitle">Anmeldung für Chefs & Fahrer</p>
     </div>
 
     <form onsubmit="handleLogin(event)">
@@ -183,24 +101,19 @@
 
   function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('veribase_theme', next);
+    document.documentElement.setAttribute('data-theme', current === 'dark' ? '' : 'dark');
   }
 
   async function handleLogin(e) {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     const errorMsg = document.getElementById('errorMsg');
-    const logoWrapper = document.getElementById('logoWrapper');
     
     let identifier = document.getElementById('username').value.trim().toLowerCase();
     const password = document.getElementById('password').value;
 
+    errorMsg.innerText = 'Prüfe Zugangsdaten...';
     btn.disabled = true;
-    logoWrapper.classList.add('glow-active');
-    errorMsg.style.color = 'var(--primary)';
-    errorMsg.innerText = 'Authentifiziere...';
 
     if (!identifier.includes('@')) {
       identifier = `${identifier}@app.local`;
@@ -212,18 +125,12 @@
     });
 
     if (authError) {
-      logoWrapper.classList.remove('glow-active');
-      errorMsg.style.color = '#ef4444';
       errorMsg.innerText = 'Login fehlgeschlagen: Zugangsdaten ungültig.';
       btn.disabled = false;
       return;
     }
 
-    errorMsg.innerText = 'Erfolgreich angemeldet!';
-
-    setTimeout(async () => {
-      await redirectUser(authData.user.id);
-    }, 1200);
+    await redirectUser(authData.user.id);
   }
 
   async function redirectUser(userId) {
@@ -236,7 +143,6 @@
       .maybeSingle();
 
     if (profileError || !profile) {
-      errorMsg.style.color = '#ef4444';
       errorMsg.innerText = 'Profil konnte nicht geladen werden.';
       document.getElementById('submitBtn').disabled = false;
       return;
@@ -249,5 +155,6 @@
     }
   }
 </script>
+
 </body>
 </html>
