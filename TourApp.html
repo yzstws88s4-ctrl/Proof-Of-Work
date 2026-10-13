@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Veribase – Driver Operations</title>
 
-<!-- PWA & Mobile Settings -->
 <meta name="apple-mobile-web-app-title" content="Veribase">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,7 +29,7 @@
 :root {
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #f8fafc;
-  --surface: #ffffff;
+  --surface: rgba(255, 255, 255, 0.85);
   --border: rgba(0, 0, 0, 0.08);
   --text-main: #0f172a;
   --text-sub: #475569;
@@ -41,17 +40,17 @@
   --input-bg: #f1f5f9;
   --success: #10b981;
   --success-bg: rgba(16, 185, 129, 0.12);
-  --shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.06);
+  --shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="dark"] {
   --bg: #070b14;
-  --surface: #0f172a;
+  --surface: rgba(15, 23, 42, 0.75);
   --border: rgba(255, 255, 255, 0.08);
   --text-main: #f9fafb;
   --text-sub: #9ca3af;
   --text-muted: #6b7280;
-  --input-bg: #020617;
+  --input-bg: rgba(2, 6, 23, 0.6);
   --shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
 }
 
@@ -81,19 +80,20 @@ body {
 
 .icon-btn {
   background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
-  height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; padding: 0 12px; font-size: 12px; font-weight: 600; box-shadow: var(--shadow);
+  height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0 14px; font-size: 12px; font-weight: 600; box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
 }
-.icon-btn.theme-btn { width: 38px; padding: 0; }
+.icon-btn.theme-btn { width: 40px; padding: 0; }
 .icon-btn.theme-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 .card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-  padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); backdrop-filter: blur(10px);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+  padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); backdrop-filter: blur(16px);
 }
 
 button, .nav-link-btn {
-  width: 100%; padding: 14px 18px; border: none; border-radius: 14px; font-size: 14px;
+  width: 100%; padding: 15px 18px; border: none; border-radius: 14px; font-size: 14px;
   font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;
   gap: 10px; margin-bottom: 12px; text-decoration: none; font-family: inherit;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -113,33 +113,33 @@ button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .btn-grid button { margin-bottom: 0; padding: 12px; font-size: 13px; }
 
 .stop-actions-grid { display: grid; grid-template-columns: 24% 73%; gap: 3%; margin-bottom: 14px; }
-.stop-actions-grid button { margin-bottom: 0; height: 50px; font-size: 13px; }
+.stop-actions-grid button { margin-bottom: 0; height: 52px; font-size: 13px; }
 
 .btn-navigate {
-  min-height: 70px; font-size: 18px; font-weight: 800; text-transform: uppercase;
+  min-height: 72px; font-size: 18px; font-weight: 800; text-transform: uppercase;
   background: var(--success-bg); color: var(--success); border-radius: 16px;
   border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
   margin-bottom: 16px; letter-spacing: 0.02em;
 }
 
 textarea, input[type="text"] {
-  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px; color: var(--text-main); font-family: inherit; font-size: 13px; margin-bottom: 12px;
+  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px 16px; color: var(--text-main); font-family: inherit; font-size: 14px; margin-bottom: 14px;
 }
 textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-textarea { height: 100px; resize: vertical; }
+textarea { height: 110px; resize: vertical; }
 
 select {
-  width: 100%; padding: 12px 14px; background: var(--input-bg); border: 1px solid var(--border);
-  border-radius: 12px; color: var(--text-main); font-size: 13px; margin-bottom: 14px; font-family: inherit; cursor: pointer;
+  width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border);
+  border-radius: 14px; color: var(--text-main); font-size: 14px; margin-bottom: 16px; font-family: inherit; cursor: pointer;
 }
 
 .toggle-box {
   display: flex; align-items: center; justify-content: space-between;
-  background: var(--input-bg); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px;
+  background: var(--input-bg); padding: 14px 18px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px;
 }
 
-.switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider {
   position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -150,44 +150,44 @@ select {
   background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 input:checked + .slider { background-color: var(--accent) !important; }
-input:checked + .slider:before { transform: translateX(18px); }
+input:checked + .slider:before { transform: translateX(20px); }
 
 #tour-view { display: none; }
 
 .current-destination {
-  background: var(--input-bg); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 14px; text-align: center;
+  background: var(--input-bg); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 16px; text-align: center;
 }
-.dest-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; letter-spacing: 0.05em; }
-.dest-text { font-size: 18px; font-weight: 700; margin-top: 4px; word-break: break-word; }
+.dest-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; letter-spacing: 0.06em; }
+.dest-text { font-size: 19px; font-weight: 700; margin-top: 6px; word-break: break-word; }
 .gps-status { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
 
-.stop-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; background: var(--input-bg); }
+.stop-list { max-height: 240px; overflow-y: auto; border: 1px solid var(--border); border-radius: 14px; margin-bottom: 16px; background: var(--input-bg); }
 .stop-item {
-  padding: 12px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 13px; cursor: pointer;
+  padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 13px; cursor: pointer;
 }
 .stop-item:last-child { border-bottom: none; }
 .stop-item.done { opacity: 0.4; }
 .stop-item.done .stop-name { text-decoration: line-through; }
-.stop-item.active { background: var(--surface); font-weight: 700; border-left: 3px solid var(--accent); }
+.stop-item.active { background: var(--surface); font-weight: 700; border-left: 4px solid var(--accent); }
 
-.proof-gallery-container { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-.proof-item-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-.proof-item-card img { width: 100%; max-height: 180px; object-fit: cover; display: block; }
-.proof-item-info { padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+.proof-gallery-container { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.proof-item-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.proof-item-card img { width: 100%; max-height: 190px; object-fit: cover; display: block; }
+.proof-item-info { padding: 12px; font-size: 12px; display: flex; flex-direction: column; gap: 4px; }
 
 .modal-overlay {
   display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); z-index: 999;
+  background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px); z-index: 999;
   align-items: center; justify-content: center; padding: 16px;
 }
 .modal-box {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-  padding: 20px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+  padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; backdrop-filter: blur(20px);
 }
 
 .history-card {
-  border: 1px solid var(--border); background: var(--input-bg); border-radius: 12px;
-  padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s ease;
+  border: 1px solid var(--border); background: var(--input-bg); border-radius: 14px;
+  padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease;
 }
 .history-card:hover { border-color: var(--text-muted); }
 
@@ -215,7 +215,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 
   <!-- SETUP VIEW -->
   <div class="card" id="setup-view">
-    <div style="font-weight: 700; margin-bottom: 12px; font-size: 14px;">Tour planen & laden</div>
+    <div style="font-weight: 700; margin-bottom: 14px; font-size: 15px;">Tour planen & einlesen</div>
     <div class="btn-grid">
       <button class="btn-primary" onclick="document.getElementById('ocrCameraInput').click()">
         <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> OCR Kamera
@@ -246,7 +246,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       <option value="apple">Apple Maps</option>
     </select>
 
-    <button class="btn-primary" onclick="loadSupabaseTour()" style="margin-bottom: 10px;">
+    <button class="btn-primary" onclick="loadSupabaseTour()" style="margin-bottom: 12px;">
       <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       Live-Tour vom Chef laden
     </button>
@@ -255,10 +255,10 @@ input:checked + .slider:before { transform: translateX(18px); }
       Tour starten
     </button>
 
-    <div style="margin-top: 22px; border-top: 1px solid var(--border); padding-top: 16px;">
-      <div style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">Vergangene Touren</div>
+    <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 18px;">
+      <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Vergangene Touren</div>
       <div id="tourHistoryContainer">
-        <p style="color: var(--text-muted); font-size: 12px;">Lade Archiv...</p>
+        <p style="color: var(--text-muted); font-size: 13px;">Lade Archiv...</p>
       </div>
     </div>
   </div>
@@ -272,7 +272,7 @@ input:checked + .slider:before { transform: translateX(18px); }
     </div>
 
     <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
-      <svg class="icon-svg" style="width:20px; height:20px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      <svg class="icon-svg" style="width:22px; height:22px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       Jetzt Navigieren
     </a>
 
@@ -288,22 +288,22 @@ input:checked + .slider:before { transform: translateX(18px); }
       </button>
     </div>
 
-    <div style="margin-top: 14px; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em;">
+    <div style="margin-top: 16px; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em;">
       Tourübersicht (Tippen zum Bearbeiten)
     </div>
     <div class="stop-list" id="stopListContainer"></div>
 
-    <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 14px;">
+    <div style="margin-top: 22px; border-top: 1px solid var(--border); padding-top: 16px;">
       <div style="font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em;">
         Fotobeweise (<span id="photoCount">0</span>)
       </div>
       <div class="proof-gallery-container" id="galleryGrid"></div>
     </div>
 
-    <button class="btn-success" style="margin-top: 20px;" id="finishTourBtn" onclick="finishAndSaveTour()">
+    <button class="btn-success" style="margin-top: 22px;" id="finishTourBtn" onclick="finishAndSaveTour()">
       Tour beenden & Speichern
     </button>
-    <button class="btn-primary" style="margin-top: 6px;" onclick="cancelAndReturn()">
+    <button class="btn-primary" style="margin-top: 8px;" onclick="cancelAndReturn()">
       Abbrechen
     </button>
   </div>
@@ -314,10 +314,10 @@ input:checked + .slider:before { transform: translateX(18px); }
 <!-- FOTO MODAL -->
 <div class="modal-overlay" id="proofPreviewModal">
   <div class="modal-box">
-    <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Fotobeweis erfassen</div>
+    <div style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">Fotobeweis erfassen</div>
     <input type="text" id="modalProofNoteInput" placeholder="Notiz zum Stopp..." oninput="updateLiveStampNote()">
-    <div style="border-radius: 12px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--border); background: #000;">
-      <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 240px; object-fit: contain;">
+    <div style="border-radius: 14px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border); background: #000;">
+      <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 260px; object-fit: contain;">
     </div>
     <button class="btn-success" onclick="confirmAndUploadProof()">Bestätigen & Weiter</button>
   </div>
@@ -326,14 +326,14 @@ input:checked + .slider:before { transform: translateX(18px); }
 <!-- STOPP BEARBEITEN MODAL -->
 <div class="modal-overlay" id="noteEditModal">
   <div class="modal-box">
-    <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;" id="noteModalTitle">Stopp bearbeiten</div>
-    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 10px;" id="noteModalSub">Details</div>
+    <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;" id="noteModalTitle">Stopp bearbeiten</div>
+    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;" id="noteModalSub">Details</div>
     <textarea id="noteModalInput" placeholder="Notiz eingeben..."></textarea>
-    <button class="btn-primary" onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 10px;">
+    <button class="btn-primary" onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 12px;">
       Foto aufnehmen / ersetzen
     </button>
-    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border);">
-      <img id="modalStopPhotoImg" src="" style="width: 100%; max-height: 150px; object-fit: cover; display: block;">
+    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 12px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+      <img id="modalStopPhotoImg" src="" style="width: 100%; max-height: 160px; object-fit: cover; display: block;">
     </div>
     <div style="display: flex; gap: 10px;">
       <button class="btn-success" style="margin-bottom:0;" onclick="saveStopNoteFromModal()">Speichern</button>
@@ -344,10 +344,10 @@ input:checked + .slider:before { transform: translateX(18px); }
 
 <!-- DETAILS MODAL -->
 <div class="modal-overlay" id="tourDetailModal">
-  <div class="modal-box" style="max-height: 80vh;">
-    <h3 id="detailTourTitle" style="margin-top:0; margin-bottom: 10px; font-size: 16px;">Tour Details</h3>
-    <div id="detailStopsContainer" style="overflow-y: auto; flex-grow: 1; margin-bottom: 14px; padding-right: 2px;"></div>
-    <div style="display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 12px;">
+  <div class="modal-box" style="max-height: 85vh;">
+    <h3 id="detailTourTitle" style="margin-top:0; margin-bottom: 12px; font-size: 18px;">Tour Details</h3>
+    <div id="detailStopsContainer" style="overflow-y: auto; flex-grow: 1; margin-bottom: 16px; padding-right: 4px;"></div>
+    <div style="display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
       <button class="btn-danger" style="margin-bottom:0;" onclick="archiveCurrentDetailTour()">Ausblenden</button>
       <button class="btn-primary" style="margin-bottom:0;" onclick="closeDetailModal()">Zurück</button>
     </div>
@@ -357,8 +357,8 @@ input:checked + .slider:before { transform: translateX(18px); }
 <!-- INFO MODAL -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box" style="text-align: center;">
-    <div style="font-size:16px; font-weight:700;" id="modalTitle">Hinweis</div>
-    <div id="modalBody" style="margin: 10px 0; font-size: 13px;"></div>
+    <div style="font-size:18px; font-weight:700;" id="modalTitle">Hinweis</div>
+    <div id="modalBody" style="margin: 12px 0; font-size: 14px;"></div>
     <button class="btn-success" onclick="closeModal()" style="margin-bottom:0;">OK</button>
   </div>
 </div>
@@ -506,9 +506,9 @@ function renderTourUI() {
     item.innerHTML = `
       <div class="stop-name" style="pointer-events: none;">
         <strong>#${idx + 1}</strong> ${stop.address}${hasPhotoBadge}
-        ${stop.notes ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Notiz: ${stop.notes}</div>` : ''}
+        ${stop.notes ? `<div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Notiz: ${stop.notes}</div>` : ''}
       </div>
-      <div style="font-size: 11px; color: var(--text-muted); text-align: right; pointer-events: none;">
+      <div style="font-size: 12px; color: var(--text-muted); text-align: right; pointer-events: none;">
         ${stop.done ? 'Erledigt' : 'Offen'}<br><span style="text-decoration: underline;">Bearbeiten</span>
       </div>
     `;
@@ -738,7 +738,7 @@ function updateGalleryGrid() {
 async function finishAndSaveTour() {
   const btn = document.getElementById('finishTourBtn');
   btn.disabled = true;
-  btn.innerText = "Speichere...";
+  btn.innerText = "Speichere Tour...";
 
   try {
     let tourId = currentSupabaseTourId;
@@ -784,7 +784,7 @@ async function finishAndSaveTour() {
       }
     }
 
-    alert("Tour erfolgreich gespeichert!");
+    alert("Tour erfolgreich in Supabase gespeichert!");
     cancelAndReturn();
   } catch (err) {
     alert("Fehler: " + err.message);
@@ -811,7 +811,7 @@ async function loadTourHistory() {
   const { data: tours } = await supabaseClient.from('tours').select('*, stops(*)').eq('assigned_to', currentUser.id).eq('archived_by_driver', false).order('created_at', { ascending: false });
 
   if (!tours || tours.length === 0) {
-    container.innerHTML = '<p style="color: var(--text-muted); font-size: 12px;">Keine Archiv-Touren.</p>';
+    container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Noch keine gefahrenen Touren vorhanden.</p>';
     return;
   }
 
@@ -824,7 +824,7 @@ async function loadTourHistory() {
     const card = document.createElement('div');
     card.className = 'history-card';
     card.onclick = () => openTourDetails(tour);
-    card.innerHTML = `<div style="display:flex; justify-content:space-between; font-weight:700; font-size:13px;"><span>${tour.title}</span><span style="color:var(--text-muted); font-size:11px;">${dateStr}</span></div><div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Status: ${tour.status} • ${done}/${total} Stopps</div>`;
+    card.innerHTML = `<div style="display:flex; justify-content:space-between; font-weight:700; font-size:14px;"><span>${tour.title}</span><span style="color:var(--text-muted); font-size:12px;">${dateStr}</span></div><div style="font-size:12px; color:var(--text-sub); margin-top:4px;">Status: <strong>${tour.status}</strong> • ${done}/${total} erledigt</div>`;
     container.appendChild(card);
   });
 }
@@ -836,12 +836,12 @@ function openTourDetails(tour) {
   container.innerHTML = '';
 
   if (!tour.stops || tour.stops.length === 0) {
-    container.innerHTML = '<p style="font-size:12px; color:var(--text-muted);">Keine Stopps.</p>';
+    container.innerHTML = '<p style="font-size:13px; color:var(--text-muted);">Keine Stopps vorhanden.</p>';
   } else {
     tour.stops.sort((a,b) => a.sequence - b.sequence).forEach(s => {
       const box = document.createElement('div');
-      box.style.cssText = "border:1px solid var(--border); padding:10px; border-radius:10px; margin-bottom:8px; background:var(--input-bg); font-size:12px;";
-      box.innerHTML = `<strong>#${s.sequence}: ${s.address}</strong><br><span style="color:var(--text-sub);">Status: ${s.status}</span>${s.notes ? `<br><b>Notiz:</b> ${s.notes}` : ''}${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:6px; margin-top:6px; max-height:140px; object-fit:cover;">` : ''}`;
+      box.style.cssText = "border:1px solid var(--border); padding:12px; border-radius:12px; margin-bottom:10px; background:var(--input-bg); font-size:13px;";
+      box.innerHTML = `<strong>#${s.sequence}: ${s.address}</strong><br><span style="color:var(--text-sub);">Status: ${s.status}</span>${s.notes ? `<br><b>Notiz:</b> ${s.notes}` : ''}${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:8px; margin-top:8px; max-height:160px; object-fit:cover;">` : ''}`;
       container.appendChild(box);
     });
   }
@@ -855,7 +855,7 @@ function closeDetailModal() {
 
 async function archiveCurrentDetailTour() {
   if (!activeDetailTourId) return;
-  if (!confirm("Aus Ansicht entfernen?")) return;
+  if (!confirm("Möchtest du diese Tour aus deiner Ansicht entfernen?")) return;
   await supabaseClient.from('tours').update({ archived_by_driver: true }).eq('id', activeDetailTourId);
   closeDetailModal();
   loadTourHistory();
