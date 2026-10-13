@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Veribase – Enterprise Management Dashboard</title>
 
-<!-- PWA & Homescreen Settings -->
+<!-- PWA Settings -->
 <meta name="apple-mobile-web-app-title" content="Veribase">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,191 +14,109 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="manifest.json">
 
-<!-- Google Fonts (Inter) -->
+<!-- Fonts & CDNs -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- PDF Generator CDN -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<!-- OCR Texterkennung -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 :root {
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --primary-light: rgba(59, 130, 246, 0.1);
+  --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: rgba(0, 0, 0, 0.08);
+  --text-main: #0f172a;
+  --text-sub: #475569;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --input-bg: #f1f5f9;
   --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.1);
+  --success-bg: rgba(16, 185, 129, 0.12);
   --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.1);
+  --warning-bg: rgba(245, 158, 11, 0.12);
   --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.1);
-
-  --bg: #f3f4f6;
-  --card: #ffffff;
-  --text: #111827;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
-  --input-bg: #f9fafb;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="dark"] {
-  --bg: #060913;
-  --card: #0b1120;
-  --text: #f3f4f6;
-  --text-muted: #9ca3af;
-  --border: #1e293b;
+  --bg: #070b14;
+  --surface: #0f172a;
+  --border: rgba(255, 255, 255, 0.08);
+  --text-main: #f9fafb;
+  --text-sub: #9ca3af;
+  --text-muted: #6b7280;
   --input-bg: #020617;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
-  font-family: var(--font-family);
+  font-family: var(--font);
   background-color: var(--bg);
-  color: var(--text);
-  margin: 0;
-  padding: 40px 20px;
-  display: flex;
-  justify-content: center;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  color: var(--text-main);
+  margin: 0; padding: 32px 20px;
+  display: flex; justify-content: center;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease;
 }
 
 .container { width: 100%; max-width: 1280px; }
 
-/* Header Design */
+/* Header */
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
-  gap: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); gap: 16px;
 }
 
-.brand-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+.brand-wrapper { display: flex; align-items: center; gap: 14px; }
 
 .brand-logo-box {
-  width: 46px;
-  height: 46px;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 20px;
-  box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.4);
+  width: 48px; height: 48px; background: var(--accent-gradient); border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 20px;
+  box-shadow: 0 6px 20px var(--accent-glow);
 }
 
-.title { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.03em; }
-.subtitle { font-size: 12px; color: var(--text-muted); margin: 3px 0 0 0; font-weight: 500; }
+.title { font-size: 20px; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+.subtitle { font-size: 12px; color: var(--text-sub); margin: 2px 0 0 0; font-weight: 500; }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.header-actions { display: flex; align-items: center; gap: 10px; }
 
 .theme-toggle-btn, .logout-btn {
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--text);
-  height: 42px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  padding: 0 16px;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
+  height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0 16px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow);
+  transition: all 0.2s ease;
 }
-
-.theme-toggle-btn:hover, .logout-btn:hover {
-  border-color: var(--primary);
-  background: var(--primary-light);
-  transform: translateY(-1px);
-}
-
+.theme-toggle-btn:hover, .logout-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
 .theme-toggle-btn { width: 42px; padding: 0; }
-.theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
+.theme-toggle-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Navigation Tabs */
-.nav-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 32px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-}
+.nav-tabs { display: flex; gap: 8px; margin-bottom: 28px; overflow-x: auto; padding-bottom: 4px; }
+.nav-tabs::-webkit-scrollbar { display: none; }
 
 .tab-btn {
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow);
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-sub);
+  padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+  white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; box-shadow: var(--shadow);
 }
-
-.tab-btn:hover {
-  color: var(--text);
-  border-color: var(--text-muted);
-  transform: translateY(-1px);
-}
-
-.tab-btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-  box-shadow: 0 8px 20px -4px rgba(59, 130, 246, 0.4);
-}
+.tab-btn:hover { color: var(--text-main); border-color: var(--text-muted); }
+.tab-btn.active { background: var(--accent-gradient); color: white; border-color: transparent; box-shadow: 0 4px 16px var(--accent-glow); }
 
 /* Card System */
 .card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 28px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow);
-  transition: box-shadow 0.3s ease;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  padding: 26px; margin-bottom: 24px; box-shadow: var(--shadow); backdrop-filter: blur(10px);
 }
 
 .card-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin-top: 0;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  letter-spacing: -0.02em;
+  font-size: 16px; font-weight: 700; margin: 0 0 20px 0; display: flex; align-items: center; justify-content: space-between; letter-spacing: -0.01em;
 }
 
 .tab-content { display: none; }
@@ -207,329 +125,103 @@ body {
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 
-/* Form Elements */
-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+/* Forms */
+label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
 
 input[type="text"], input[type="password"], input[type="date"], input[type="email"], select, textarea {
-  width: 100%;
-  background: var(--input-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 13px 16px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 14px;
-  margin-bottom: 18px;
+  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; color: var(--text-main); font-family: inherit; font-size: 13px; margin-bottom: 16px;
   transition: all 0.2s ease;
 }
-
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-  background: var(--card);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-}
-
-input[type="date"] {
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  filter: invert(0.7);
-}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); background: var(--surface); }
 
 button {
-  padding: 13px 20px;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 12px 18px; border: none; border-radius: 12px; font-size: 13px; font-weight: 700;
+  font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;
 }
-
 button:active { transform: scale(0.98); }
-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-primary { background: var(--accent-gradient); color: white; box-shadow: 0 4px 14px var(--accent-glow); }
+.btn-primary:hover { opacity: 0.95; transform: translateY(-1px); }
 
-.btn-success { background: var(--success); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-.btn-success:hover { background: #059669; transform: translateY(-1px); }
+.btn-success { background: var(--success); color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25); }
+.btn-success:hover { background: #059669; }
 
-.btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
-.btn-danger:hover { background: #dc2626; transform: translateY(-1px); }
+.btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25); }
+.btn-danger:hover { background: #dc2626; }
 
-.btn-secondary { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:hover { background: var(--border); border-color: var(--text-muted); }
+.btn-secondary { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--text-muted); }
 
-/* Live Monitor Cards */
+/* Live Monitor */
 .tour-monitor-card {
-  border: 1px solid var(--border);
-  background: var(--input-bg);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 16px;
-  transition: all 0.25s ease;
+  border: 1px solid var(--border); background: var(--input-bg); border-radius: 14px; padding: 18px; margin-bottom: 14px; transition: all 0.2s ease;
 }
-.tour-monitor-card:hover {
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary);
-  transform: translateY(-2px);
-}
+.tour-monitor-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
 
-.progress-bar-bg {
-  background: var(--border);
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 14px 0 10px 0;
-}
-
-.progress-bar-fill {
-  background: var(--success);
-  height: 100%;
-  width: 0%;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
+.progress-bar-bg { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin: 12px 0 8px 0; }
+.progress-bar-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.4s ease; }
 
 /* Scan Box */
 .scan-action-box {
-  background: var(--input-bg);
-  border: 2px dashed var(--border);
-  border-radius: 16px;
-  padding: 24px;
-  text-align: center;
-  margin-bottom: 24px;
-  transition: all 0.25s ease;
+  background: var(--input-bg); border: 2px dashed var(--border); border-radius: 16px; padding: 22px; text-align: center; margin-bottom: 22px; transition: all 0.2s ease;
 }
-.scan-action-box:hover {
-  border-color: var(--primary);
-  background: var(--primary-light);
-}
-
-.scan-btn-group {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 14px;
-}
-
-.scan-status {
-  font-size: 12px;
-  color: var(--success);
-  font-weight: 600;
-  margin-top: 10px;
-  display: none;
-}
+.scan-action-box:hover { border-color: var(--accent); }
+.scan-btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
 
 /* Tables */
-.table-responsive { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); background: var(--card); }
+.table-responsive { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-th, td { padding: 16px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-th { color: var(--text-muted); font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: var(--input-bg); }
+th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th { color: var(--text-sub); font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: var(--input-bg); }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
+tr:hover td { background-color: rgba(99, 102, 241, 0.02); }
 
-.custom-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--primary);
-  border-radius: 4px;
-}
+.custom-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); border-radius: 4px; }
 
 .batch-action-bar {
-  display: none;
-  background: var(--primary-light);
-  border: 1px solid var(--primary);
-  border-radius: 14px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  align-items: center;
-  justify-content: space-between;
-  animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: none; background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); border-radius: 12px;
+  padding: 14px 18px; margin-bottom: 18px; align-items: center; justify-content: space-between;
 }
 .batch-action-bar.active { display: flex; }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+.proof-table-img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: transform 0.2s; }
+.proof-table-img:hover { transform: scale(1.1); }
+.proof-table-img-placeholder { width: 44px; height: 44px; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--text-muted); text-align: center; font-weight: 600; }
 
-.proof-table-img {
-  width: 46px;
-  height: 46px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.proof-table-img:hover { transform: scale(1.12); }
-
-.proof-table-img-placeholder {
-  width: 46px;
-  height: 46px;
-  border-radius: 10px;
-  background: var(--input-bg);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  color: var(--text-muted);
-  font-weight: 600;
-  text-align: center;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 30px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-}
+.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
 .status-erledigt { background: var(--success-bg); color: var(--success); }
 .status-offen { background: var(--warning-bg); color: var(--warning); }
 
-.filter-container {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-@media (max-width: 600px) {
-  .filter-container { grid-template-columns: 1fr; }
-}
+.filter-container { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+@media (max-width: 600px) { .filter-container { grid-template-columns: 1fr; } }
 
 /* Modals */
 .modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(2, 6, 23, 0.8);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-  animation: fadeIn 0.25s ease;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
 }
+.modal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; max-width: 480px; width: 100%; overflow: hidden; box-shadow: var(--shadow); }
+.modal-header { padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+.modal-header h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.modal-close { background: transparent; border: none; font-size: 18px; color: var(--text-sub); cursor: pointer; }
+.modal-body { padding: 22px; }
+.modal-body img { width: 100%; max-height: 280px; object-fit: contain; background: #000; border-radius: 12px; margin-bottom: 16px; }
 
-.modal-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  max-width: 500px;
-  width: 100%;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-}
+.modal-info-list { font-size: 12px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; background: var(--input-bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border); }
 
-.modal-header {
-  padding: 20px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-}
-.modal-header h3 { margin: 0; font-size: 17px; font-weight: 700; }
-.modal-close {
-  background: transparent;
-  border: none;
-  font-size: 18px;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-.modal-close:hover { background: var(--input-bg); color: var(--text); }
+.logo-upload-box { border: 2px dashed var(--border); background: var(--input-bg); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+.logo-upload-box:hover { border-color: var(--accent); }
+.logo-preview-box { max-width: 160px; max-height: 60px; object-fit: contain; margin: 10px auto 0 auto; border: 1px solid var(--border); border-radius: 8px; padding: 4px; background: #fff; display: none; }
 
-.modal-body { padding: 24px; }
-.modal-body img {
-  width: 100%;
-  max-height: 300px;
-  object-fit: contain;
-  background: #000;
-  border-radius: 14px;
-  margin-bottom: 18px;
-}
-
-.modal-info-list {
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 24px;
-  background: var(--input-bg);
-  padding: 16px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-}
-
-/* Logo Upload */
-.logo-upload-box {
-  border: 2px dashed var(--border);
-  background: var(--input-bg);
-  border-radius: 14px;
-  padding: 24px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  margin-bottom: 14px;
-}
-.logo-upload-box:hover { border-color: var(--primary); background: var(--primary-light); }
-.logo-preview-box {
-  max-width: 180px;
-  max-height: 70px;
-  object-fit: contain;
-  margin: 14px auto 0 auto;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px;
-  background: #ffffff;
-  display: none;
-}
-
-.icon-svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  display: inline-block;
-  vertical-align: middle;
-}
+.icon-svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; vertical-align: middle; }
 </style>
 </head>
 <body>
 
 <div class="container">
 
-<!-- Enterprise Header -->
+<!-- Header -->
 <div class="header">
   <div class="brand-wrapper">
     <div class="brand-logo-box">V</div>
@@ -540,7 +232,7 @@ tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
   </div>
   <div class="header-actions">
     <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
-      <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
     </button>
     <button class="logout-btn" onclick="logout()">Abmelden</button>
   </div>
@@ -549,24 +241,19 @@ tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
 <!-- Navigation Tabs -->
 <div class="nav-tabs">
   <button class="tab-btn active" onclick="switchTab(event, 'tab-live')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    Live-Monitor
+    <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Live-Monitor
   </button>
   <button class="tab-btn" onclick="switchTab(event, 'tab-team')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    Fahrer
+    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Fahrer
   </button>
   <button class="tab-btn" onclick="switchTab(event, 'tab-planer')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-    Tour-Planer
+    <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg> Tour-Planer
   </button>
   <button class="tab-btn" onclick="switchTab(event, 'tab-proofs')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    Nachweise
+    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nachweise
   </button>
   <button class="tab-btn" onclick="switchTab(event, 'tab-company')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-    Firmendaten & Logo
+    <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Firmendaten
   </button>
 </div>
 
@@ -575,16 +262,15 @@ tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
   <div class="card">
     <div class="card-title">
       <span>Echte Live-Touren Aktiver Fahrer</span>
-      <span class="status-badge status-erledigt" style="font-size: 11px;">● Echtzeit aktiv</span>
+      <span class="status-badge status-erledigt">● Echtzeit aktiv</span>
     </div>
-
     <div id="liveToursContainer">
-      <p style="color: var(--text-muted); font-size: 13px;">Lade Live-Daten aus Supabase...</p>
+      <p style="color: var(--text-muted); font-size: 13px;">Lade Live-Daten...</p>
     </div>
   </div>
 </div>
 
-<!-- TAB 2: FAHRER VERWALTUNG -->
+<!-- TAB 2: FAHRER -->
 <div id="tab-team" class="tab-content">
   <div class="grid-2">
     <div class="card">
@@ -592,14 +278,11 @@ tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
       <form id="addWorkerForm" onsubmit="addEmployee(event)">
         <label>Vollständiger Name</label>
         <input type="text" id="empName" placeholder="z. B. Max Mustermann" required>
-
         <label>Benutzername (Login)</label>
-        <input type="text" id="empUsername" placeholder="z. B. max_mustermann" required>
-
-        <label>Initiales Passwort</label>
+        <input type="text" id="empUsername" placeholder="z. B. max" required>
+        <label>Passwort</label>
         <input type="password" id="empPassword" placeholder="••••••••" required>
-
-        <button type="submit" id="addEmpBtn" class="btn-success" style="width: 100%;">Fahrer-Account erstellen</button>
+        <button type="submit" id="addEmpBtn" class="btn-success" style="width: 100%;">Fahrer erstellen</button>
       </form>
     </div>
 
@@ -608,15 +291,9 @@ tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
       <div class="table-responsive">
         <table>
           <thead>
-            <tr>
-              <th>Name</th>
-              <th>Benutzername</th>
-              <th>Status</th>
-              <th style="text-align: right;">Aktion</th>
-            </tr>
+            <tr><th>Name</th><th>User</th><th>Status</th><th style="text-align: right;">Aktion</th></tr>
           </thead>
-          <tbody id="employeeTableBody">
-          </tbody>
+          <tbody id="employeeTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -626,43 +303,32 @@ tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
 <!-- TAB 3: TOUR PLANER -->
 <div id="tab-planer" class="tab-content">
   <div class="card">
-    <div class="card-title">Neue Tour erstellen & zuweisen</div>
-
+    <div class="card-title">Tour erstellen & zuweisen</div>
     <div class="scan-action-box">
-      <div style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Tourplan per Foto erfassen (OCR-Texterkennung)</div>
+      <div style="font-size: 13px; font-weight: 600; color: var(--text-sub);">Tourplan per Foto erfassen (OCR-Texterkennung)</div>
       <div class="scan-btn-group">
-        <button type="button" class="btn-secondary" onclick="document.getElementById('bossCameraInput').click()">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Kamera
-        </button>
-        <button type="button" class="btn-secondary" onclick="document.getElementById('bossFileInput').click()">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Datei
-        </button>
+        <button type="button" class="btn-secondary" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
+        <button type="button" class="btn-secondary" onclick="document.getElementById('bossFileInput').click()">Datei</button>
       </div>
-
       <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
       <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
-
-      <div id="scanStatusMsg" class="scan-status">✓ Adressen erfolgreich eingelesen</div>
+      <div id="scanStatusMsg" style="font-size: 12px; color: var(--success); font-weight: 600; margin-top: 8px; display: none;">✓ Eingelesen</div>
     </div>
 
     <div class="grid-2">
       <div>
         <label>Tour-Bezeichnung</label>
         <input type="text" id="tourTitle" placeholder="z. B. Tour 1 - Wiehlmünden">
-
         <label>Fahrer auswählen</label>
         <select id="tourAssignee"></select>
-
         <label>Adressen (zeilenweise)</label>
-        <textarea id="tourAddresses" style="height:130px;" placeholder="Hauptstraße 12, Engelskirchen&#10;Bahnhofstraße 5, Engelskirchen"></textarea>
+        <textarea id="tourAddresses" style="height:120px;" placeholder="Hauptstraße 12, Engelskirchen"></textarea>
       </div>
-
       <div>
-        <label>Hinweise / Vorgaben (Optional)</label>
-        <textarea id="tourNotes" style="height:112px;" placeholder="z. B. Besondere Anweisungen oder Tonnenstandort"></textarea>
-
-        <button class="btn-primary" onclick="createAndSendTour()" style="width: 100%; margin-top: 22px;">
-          Tour direkt an Fahrer übermitteln
+        <label>Hinweise (Optional)</label>
+        <textarea id="tourNotes" style="height:100px;" placeholder="Optionale Anweisungen..."></textarea>
+        <button class="btn-primary" onclick="createAndSendTour()" style="width: 100%; margin-top: 20px;">
+          Tour an Fahrer übermitteln
         </button>
       </div>
     </div>
@@ -674,108 +340,84 @@ tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
   <div class="card">
     <div class="card-title">
       <span>Erfasste Fotobeweise & Protokolle</span>
-      <span id="proofsCountBadge" style="font-size: 12px; color: var(--primary); font-weight:600;">0 Nachweise</span>
+      <span id="proofsCountBadge" style="font-size: 12px; color: var(--accent); font-weight:600;">0 Nachweise</span>
     </div>
 
     <div class="filter-container">
-      <input type="text" id="proofSearchInput" placeholder="Suche nach Adresse, Fahrer, Tour..." oninput="filterAndRenderProofs()">
+      <input type="text" id="proofSearchInput" placeholder="Suche..." oninput="filterAndRenderProofs()">
       <input type="date" id="proofDateFilter" onchange="filterAndRenderProofs()">
-      <select id="proofDriverFilter" onchange="filterAndRenderProofs()">
-        <option value="">Alle Fahrer</option>
-      </select>
+      <select id="proofDriverFilter" onchange="filterAndRenderProofs()"><option value="">Alle Fahrer</option></select>
     </div>
 
     <div id="batchActionBar" class="batch-action-bar">
-      <span id="selectedCountText" style="font-size: 13px; font-weight: 600; color: var(--primary);">0 ausgewählt</span>
-      <button class="btn-success" onclick="exportSelectedProofsPDF()" style="padding: 8px 14px; font-size: 13px;">
-        Ausgewählte als Kunden-PDF exportieren
-      </button>
+      <span id="selectedCountText" style="font-size: 13px; font-weight: 600; color: var(--accent);">0 ausgewählt</span>
+      <button class="btn-success" onclick="exportSelectedProofsPDF()" style="padding: 6px 12px; font-size: 12px;">PDF Export</button>
     </div>
 
     <div class="table-responsive">
       <table>
         <thead>
           <tr>
-            <th style="width: 30px; text-align: center;">
-              <input type="checkbox" id="selectAllCheckbox" class="custom-checkbox" onchange="toggleSelectAllProofs(this)" title="Alle auswählen">
-            </th>
-            <th style="width: 60px;">Foto</th>
-            <th>Adresse / Kunde</th>
+            <th style="width: 30px; text-align: center;"><input type="checkbox" id="selectAllCheckbox" class="custom-checkbox" onchange="toggleSelectAllProofs(this)"></th>
+            <th style="width: 55px;">Foto</th>
+            <th>Adresse</th>
             <th>Fahrer</th>
             <th>Tour</th>
-            <th>Datum & Uhrzeit</th>
+            <th>Zeitstempel</th>
             <th>Status</th>
             <th style="text-align: right;">Aktion</th>
           </tr>
         </thead>
         <tbody id="proofsTableBody">
-          <tr>
-            <td colspan="8" style="color: var(--text-muted); text-align: center;">Lade Fotobeweise...</td>
-          </tr>
+          <tr><td colspan="8" style="color: var(--text-muted); text-align: center;">Lade Daten...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- TAB 5: FIRMENDATEN & LOGO -->
+<!-- TAB 5: FIRMENDATEN -->
 <div id="tab-company" class="tab-content">
   <div class="card">
-    <div class="card-title">Unternehmensdaten & Branding für PDF-Kopfzeile</div>
-    <p style="font-size: 13px; color: var(--text-muted); margin-top: -10px; margin-bottom: 24px;">
-      Hier hinterlegte Daten und Ihr Firmenlogo erscheinen vollautomatisch auf allen offiziellen B2B-PDF-Leistungsnachweisen.
-    </p>
-
+    <div class="card-title">Unternehmensdaten & Branding für PDF</div>
     <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
       <div class="grid-2">
         <div>
-          <label>Firmenname / Rechtliche Bezeichnung</label>
-          <input type="text" id="compName" placeholder="z. B. Müller Dienstleistungen GmbH" required>
-
-          <label>Slogan / Untertitel</label>
-          <input type="text" id="compSubtitle" placeholder="z. B. Die Nummer 1 in NRW">
-
-          <label>Inhaber / Geschäftsführung (Optional)</label>
-          <input type="text" id="compOwner" placeholder="z. B. Max Müller">
-
+          <label>Firmenname</label>
+          <input type="text" id="compName" required>
+          <label>Untertitel / Slogan</label>
+          <input type="text" id="compSubtitle">
+          <label>Inhaber</label>
+          <input type="text" id="compOwner">
           <label>Straße & Hausnummer</label>
-          <input type="text" id="compStreet" placeholder="z. B. Hauptstraße 2" required>
-
+          <input type="text" id="compStreet" required>
           <label>PLZ & Ort</label>
-          <input type="text" id="compCity" placeholder="z. B. 51503 Rösrath" required>
+          <input type="text" id="compCity" required>
         </div>
-
         <div>
-          <label>E-Mail-Adresse</label>
-          <input type="email" id="compEmail" placeholder="z. B. info@mueller.de">
-
-          <label>Telefon / Mobil</label>
-          <input type="text" id="compPhone" placeholder="z. B. 01521 687234">
-
+          <label>E-Mail</label>
+          <input type="email" id="compEmail">
+          <label>Telefon</label>
+          <input type="text" id="compPhone">
           <label>Steuernummer / USt-IdNr.</label>
-          <input type="text" id="compTax" placeholder="z. B. DE100110011001">
-
-          <label>Firmenlogo hochladen</label>
+          <input type="text" id="compTax">
+          <label>Firmenlogo</label>
           <div class="logo-upload-box" onclick="document.getElementById('compLogoInput').click()">
-            <div style="font-size: 13px; font-weight: 600; color: var(--primary);">Firmenlogo auswählen (PNG / JPG)</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Klicken zum Hochladen oder Ablegen</div>
-            <img id="compLogoPreview" class="logo-preview-box" alt="Logo Vorschau">
+            <div style="font-size: 12px; font-weight: 600;">Logo auswählen (PNG/JPG)</div>
+            <img id="compLogoPreview" class="logo-preview-box" alt="Logo">
           </div>
           <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
-          <button type="button" class="btn-danger" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; padding: 6px; font-size:12px; margin-bottom: 12px;">Logo entfernen</button>
+          <button type="button" class="btn-danger" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; padding: 6px; font-size:11px; margin-bottom: 10px;">Logo entfernen</button>
         </div>
       </div>
-
-      <button type="submit" class="btn-primary" style="width: 100%; margin-top: 14px;">
-        Firmendaten & Logo speichern
-      </button>
+      <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Firmendaten speichern</button>
     </form>
   </div>
 </div>
 
 </div>
 
-<!-- MODAL FÜR FOTOBEWEIS-GROSSANSICHT -->
+<!-- MODAL FÜR GROSSANSICHT -->
 <div id="proofModal" class="modal-overlay" style="display: none;">
   <div class="modal-card">
     <div class="modal-header">
@@ -783,17 +425,15 @@ tr:hover td { background-color: rgba(59, 130, 246, 0.03); }
       <button class="modal-close" onclick="closeProofModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div id="modalImageContainer">
-        <img id="modalImage" src="" alt="Fotobeweis Großansicht">
-      </div>
+      <img id="modalImage" src="" alt="Großansicht">
       <div class="modal-info-list">
-        <div><strong>Adresse / Kunde:</strong> <span id="modalAddress"></span></div>
+        <div><strong>Adresse:</strong> <span id="modalAddress"></span></div>
         <div><strong>Fahrer:</strong> <span id="modalDriver"></span></div>
         <div><strong>Tour:</strong> <span id="modalTour"></span></div>
-        <div><strong>Datum & Zeit:</strong> <span id="modalTime"></span></div>
+        <div><strong>Zeit:</strong> <span id="modalTime"></span></div>
         <div><strong>Status:</strong> <span id="modalStatus" style="color:var(--success); font-weight:600;"></span></div>
       </div>
-      <button class="btn-primary" onclick="downloadSingleProofPDF()" style="width:100%;">Einzel-PDF für Kunde herunterladen</button>
+      <button class="btn-primary" onclick="downloadSingleProofPDF()" style="width:100%;">Einzel-PDF herunterladen</button>
     </div>
   </div>
 </div>
@@ -812,21 +452,11 @@ let companyLogoBase64 = '';
 
 window.onload = async () => {
   const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session || !session.user) {
-    window.location.href = 'index.html';
-    return;
-  }
-
+  if (!session || !session.user) { window.location.href = 'index.html'; return; }
   currentChef = session.user;
 
-  const { data: profile } = await supabaseClient
-    .from('profiles')
-    .select('role')
-    .eq('id', currentChef.id)
-    .maybeSingle();
-
+  const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', currentChef.id).maybeSingle();
   if (!profile || profile.role !== 'chef') {
-    alert('Zugriff verweigert: Nur Chefs haben Zugang zu diesem Dashboard.');
     window.location.href = 'TourApp.html';
     return;
   }
@@ -838,26 +468,15 @@ window.onload = async () => {
 };
 
 function subscribeRealtime() {
-  supabaseClient
-    .channel('public:stops')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'stops' }, () => {
-      loadToursFromSupabase();
-    })
-    .subscribe();
-
-  supabaseClient
-    .channel('public:tours')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tours' }, () => {
-      loadToursFromSupabase();
-    })
-    .subscribe();
+  supabaseClient.channel('public:stops').on('postgres_changes', { event: '*', schema: 'public', table: 'stops' }, () => loadToursFromSupabase()).subscribe();
+  supabaseClient.channel('public:tours').on('postgres_changes', { event: '*', schema: 'public', table: 'tours' }, () => loadToursFromSupabase()).subscribe();
 }
 
 function loadCompanyProfile() {
-  const savedProfile = localStorage.getItem('companyProfile');
-  if (savedProfile) {
+  const saved = localStorage.getItem('companyProfile');
+  if (saved) {
     try {
-      const data = JSON.parse(savedProfile);
+      const data = JSON.parse(saved);
       document.getElementById('compName').value = data.name || '';
       document.getElementById('compSubtitle').value = data.subtitle || '';
       document.getElementById('compOwner').value = data.owner || '';
@@ -866,30 +485,24 @@ function loadCompanyProfile() {
       document.getElementById('compEmail').value = data.email || '';
       document.getElementById('compPhone').value = data.phone || '';
       document.getElementById('compTax').value = data.tax || '';
-      
       if (data.logo) {
         companyLogoBase64 = data.logo;
-        const preview = document.getElementById('compLogoPreview');
-        preview.src = data.logo;
-        preview.style.display = 'block';
+        const prev = document.getElementById('compLogoPreview');
+        prev.src = data.logo; prev.style.display = 'block';
         document.getElementById('removeLogoBtn').style.display = 'block';
       }
-    } catch (e) {
-      console.error('Fehler beim Laden des Firmenprofils:', e);
-    }
+    } catch (e) {}
   }
 }
 
-function handleLogoUpload(event) {
-  const file = event.target.files[0];
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
-  reader.onload = function(e) {
-    companyLogoBase64 = e.target.result;
-    const preview = document.getElementById('compLogoPreview');
-    preview.src = companyLogoBase64;
-    preview.style.display = 'block';
+  reader.onload = (event) => {
+    companyLogoBase64 = event.target.result;
+    const prev = document.getElementById('compLogoPreview');
+    prev.src = companyLogoBase64; prev.style.display = 'block';
     document.getElementById('removeLogoBtn').style.display = 'block';
   };
   reader.readAsDataURL(file);
@@ -897,16 +510,14 @@ function handleLogoUpload(event) {
 
 function removeLogo() {
   companyLogoBase64 = '';
-  const preview = document.getElementById('compLogoPreview');
-  preview.src = '';
-  preview.style.display = 'none';
+  document.getElementById('compLogoPreview').style.display = 'none';
   document.getElementById('compLogoInput').value = '';
   document.getElementById('removeLogoBtn').style.display = 'none';
 }
 
 function saveCompanyProfile(e) {
   e.preventDefault();
-  const profileData = {
+  const data = {
     name: document.getElementById('compName').value.trim(),
     subtitle: document.getElementById('compSubtitle').value.trim(),
     owner: document.getElementById('compOwner').value.trim(),
@@ -917,41 +528,18 @@ function saveCompanyProfile(e) {
     tax: document.getElementById('compTax').value.trim(),
     logo: companyLogoBase64
   };
-
-  localStorage.setItem('companyProfile', JSON.stringify(profileData));
-  alert('Firmendaten & Logo wurden erfolgreich gespeichert!');
+  localStorage.setItem('companyProfile', JSON.stringify(data));
+  alert('Firmendaten erfolgreich gespeichert!');
 }
 
 function getCompanyProfile() {
   const saved = localStorage.getItem('companyProfile');
-  if (saved) {
-    return JSON.parse(saved);
-  }
-  return {
-    name: 'Müller Dienstleistungen GmbH',
-    subtitle: 'Die Nummer 1 in NRW',
-    owner: 'Max Müller',
-    street: 'Hauptstraße 2',
-    city: '51503 Rösrath',
-    email: 'info@mueller.de',
-    phone: '01521 687234',
-    tax: 'DE100110011001',
-    logo: ''
-  };
+  if (saved) return JSON.parse(saved);
+  return { name: 'Veribase Operations', subtitle: '', owner: '', street: '', city: '', email: '', phone: '', tax: '', logo: '' };
 }
 
 async function loadDriversFromSupabase() {
-  const { data: profiles, error } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('role', 'driver')
-    .eq('is_active', true);
-
-  if (error) {
-    console.error('Fehler beim Laden der Fahrer:', error);
-    return;
-  }
-
+  const { data: profiles } = await supabaseClient.from('profiles').select('*').eq('role', 'driver').eq('is_active', true);
   driversList = profiles || [];
   renderDriverList();
 }
@@ -966,7 +554,7 @@ function renderDriverList() {
   if (driverFilter) driverFilter.innerHTML = '<option value="">Alle Fahrer</option>';
 
   if (driversList.length === 0) {
-    if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted); text-align: center;">Noch keine aktiven Fahrer angelegt.</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted); text-align: center;">Keine Fahrer.</td></tr>';
     if (select) select.innerHTML = '<option value="">Keine Fahrer verfügbar</option>';
     return;
   }
@@ -974,53 +562,19 @@ function renderDriverList() {
   driversList.forEach(driver => {
     const rawEmail = driver.email || '';
     const cleanUsername = rawEmail.split('@')[0];
-    const driverName = driver.full_name || cleanUsername;
+    const name = driver.full_name || cleanUsername;
 
     if (tbody) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${driverName}</strong></td>
-        <td>${cleanUsername}</td>
-        <td><span style="color:var(--success); font-weight:600;">Aktiv</span></td>
-        <td style="text-align: right;">
-          <button class="btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteDriver('${driver.id}', '${driverName}')">
-            Löschen
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
+      tbody.innerHTML += `<tr><td><strong>${name}</strong></td><td>${cleanUsername}</td><td><span style="color:var(--success); font-weight:600;">Aktiv</span></td><td style="text-align: right;"><button class="btn-danger" style="padding: 4px 10px; font-size: 11px;" onclick="deleteDriver('${driver.id}', '${name}')">Löschen</button></td></tr>`;
     }
-
-    if (select) {
-      const option = document.createElement('option');
-      option.value = driver.id;
-      option.innerText = `${driverName} (${cleanUsername})`;
-      select.appendChild(option);
-    }
-
-    if (driverFilter) {
-      const option = document.createElement('option');
-      option.value = driverName.toLowerCase();
-      option.innerText = driverName;
-      driverFilter.appendChild(option);
-    }
+    if (select) select.innerHTML += `<option value="${driver.id}">${name} (${cleanUsername})</option>`;
+    if (driverFilter) driverFilter.innerHTML += `<option value="${name.toLowerCase()}">${name}</option>`;
   });
 }
 
-async function deleteDriver(driverId, driverName) {
-  if (!confirm(`Möchtest du den Fahrer "${driverName}" wirklich löschen? Der Account wird deaktiviert.`)) return;
-
-  const { error } = await supabaseClient
-    .from('profiles')
-    .update({ is_active: false })
-    .eq('id', driverId);
-
-  if (error) {
-    alert('Fehler beim Löschen des Fahrers: ' + error.message);
-    return;
-  }
-
-  alert(`Fahrer "${driverName}" wurde erfolgreich deaktiviert.`);
+async function deleteDriver(id, name) {
+  if (!confirm(`Fahrer "${name}" deaktivieren?`)) return;
+  await supabaseClient.from('profiles').update({ is_active: false }).eq('id', id);
   await loadDriversFromSupabase();
   await loadToursFromSupabase();
 }
@@ -1028,7 +582,6 @@ async function deleteDriver(driverId, driverName) {
 function switchTab(event, tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
   document.getElementById(tabId).classList.add('active');
   event.currentTarget.classList.add('active');
 }
@@ -1037,70 +590,51 @@ async function addEmployee(e) {
   e.preventDefault();
   const btn = document.getElementById('addEmpBtn');
   const name = document.getElementById('empName').value.trim();
-  let usernameInput = document.getElementById('empUsername').value.trim().toLowerCase();
+  let username = document.getElementById('empUsername').value.trim().toLowerCase();
   const password = document.getElementById('empPassword').value.trim();
 
-  if (!name || !usernameInput || !password) return;
-
+  if (!name || !username || !password) return;
   btn.disabled = true;
 
-  const emailForAuth = usernameInput.includes('@') ? usernameInput : `${usernameInput}@app.local`;
-
+  const emailForAuth = username.includes('@') ? username : `${username}@app.local`;
   const { data, error } = await supabaseClient.rpc('create_driver_by_chef', {
-    driver_email: emailForAuth,
-    driver_password: password,
-    driver_name: name
+    driver_email: emailForAuth, driver_password: password, driver_name: name
   });
 
   if (error || (data && !data.success)) {
-    alert('Fehler beim Erstellen des Fahrers: ' + (error?.message || data?.error || 'Unbekannter Fehler'));
+    alert('Fehler: ' + (error?.message || data?.error || 'Unbekannt'));
     btn.disabled = false;
     return;
   }
 
-  alert(`Fahrer-Account für "${name}" wurde erfolgreich angelegt!`);
-
+  alert(`Fahrer "${name}" erfolgreich angelegt!`);
   document.getElementById('addWorkerForm').reset();
   btn.disabled = false;
   await loadDriversFromSupabase();
 }
 
-async function processBossTourScan(event) {
-  const file = event.target.files[0];
+async function processBossTourScan(e) {
+  const file = e.target.files[0];
   if (!file) return;
-
   const statusMsg = document.getElementById('scanStatusMsg');
   statusMsg.style.display = 'block';
-  statusMsg.style.color = 'var(--warning)';
-  statusMsg.innerText = '⏳ Bild wird analysiert (OCR)...';
+  statusMsg.innerText = '⏳ OCR Analyse läuft...';
 
   try {
     const result = await Tesseract.recognize(file, 'deu');
-    const rawTextFromPhoto = result.data.text;
-
-    let rawLines = rawTextFromPhoto.split(/\r?\n|;/);
-    let parsedAddresses = rawLines.map(line => line.replace(/^\s*\d+[\.\)\-]?\s*/, '').trim()).filter(line => line.length > 3);
-
-    if (parsedAddresses.length > 0) {
-      document.getElementById('tourAddresses').value = parsedAddresses.join('\n');
-      statusMsg.style.color = 'var(--success)';
-      statusMsg.innerText = '✓ ' + parsedAddresses.length + ' Adressen eingelesen';
+    const lines = result.data.text.split(/\r?\n|;/).map(l => l.replace(/^\s*\d+[\.\)\-]?\s*/, '').trim()).filter(l => l.length > 3);
+    if (lines.length > 0) {
+      document.getElementById('tourAddresses').value = lines.join('\n');
+      statusMsg.innerText = `✓ ${lines.length} Adressen eingelesen`;
     } else {
-      statusMsg.style.color = 'var(--warning)';
-      statusMsg.innerText = '⚠ Kein eindeutiger Text erkannt. Bitte manuell eingeben.';
+      statusMsg.innerText = '⚠ Keine Adressen erkannt.';
     }
-
     if (!document.getElementById('tourTitle').value) {
       document.getElementById('tourTitle').value = "Tour " + new Date().toLocaleDateString('de-DE');
     }
-  } catch (err) {
-    console.error('OCR Fehler:', err);
-    statusMsg.style.color = 'var(--danger)';
-    statusMsg.innerText = '❌ Fehler beim Auslesen des Bildes';
-  }
-
-  setTimeout(() => { statusMsg.style.display = 'none'; }, 5000);
-  event.target.value = '';
+  } catch (err) { statusMsg.innerText = '❌ OCR Fehler'; }
+  setTimeout(() => { statusMsg.style.display = 'none'; }, 4000);
+  e.target.value = '';
 }
 
 async function createAndSendTour() {
@@ -1109,140 +643,86 @@ async function createAndSendTour() {
   const addressText = document.getElementById('tourAddresses').value.trim();
   const notes = document.getElementById('tourNotes').value.trim();
 
-  if (!driverId) return alert('Bitte wähle zuerst einen Fahrer aus!');
-  if (!addressText) return alert('Bitte gib mindestens eine Adresse ein!');
-
+  if (!driverId || !addressText) return alert('Fahrer und Adressen angeben!');
   const addresses = addressText.split('\n').map(a => a.trim()).filter(a => a.length > 2);
 
-  const { data: tourData, error: tourError } = await supabaseClient
-    .from('tours')
-    .insert([{ 
-      title: title, 
-      assigned_to: driverId, 
-      created_by: currentChef.id,
-      notes: notes,
-      status: 'geplant' 
-    }])
-    .select('*')
-    .single();
+  const { data: tourData, error } = await supabaseClient.from('tours').insert([{
+    title, assigned_to: driverId, created_by: currentChef.id, notes, status: 'geplant'
+  }]).select('*').single();
 
-  if (tourError) return alert('Fehler beim Erstellen der Tour: ' + tourError.message);
+  if (error) return alert('Fehler: ' + error.message);
 
-  const stopsToInsert = addresses.map((addr, idx) => ({
-    tour_id: tourData.id,
-    address: addr,
-    sequence: idx + 1,
-    status: 'offen'
-  }));
+  const stops = addresses.map((addr, idx) => ({ tour_id: tourData.id, address: addr, sequence: idx + 1, status: 'offen' }));
+  await supabaseClient.from('stops').insert(stops);
 
-  const { error: stopsError } = await supabaseClient.from('stops').insert(stopsToInsert);
-
-  if (stopsError) return alert('Fehler beim Speichern der Stopps: ' + stopsError.message);
-
-  alert('Tour wurde erfolgreich erstellt und zugewiesen!');
-
+  alert('Tour erfolgreich übermittelt!');
   document.getElementById('tourAddresses').value = '';
   document.getElementById('tourNotes').value = '';
   document.getElementById('tourTitle').value = '';
-
   await loadToursFromSupabase();
 }
 
 async function loadToursFromSupabase() {
-  const { data: tours, error } = await supabaseClient
-    .from('tours')
-    .select('*, stops(*), profiles:assigned_to(full_name, email, is_active)');
-
-  if (error) {
-    console.error('Fehler beim Laden der Touren:', error);
-    return;
-  }
-
-  const activeLiveTours = (tours || []).filter(t => {
-    const isDriverActive = t.profiles && t.profiles.is_active === true;
-    const isNotFinished = t.status !== 'beendet';
-    return isDriverActive && isNotFinished;
-  });
-
-  renderTours(activeLiveTours);
+  const { data: tours } = await supabaseClient.from('tours').select('*, stops(*), profiles:assigned_to(full_name, email, is_active)');
+  const activeTours = (tours || []).filter(t => t.profiles?.is_active === true && t.status !== 'beendet');
+  renderTours(activeTours);
   extractAndProcessProofs(tours || []);
 }
 
 function renderTours(tours) {
   const container = document.getElementById('liveToursContainer');
   if (!container) return;
-
   if (tours.length === 0) {
-    container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Aktuell keine laufenden Touren aktiver Fahrer vorhanden.</p>';
+    container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Keine aktiven Live-Touren.</p>';
     return;
   }
-
-  container.innerHTML = '';
-  tours.forEach(tour => {
-    const totalStops = tour.stops ? tour.stops.length : 0;
-    const completedStops = tour.stops ? tour.stops.filter(s => s.status === 'erledigt').length : 0;
-    const progressPercent = totalStops > 0 ? Math.round((completedStops / totalStops) * 100) : 0;
-    const driverName = tour.profiles?.full_name || tour.profiles?.email?.split('@')[0] || 'Unzugewiesen';
-
-    const card = document.createElement('div');
-    card.className = 'tour-monitor-card';
-    card.innerHTML = `
-      <div style="display:flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong style="font-size: 14px;">${driverName}</strong> 
-          <span style="color: var(--text-muted); font-size: 12px; margin-left: 6px;">(${tour.title})</span>
+  container.innerHTML = tours.map(t => {
+    const total = t.stops ? t.stops.length : 0;
+    const done = t.stops ? t.stops.filter(s => s.status === 'erledigt').length : 0;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    const driverName = t.profiles?.full_name || t.profiles?.email?.split('@')[0] || 'Fahrer';
+    return `
+      <div class="tour-monitor-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>${driverName}</strong> <span style="font-size:11px; color:var(--text-sub);">(${t.title})</span>
+          <span class="status-badge status-erledigt">${t.status}</span>
         </div>
-        <span class="status-badge status-erledigt">${tour.status}</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
-      </div>
-      <div style="display:flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
-        <span>Fortschritt: ${completedStops} von ${totalStops} Stopps erledigt</span>
-        <span style="font-weight: 600; color: var(--text);">${progressPercent}% abgeschlossen</span>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sub);">
+          <span>Stopps: ${done}/${total}</span><span>${pct}%</span>
+        </div>
       </div>
     `;
-    container.appendChild(card);
-  });
+  }).join('');
 }
 
 function extractAndProcessProofs(tours) {
   allExtractedProofs = [];
-
   tours.forEach(tour => {
-    const driverName = tour.profiles?.full_name || tour.profiles?.email?.split('@')[0] || 'Ehemaliger Fahrer';
+    const driverName = tour.profiles?.full_name || tour.profiles?.email?.split('@')[0] || 'Unbekannt';
     if (tour.stops) {
       tour.stops.forEach(stop => {
         allExtractedProofs.push({
-          id: stop.id,
-          address: stop.address || 'Unbekannte Adresse',
-          status: stop.status || 'offen',
-          photo_url: stop.photo_url,
-          tourTitle: tour.title || 'Tour',
-          driverName: driverName,
+          id: stop.id, address: stop.address, status: stop.status || 'offen',
+          photo_url: stop.photo_url, tourTitle: tour.title, driverName,
           created_at: stop.created_at || tour.created_at || new Date().toISOString()
         });
       });
     }
   });
-
   filterAndRenderProofs();
 }
 
 function filterAndRenderProofs() {
-  const searchTerm = (document.getElementById('proofSearchInput')?.value || '').toLowerCase();
-  const dateFilter = document.getElementById('proofDateFilter')?.value;
-  const driverFilter = (document.getElementById('proofDriverFilter')?.value || '').toLowerCase();
+  const search = (document.getElementById('proofSearchInput')?.value || '').toLowerCase();
+  const date = document.getElementById('proofDateFilter')?.value;
+  const driver = (document.getElementById('proofDriverFilter')?.value || '').toLowerCase();
 
   const filtered = allExtractedProofs.filter(item => {
-    const matchesSearch = item.address.toLowerCase().includes(searchTerm) ||
-                          item.driverName.toLowerCase().includes(searchTerm) ||
-                          item.tourTitle.toLowerCase().includes(searchTerm);
-
-    const matchesDriver = !driverFilter || item.driverName.toLowerCase() === driverFilter;
-    const matchesDate = !dateFilter || item.created_at.startsWith(dateFilter);
-
-    return matchesSearch && matchesDriver && matchesDate;
+    const mSearch = item.address.toLowerCase().includes(search) || item.driverName.toLowerCase().includes(search);
+    const mDriver = !driver || item.driverName.toLowerCase() === driver;
+    const mDate = !date || item.created_at.startsWith(date);
+    return mSearch && mDriver && mDate;
   });
 
   renderProofTable(filtered);
@@ -1251,97 +731,61 @@ function filterAndRenderProofs() {
 function renderProofTable(items) {
   const tbody = document.getElementById('proofsTableBody');
   const countBadge = document.getElementById('proofsCountBadge');
-
   if (countBadge) countBadge.innerText = `${items.length} Nachweise`;
   if (!tbody) return;
 
   if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="color: var(--text-muted); text-align: center;">Keine passenden Fotobeweise gefunden.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="color: var(--text-muted); text-align: center;">Keine Nachweise gefunden.</td></tr>';
     updateBatchActionBar();
     return;
   }
 
   tbody.innerHTML = items.map((s, idx) => {
-    const isChecked = selectedProofIds.has(s.id) ? 'checked' : '';
+    const checked = selectedProofIds.has(s.id) ? 'checked' : '';
     return `
       <tr>
-        <td style="text-align: center;">
-          <input type="checkbox" class="custom-checkbox proof-select-checkbox" data-id="${s.id}" ${isChecked} onchange="toggleSelectProof('${s.id}')">
-        </td>
-        <td>
-          ${s.photo_url 
-            ? `<img src="${s.photo_url}" class="proof-table-img" onclick="openProofModal(${idx})" title="Klicken für Großansicht">` 
-            : `<div class="proof-table-img-placeholder">Kein Foto</div>`}
-        </td>
+        <td style="text-align: center;"><input type="checkbox" class="custom-checkbox" data-id="${s.id}" ${checked} onchange="toggleSelectProof('${s.id}')"></td>
+        <td>${s.photo_url ? `<img src="${s.photo_url}" class="proof-table-img" onclick="openProofModal(${idx})">` : `<div class="proof-table-img-placeholder">Kein</div>`}</td>
         <td><strong>${s.address}</strong></td>
         <td>${s.driverName}</td>
         <td>${s.tourTitle}</td>
         <td>${new Date(s.created_at).toLocaleString('de-DE')}</td>
-        <td>
-          <span class="status-badge ${s.status === 'erledigt' ? 'status-erledigt' : 'status-offen'}">
-            ${s.status}
-          </span>
-        </td>
-        <td style="text-align: right;">
-          <button class="btn-secondary" onclick="openProofModal(${idx})" style="padding: 6px 12px; font-size: 12px;">
-            Details
-          </button>
-        </td>
+        <td><span class="status-badge ${s.status === 'erledigt' ? 'status-erledigt' : 'status-offen'}">${s.status}</span></td>
+        <td style="text-align: right;"><button class="btn-secondary" onclick="openProofModal(${idx})" style="padding: 4px 10px; font-size:11px;">Details</button></td>
       </tr>
     `;
   }).join('');
 
   window.currentFilteredProofs = items;
-  updateSelectAllCheckboxState(items);
   updateBatchActionBar();
 }
 
 function toggleSelectProof(id) {
-  if (selectedProofIds.has(id)) {
-    selectedProofIds.delete(id);
-  } else {
-    selectedProofIds.add(id);
-  }
-  updateSelectAllCheckboxState(window.currentFilteredProofs || []);
+  if (selectedProofIds.has(id)) selectedProofIds.delete(id);
+  else selectedProofIds.add(id);
   updateBatchActionBar();
 }
 
-function toggleSelectAllProofs(masterCheckbox) {
-  const currentItems = window.currentFilteredProofs || [];
-  if (masterCheckbox.checked) {
-    currentItems.forEach(item => selectedProofIds.add(item.id));
-  } else {
-    currentItems.forEach(item => selectedProofIds.delete(item.id));
-  }
-  renderProofTable(currentItems);
-}
-
-function updateSelectAllCheckboxState(currentItems) {
-  const selectAllCb = document.getElementById('selectAllCheckbox');
-  if (!selectAllCb || currentItems.length === 0) return;
-  const allSelected = currentItems.every(item => selectedProofIds.has(item.id));
-  selectAllCb.checked = allSelected;
+function toggleSelectAllProofs(master) {
+  const items = window.currentFilteredProofs || [];
+  items.forEach(i => { if (master.checked) selectedProofIds.add(i.id); else selectedProofIds.delete(i.id); });
+  renderProofTable(items);
 }
 
 function updateBatchActionBar() {
   const bar = document.getElementById('batchActionBar');
   const countText = document.getElementById('selectedCountText');
-  if (!bar || !countText) return;
-
-  const count = selectedProofIds.size;
-  if (count > 0) {
+  if (!bar) return;
+  if (selectedProofIds.size > 0) {
     bar.classList.add('active');
-    countText.innerText = `${count} Nachweis(e) ausgewählt`;
-  } else {
-    bar.classList.remove('active');
-  }
+    countText.innerText = `${selectedProofIds.size} ausgewählt`;
+  } else bar.classList.remove('active');
 }
 
-function openProofModal(index) {
+function openProofModal(idx) {
   const items = window.currentFilteredProofs || allExtractedProofs;
-  const proof = items[index];
+  const proof = items[idx];
   if (!proof) return;
-
   activeModalProof = proof;
 
   document.getElementById('modalAddress').innerText = proof.address;
@@ -1350,13 +794,9 @@ function openProofModal(index) {
   document.getElementById('modalTime').innerText = new Date(proof.created_at).toLocaleString('de-DE');
   document.getElementById('modalStatus').innerText = proof.status;
 
-  const imgEl = document.getElementById('modalImage');
-  if (proof.photo_url) {
-    imgEl.src = proof.photo_url;
-    imgEl.style.display = 'block';
-  } else {
-    imgEl.style.display = 'none';
-  }
+  const img = document.getElementById('modalImage');
+  if (proof.photo_url) { img.src = proof.photo_url; img.style.display = 'block'; }
+  else img.style.display = 'none';
 
   document.getElementById('proofModal').style.display = 'flex';
 }
@@ -1366,157 +806,56 @@ function closeProofModal() {
   activeModalProof = null;
 }
 
-function generatePDFHTML(proofs, title = 'Digitaler Kunden-Leistungsnachweis') {
-  const company = getCompanyProfile();
-  const currentDate = new Date().toLocaleDateString('de-DE');
-  const totalItems = proofs.length;
-  const completedItems = proofs.filter(p => p.status === 'erledigt').length;
-  const rate = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+function generatePDFHTML(proofs, title = 'Leistungsnachweis') {
+  const comp = getCompanyProfile();
+  const date = new Date().toLocaleDateString('de-DE');
+  const total = proofs.length;
+  const done = proofs.filter(p => p.status === 'erledigt').length;
 
-  const logoHtml = company.logo 
-    ? `<img src="${company.logo}" style="max-height: 60px; max-width: 220px; object-fit: contain;">`
-    : `<div style="font-size: 20px; font-weight: 800; color: #3b82f6; text-transform: uppercase; letter-spacing: -0.5px;">${company.name}</div>`;
+  const logo = comp.logo ? `<img src="${comp.logo}" style="max-height: 50px;">` : `<strong style="font-size:18px;">${comp.name}</strong>`;
 
-  const rowsHtml = proofs.map((item, index) => {
-    const formattedDate = new Date(item.created_at).toLocaleString('de-DE', {
-      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-
-    const photoHtml = item.photo_url 
-      ? `<img src="${item.photo_url}" style="width: 110px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1;">`
-      : `<div style="width: 110px; height: 80px; background: #f1f5f9; border-radius: 6px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748b; text-align: center; padding: 4px;">Standardausführung<br>(ohne Fotopflicht)</div>`;
-
-    return `
-      <tr style="border-bottom: 1px solid #e2e8f0; ${index % 2 === 1 ? 'background-color: #f8fafc;' : ''}">
-        <td style="padding: 10px; vertical-align: top; width: 125px;">${photoHtml}</td>
-        <td style="padding: 10px; vertical-align: top;">
-          <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">${item.address}</div>
-          <div style="font-size: 11px; color: #64748b;">Tour: ${item.tourTitle}</div>
-          <div style="font-size: 11px; color: #64748b;">Servicekraft: ${item.driverName}</div>
-        </td>
-        <td style="padding: 10px; vertical-align: top; font-size: 11px; color: #334155; white-space: nowrap;">
-          ${formattedDate} Uhr
-        </td>
-        <td style="padding: 10px; vertical-align: top; text-align: right;">
-          <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; background: ${item.status === 'erledigt' ? '#d1fae5' : '#fef3c7'}; color: ${item.status === 'erledigt' ? '#065f46' : '#92400e'};">
-            ${item.status === 'erledigt' ? '✓ Ordnungsgemäß ausgeführt' : 'In Bearbeitung'}
-          </span>
-        </td>
-      </tr>
-    `;
-  }).join('');
+  const rows = proofs.map(p => `
+    <tr style="border-bottom: 1px solid #e2e8f0;">
+      <td style="padding: 8px; width: 100px;">${p.photo_url ? `<img src="${p.photo_url}" style="width:90px; height:65px; object-fit:cover; border-radius:4px;">` : 'Kein Foto'}</td>
+      <td style="padding: 8px;"><strong>${p.address}</strong><br><span style="font-size:11px; color:#64748b;">Tour: ${p.tourTitle} | Fahrer: ${p.driverName}</span></td>
+      <td style="padding: 8px; font-size:11px;">${new Date(p.created_at).toLocaleString('de-DE')}</td>
+      <td style="padding: 8px; text-align:right;"><span style="padding:3px 6px; border-radius:4px; font-size:10px; background:${p.status==='erledigt'?'#d1fae5':'#fef3c7'}; color:${p.status==='erledigt'?'#065f46':'#92400e'}">${p.status}</span></td>
+    </tr>
+  `).join('');
 
   return `
-    <div style="padding: 32px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #0f172a; background: #fff; max-width: 800px; margin: 0 auto;">
-      
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-        <tr>
-          <td style="vertical-align: top;">
-            ${logoHtml}
-          </td>
-          <td style="text-align: right; vertical-align: top; font-size: 11px; color: #475569; line-height: 1.5;">
-            <strong style="font-size: 13px; color: #0f172a;">${company.name}</strong><br>
-            ${company.subtitle ? `<span style="color: #64748b;">${company.subtitle}</span><br>` : ''}
-            ${company.street ? `${company.street},${company.city}<br>` : ''}
-            ${company.email ? `E-Mail: ${company.email}<br>` : ''}
-            ${company.phone ? `Tel: ${company.phone}<br>` : ''}
-            ${company.tax ? `<span style="color: #64748b; font-size: 10px;">St.-Nr./USt-ID: ${company.tax}</span>` : ''}
-          </td>
-        </tr>
+    <div style="padding: 24px; font-family: sans-serif; color: #0f172a; background: #fff;">
+      <table style="width: 100%; margin-bottom: 16px;"><tr><td>${logo}</td><td style="text-align:right; font-size:11px; color:#475569;"><strong>${comp.name}</strong><br>${comp.street}, ${comp.city}</td></tr></table>
+      <hr style="border:0; border-top:2px solid #6366f1; margin-bottom: 16px;">
+      <h2>${title}</h2>
+      <p style="font-size:11px; color:#64748b;">Erstellt am: ${date} | Erledigt: ${done}/${total}</p>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+        <thead><tr style="background:#f8fafc; font-size:11px; text-align:left;"><th>Foto</th><th>Details</th><th>Zeit</th><th style="text-align:right;">Status</th></tr></thead>
+        <tbody>${rows}</tbody>
       </table>
-
-      <hr style="border: 0; border-top: 2px solid #3b82f6; margin-bottom: 20px;">
-
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-        <tr>
-          <td>
-            <h1 style="font-size: 20px; font-weight: 800; margin: 0; color: #0f172a;">${title}</h1>
-            <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Dokumentiertes digitales Durchführungsprotokoll</p>
-          </td>
-          <td style="text-align: right; font-size: 12px; color: #334155;">
-            <strong>Erstellt am:</strong> ${currentDate}
-          </td>
-        </tr>
-      </table>
-
-      <table style="width: 100%; border-collapse: collapse; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 24px; padding: 12px;">
-        <tr>
-          <td style="padding: 10px; font-size: 12px; border-right: 1px solid #e2e8f0; text-align: center;">
-            <span style="color: #64748b; font-size: 10px; display: block; text-transform: uppercase; font-weight: 700;">Erfasste Stopps</span>
-            <strong style="font-size: 16px; color: #0f172a;">${totalItems}</strong>
-          </td>
-          <td style="padding: 10px; font-size: 12px; border-right: 1px solid #e2e8f0; text-align: center;">
-            <span style="color: #64748b; font-size: 10px; display: block; text-transform: uppercase; font-weight: 700;">Erfolgreich Erledigt</span>
-            <strong style="font-size: 16px; color: #10b981;">${completedItems}</strong>
-          </td>
-          <td style="padding: 10px; font-size: 12px; text-align: center;">
-            <span style="color: #64748b; font-size: 10px; display: block; text-transform: uppercase; font-weight: 700;">Erfüllungsquote</span>
-            <strong style="font-size: 16px; color: #3b82f6;">${rate}%</strong>
-          </td>
-        </tr>
-      </table>
-
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-        <thead>
-          <tr style="border-bottom: 2px solid #0f172a; text-align: left; font-size: 11px; color: #64748b; text-transform: uppercase;">
-            <th style="padding: 8px;">Nachweis</th>
-            <th style="padding: 8px;">Standort & Service</th>
-            <th style="padding: 8px;">Ausführungszeit</th>
-            <th style="padding: 8px; text-align: right;">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
-      </table>
-
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 40px; text-align: center; font-size: 10px; color: #94a3b8; line-height: 1.5;">
-        Dies ist ein automatisch erstellter Leistungsnachweis der ${company.name}.<br>
-        Digital erfasst und fälschungssicher mit Zeitstempeln und GPS-Zuordnung hinterlegt.
-      </div>
     </div>
   `;
 }
 
 function exportSelectedProofsPDF() {
-  const selectedProofs = allExtractedProofs.filter(p => selectedProofIds.has(p.id));
-  if (selectedProofs.length === 0) return alert('Bitte wähle mindestens einen Nachweis aus!');
-
-  const element = document.createElement('div');
-  element.innerHTML = generatePDFHTML(selectedProofs, 'Digitaler Kunden-Leistungsnachweis');
-
-  const opt = {
-    margin:       [8, 8, 8, 8],
-    filename:     `Leistungsnachweis_${new Date().toISOString().slice(0,10)}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(element).save();
+  const proofs = allExtractedProofs.filter(p => selectedProofIds.has(p.id));
+  if (proofs.length === 0) return alert('Bitte Nachweise auswählen!');
+  const el = document.createElement('div');
+  el.innerHTML = generatePDFHTML(proofs);
+  html2pdf().set({ margin: 8, filename: 'Leistungsnachweis.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
 }
 
 function downloadSingleProofPDF() {
   if (!activeModalProof) return;
-  
-  const element = document.createElement('div');
-  element.innerHTML = generatePDFHTML([activeModalProof], `Einzel-Leistungsnachweis`);
-
-  const opt = {
-    margin:       [8, 8, 8, 8],
-    filename:     `Nachweis_${activeModalProof.address.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(element).save();
+  const el = document.createElement('div');
+  el.innerHTML = generatePDFHTML([activeModalProof], 'Einzelnachweis');
+  html2pdf().set({ margin: 8, filename: 'Nachweis.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
 }
 
 function toggleTheme() {
-  const currentTheme = document.documentElement.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', newTheme);
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
 }
 
 async function logout() {
