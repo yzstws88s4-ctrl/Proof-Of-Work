@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Veribase – Enterprise Authentication</title>
 
-  <!-- PWA & Homescreen Settings -->
   <meta name="apple-mobile-web-app-title" content="Veribase">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,7 +12,6 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest.json">
 
-  <!-- Sofortiges Laden des Dark Modes -->
   <script>
     if (!localStorage.getItem('veribase_theme')) {
       localStorage.setItem('veribase_theme', 'dark');
@@ -30,26 +28,24 @@
     :root {
       --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --bg: #f8fafc;
-      --surface: #ffffff;
+      --surface: rgba(255, 255, 255, 0.85);
       --border: rgba(0, 0, 0, 0.08);
       --text-main: #0f172a;
       --text-sub: #475569;
-      --text-muted: #94a3b8;
       --accent: #6366f1;
       --accent-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
       --accent-glow: rgba(99, 102, 241, 0.25);
       --input-bg: #f1f5f9;
-      --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.07);
+      --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
     }
 
     [data-theme="dark"] {
       --bg: #070b14;
-      --surface: #0f172a;
+      --surface: rgba(15, 23, 42, 0.75);
       --border: rgba(255, 255, 255, 0.08);
       --text-main: #f9fafb;
       --text-sub: #9ca3af;
-      --text-muted: #6b7280;
-      --input-bg: #020617;
+      --input-bg: rgba(2, 6, 23, 0.6);
       --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
 
@@ -62,7 +58,7 @@
       margin: 0; padding: 20px;
       display: flex; justify-content: center; align-items: center; min-height: 100vh;
       -webkit-font-smoothing: antialiased;
-      transition: background-color 0.3s ease;
+      background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
     }
 
     .login-wrapper { width: 100%; max-width: 420px; position: relative; }
@@ -71,52 +67,30 @@
       position: absolute; top: -70px; right: 0;
       background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
       width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease; backdrop-filter: blur(10px);
     }
     .theme-toggle-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
     .theme-toggle-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
     .auth-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 36px 32px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 28px;
+      padding: 40px 32px; box-shadow: var(--shadow); backdrop-filter: blur(20px);
     }
 
-    .brand-container { text-align: center; margin-bottom: 30px; }
+    .brand-container { text-align: center; margin-bottom: 32px; }
     
     .logo-frame {
-      position: relative;
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 16px auto;
-      border-radius: 20px;
-      overflow: hidden;
-      background: var(--accent-gradient);
-      box-shadow: 0 8px 24px var(--accent-glow);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative; width: 76px; height: 76px; margin: 0 auto 16px auto;
+      border-radius: 22px; overflow: hidden; background: var(--accent-gradient);
+      box-shadow: 0 10px 25px var(--accent-glow); display: flex; align-items: center; justify-content: center;
     }
 
-    .login-logo {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
+    .login-logo { width: 100%; height: 100%; object-fit: contain; display: block; }
 
     .logo-frame::after {
-      content: '';
-      position: absolute;
-      top: -50%; left: -150%;
-      width: 200%; height: 200%;
-      background: linear-gradient(45deg, transparent 35%, rgba(255, 255, 255, 0.4) 50%, transparent 65%);
-      transform: rotate(25deg);
-      pointer-events: none;
+      content: ''; position: absolute; top: -50%; left: -150%; width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%);
+      transform: rotate(25deg); pointer-events: none;
     }
 
     .logo-frame.glow-active::after {
@@ -129,27 +103,27 @@
       100% { left: -150%; }
     }
 
-    .title { font-size: 22px; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.02em; }
+    .title { font-size: 24px; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.03em; }
     .subtitle { font-size: 13px; color: var(--text-sub); margin: 0; font-weight: 500; }
 
-    label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
     
     input {
-      width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
-      padding: 14px 16px; color: var(--text-main); font-size: 14px; font-family: inherit; margin-bottom: 18px;
+      width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 14px;
+      padding: 14px 16px; color: var(--text-main); font-size: 14px; font-family: inherit; margin-bottom: 20px;
       transition: all 0.2s ease;
     }
-    input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); background: var(--surface); }
+    input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
 
     .submit-btn {
-      width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700;
+      width: 100%; padding: 15px; border: none; border-radius: 14px; font-size: 14px; font-weight: 700;
       background: var(--accent-gradient); color: white; cursor: pointer;
-      box-shadow: 0 4px 16px var(--accent-glow); transition: all 0.2s ease; font-family: inherit;
+      box-shadow: 0 6px 20px var(--accent-glow); transition: all 0.2s ease; font-family: inherit;
     }
     .submit-btn:hover { opacity: 0.95; transform: translateY(-1px); }
     .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-    .error-box { color: #ef4444; font-size: 13px; margin-top: 16px; text-align: center; font-weight: 600; min-height: 20px; }
+    .error-box { color: #ef4444; font-size: 13px; margin-top: 18px; text-align: center; font-weight: 600; min-height: 20px; }
   </style>
 </head>
 <body>
