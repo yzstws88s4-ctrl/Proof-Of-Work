@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Veribase – Enterprise Operations Command</title>
+<title>Veribase – Command Center</title>
 
 <meta name="apple-mobile-web-app-title" content="Veribase">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,35 +23,36 @@
 :root {
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #030712;
-  --surface: rgba(15, 23, 42, 0.65);
-  --surface-solid: #0f172a;
+  --sidebar-bg: #090d16;
+  --surface: #111827;
+  --surface-hover: #1f2937;
   --border: rgba(255, 255, 255, 0.08);
   --text-main: #f9fafb;
   --text-sub: #9ca3af;
-  --text-muted: #6b7280;
+  --text-muted: #4b5563;
   --accent: #6366f1;
-  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  --accent-glow: rgba(99, 102, 241, 0.2);
-  --input-bg: rgba(2, 6, 23, 0.5);
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --input-bg: #030712;
   --success: #10b981;
   --success-bg: rgba(16, 185, 129, 0.1);
   --warning: #f59e0b;
   --warning-bg: rgba(245, 158, 11, 0.1);
   --danger: #ef4444;
   --danger-bg: rgba(239, 68, 68, 0.1);
-  --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="light"] {
-  --bg: #f8fafc;
-  --surface: rgba(255, 255, 255, 0.85);
-  --surface-solid: #ffffff;
+  --bg: #f1f5f9;
+  --sidebar-bg: #ffffff;
+  --surface: #ffffff;
+  --surface-hover: #f8fafc;
   --border: rgba(0, 0, 0, 0.08);
   --text-main: #0f172a;
   --text-sub: #475569;
   --text-muted: #94a3b8;
-  --input-bg: #f1f5f9;
-  --shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.05);
+  --input-bg: #f8fafc;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -60,380 +61,436 @@ body {
   font-family: var(--font);
   background-color: var(--bg);
   color: var(--text-main);
-  margin: 0; padding: 28px 16px;
-  display: flex; justify-content: center;
+  margin: 0; padding: 0;
+  display: flex;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease;
 }
 
-.container { width: 100%; max-width: 1300px; }
-
-/* Command Bar Header */
-.header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); gap: 16px;
+/* Neues Modernes Layout mit Sidebar & Main Content */
+.app-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
 }
 
-.brand-wrapper { display: flex; align-items: center; gap: 12px; }
-
-.brand-logo-box {
-  width: 42px; height: 42px; background: var(--accent-gradient); border-radius: 12px;
-  display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 18px;
-  box-shadow: 0 4px 16px var(--accent-glow);
+aside {
+  width: 260px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  flex-shrink: 0;
 }
 
-.title { font-size: 18px; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
-.subtitle { font-size: 11px; color: var(--text-sub); margin: 2px 0 0 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-
-.header-actions { display: flex; align-items: center; gap: 8px; }
-
-.theme-toggle-btn, .logout-btn {
-  background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
-  height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; padding: 0 14px; font-size: 12px; font-weight: 600; box-shadow: var(--shadow);
-  transition: all 0.2s ease; backdrop-filter: blur(10px);
+@media (max-width: 900px) {
+  .app-layout { flex-direction: column; }
+  aside { width: 100%; height: auto; padding: 16px; flex-direction: row; align-items: center; justify-content: space-between; overflow-x: auto; }
+  .sidebar-nav { display: flex; gap: 8px; margin-top: 0 !important; }
+  .brand-area { margin-bottom: 0 !important; }
 }
-.theme-toggle-btn:hover, .logout-btn:hover { border-color: var(--accent); }
-.theme-toggle-btn { width: 38px; padding: 0; }
-.theme-toggle-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* Navigation Tabs */
-.nav-tabs { display: flex; gap: 6px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; }
-.nav-tabs::-webkit-scrollbar { display: none; }
-
-.tab-btn {
-  background: var(--surface); border: 1px solid var(--border); color: var(--text-sub);
-  padding: 10px 16px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer;
-  white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+.brand-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
 }
-.tab-btn:hover { color: var(--text-main); border-color: var(--text-muted); }
-.tab-btn.active { background: var(--accent-gradient); color: white; border-color: transparent; box-shadow: 0 4px 14px var(--accent-glow); }
 
-/* Enterprise Card Grid */
+.brand-icon {
+  width: 38px; height: 38px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: 16px;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.brand-title { font-size: 15px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
+.brand-sub { font-size: 11px; color: var(--text-sub); margin: 0; font-weight: 600; text-transform: uppercase; }
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  flex-grow: 1;
+}
+
+.nav-item {
+  background: transparent;
+  border: none;
+  color: var(--text-sub);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.nav-item:hover { background-color: var(--surface-hover); color: var(--text-main); }
+.nav-item.active { background-color: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
+
+.main-content {
+  flex-grow: 1;
+  padding: 32px;
+  max-width: 1100px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .main-content { padding: 16px; }
+}
+
+/* Top Bar im Content */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.content-title { font-size: 20px; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+
+.header-actions { display: flex; gap: 8px; }
+
+.action-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.2s;
+}
+.action-btn:hover { border-color: var(--accent); }
+
+/* Cards & Grid */
 .card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-  padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); backdrop-filter: blur(16px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
 }
 
-.card-title {
-  font-size: 13px; font-weight: 700; margin: 0 0 18px 0; display: flex; align-items: center; justify-content: space-between;
-  text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-sub);
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-sub);
 }
 
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
 
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 
 label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 
-input[type="text"], input[type="password"], input[type="date"], input[type="email"], select, textarea {
-  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px;
-  padding: 11px 14px; color: var(--text-main); font-family: inherit; font-size: 13px; margin-bottom: 14px;
-  transition: all 0.2s ease;
+input, select, textarea {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 13px;
+  margin-bottom: 14px;
+  transition: border-color 0.2s;
 }
-input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
 
-button {
-  padding: 11px 16px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700;
-  font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;
+button.btn-main {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%;
+  transition: opacity 0.2s;
 }
-button:active { transform: scale(0.98); }
+button.btn-main:hover { opacity: 0.9; }
 
-.btn-primary { background: var(--accent-gradient); color: white; box-shadow: 0 4px 14px var(--accent-glow); }
-.btn-primary:hover { opacity: 0.92; }
-
-.btn-success { background: var(--success); color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2); }
-.btn-success:hover { background: #059669; }
-
-.btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2); }
-.btn-danger:hover { background: #dc2626; }
-
-.btn-secondary { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); }
-.btn-secondary:hover { border-color: var(--text-muted); }
-
-/* Live Monitor Cards */
-.tour-monitor-card {
-  border: 1px solid var(--border); background: var(--input-bg); border-radius: 12px; padding: 16px; margin-bottom: 12px; transition: all 0.2s ease;
+.btn-danger-sub {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
 }
-.tour-monitor-card:hover { border-color: var(--accent); }
 
-.progress-bar-bg { background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; margin: 10px 0 6px 0; }
-.progress-bar-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.4s ease; }
-
-/* Scan Box */
-.scan-action-box {
-  background: var(--input-bg); border: 2px dashed var(--border); border-radius: 14px; padding: 18px; text-align: center; margin-bottom: 18px; transition: all 0.2s ease;
-}
-.scan-action-box:hover { border-color: var(--accent); }
-.scan-btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
-
-/* Table System */
-.table-responsive { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-solid); }
+/* Tabellen */
+.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
 th, td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-th { color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; background: var(--input-bg); }
+th { background: var(--input-bg); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background-color: rgba(99, 102, 241, 0.02); }
 
-.custom-checkbox { width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent); border-radius: 3px; }
+.status-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.status-done { background: var(--success-bg); color: var(--success); }
+.status-open { background: var(--warning-bg); color: var(--warning); }
 
-.batch-action-bar {
-  display: none; background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); border-radius: 10px;
-  padding: 12px 16px; margin-bottom: 16px; align-items: center; justify-content: space-between;
+.batch-bar {
+  display: none; background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); border-radius: 8px;
+  padding: 10px 14px; margin-bottom: 14px; align-items: center; justify-content: space-between; font-size: 13px;
 }
-.batch-action-bar.active { display: flex; }
+.batch-bar.active { display: flex; }
 
-.proof-table-img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; transition: transform 0.2s; }
-.proof-table-img:hover { transform: scale(1.08); }
-.proof-table-img-placeholder { width: 40px; height: 40px; border-radius: 6px; background: var(--input-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 8px; color: var(--text-muted); text-align: center; font-weight: 600; }
-
-.status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-.status-erledigt { background: var(--success-bg); color: var(--success); }
-.status-offen { background: var(--warning-bg); color: var(--warning); }
-
-.filter-container { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-@media (max-width: 600px) { .filter-container { grid-template-columns: 1fr; } }
+.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+@media (max-width: 600px) { .filter-grid { grid-template-columns: 1fr; } }
 
 /* Modals */
 .modal-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
 }
-.modal-card { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 20px; max-width: 460px; width: 100%; overflow: hidden; box-shadow: var(--shadow); }
-.modal-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-.modal-header h3 { margin: 0; font-size: 15px; font-weight: 700; }
-.modal-close { background: transparent; border: none; font-size: 16px; color: var(--text-sub); cursor: pointer; }
-.modal-body { padding: 20px; }
-.modal-body img { width: 100%; max-height: 260px; object-fit: contain; background: #000; border-radius: 10px; margin-bottom: 14px; }
+.modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 440px; overflow: hidden; padding: 20px; box-shadow: var(--shadow); }
 
-.modal-info-list { font-size: 12px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; background: var(--input-bg); padding: 12px; border-radius: 10px; border: 1px solid var(--border); }
-
-.logo-upload-box { border: 2px dashed var(--border); background: var(--input-bg); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 10px; }
-.logo-upload-box:hover { border-color: var(--accent); }
-.logo-preview-box { max-width: 140px; max-height: 50px; object-fit: contain; margin: 8px auto 0 auto; border: 1px solid var(--border); border-radius: 6px; padding: 3px; background: #fff; display: none; }
-
-.icon-svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; vertical-align: middle; }
+.icon-svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 </head>
 <body>
 
-<div class="container">
-
-<div class="header">
-  <div class="brand-wrapper">
-    <div class="brand-logo-box">V</div>
+<div class="app-layout">
+  <!-- Sidebar Navigation -->
+  <aside>
     <div>
-      <h1 class="title">Veribase Operations</h1>
-      <p class="subtitle">Enterprise Command Center</p>
-    </div>
-  </div>
-  <div class="header-actions">
-    <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
-      <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-    </button>
-    <button class="logout-btn" onclick="logout()">Abmelden</button>
-  </div>
-</div>
-
-<div class="nav-tabs">
-  <button class="tab-btn active" onclick="switchTab(event, 'tab-live')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Live-Monitor
-  </button>
-  <button class="tab-btn" onclick="switchTab(event, 'tab-team')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Fahrer-Verwaltung
-  </button>
-  <button class="tab-btn" onclick="switchTab(event, 'tab-planer')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg> Tour-Planer & OCR
-  </button>
-  <button class="tab-btn" onclick="switchTab(event, 'tab-proofs')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nachweise & Audit
-  </button>
-  <button class="tab-btn" onclick="switchTab(event, 'tab-company')">
-    <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Firmendaten & Logo
-  </button>
-</div>
-
-<!-- TAB 1: LIVE MONITOR -->
-<div id="tab-live" class="tab-content active">
-  <div class="card">
-    <div class="card-title">
-      <span>Echte Live-Touren Aktiver Fahrer</span>
-      <span class="status-badge status-erledigt">● Echtzeit verbunden</span>
-    </div>
-    <div id="liveToursContainer">
-      <p style="color: var(--text-muted); font-size: 13px;">Lade Live-Daten...</p>
-    </div>
-  </div>
-</div>
-
-<!-- TAB 2: FAHRER -->
-<div id="tab-team" class="tab-content">
-  <div class="grid-2">
-    <div class="card" style="margin-bottom:0;">
-      <div class="card-title">Neuen Fahrer anlegen</div>
-      <form id="addWorkerForm" onsubmit="addEmployee(event)">
-        <label>Vollständiger Name</label>
-        <input type="text" id="empName" placeholder="z. B. Max Mustermann" required>
-        <label>Benutzername (Login)</label>
-        <input type="text" id="empUsername" placeholder="z. B. max" required>
-        <label>Passwort</label>
-        <input type="password" id="empPassword" placeholder="••••••••" required>
-        <button type="submit" id="addEmpBtn" class="btn-success" style="width: 100%;">Fahrer erstellen</button>
-      </form>
-    </div>
-
-    <div class="card" style="margin-bottom:0;">
-      <div class="card-title">Aktive Fahrerliste</div>
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr><th>Name</th><th>User</th><th>Status</th><th style="text-align: right;">Aktion</th></tr>
-          </thead>
-          <tbody id="employeeTableBody"></tbody>
-        </table>
+      <div class="brand-area">
+        <div class="brand-icon">V</div>
+        <div>
+          <h1 class="brand-title">Veribase</h1>
+          <p class="brand-sub">Operations</p>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- TAB 3: TOUR PLANER -->
-<div id="tab-planer" class="tab-content">
-  <div class="card">
-    <div class="card-title">Tour erstellen & zuweisen</div>
-    <div class="scan-action-box">
-      <div style="font-size: 13px; font-weight: 600; color: var(--text-sub);">Tourplan per Foto erfassen (OCR-Texterkennung)</div>
-      <div class="scan-btn-group">
-        <button type="button" class="btn-secondary" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
-        <button type="button" class="btn-secondary" onclick="document.getElementById('bossFileInput').click()">Datei</button>
-      </div>
-      <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
-      <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
-      <div id="scanStatusMsg" style="font-size: 12px; color: var(--success); font-weight: 600; margin-top: 8px; display: none;">✓ Eingelesen</div>
-    </div>
-
-    <div class="grid-2">
-      <div>
-        <label>Tour-Bezeichnung</label>
-        <input type="text" id="tourTitle" placeholder="z. B. Tour 1 - Wiehlmünden">
-        <label>Fahrer auswählen</label>
-        <select id="tourAssignee"></select>
-        <label>Adressen (zeilenweise)</label>
-        <textarea id="tourAddresses" style="height:110px;" placeholder="Hauptstraße 12, Engelskirchen"></textarea>
-      </div>
-      <div>
-        <label>Hinweise (Optional)</label>
-        <textarea id="tourNotes" style="height:92px;" placeholder="Optionale Anweisungen..."></textarea>
-        <button class="btn-primary" onclick="createAndSendTour()" style="width: 100%; margin-top: 18px;">
-          Tour an Fahrer übermitteln
+      <div class="sidebar-nav">
+        <button class="nav-item active" onclick="switchTab(event, 'pane-live')">
+          <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Live-Monitor
+        </button>
+        <button class="nav-item" onclick="switchTab(event, 'pane-team')">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Fahrer-Verwaltung
+        </button>
+        <button class="nav-item" onclick="switchTab(event, 'pane-planer')">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg> Tour-Planer & OCR
+        </button>
+        <button class="nav-item" onclick="switchTab(event, 'pane-proofs')">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nachweise & Audit
+        </button>
+        <button class="nav-item" onclick="switchTab(event, 'pane-company')">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Firmendaten
         </button>
       </div>
     </div>
-  </div>
-</div>
+  </aside>
 
-<!-- TAB 4: NACHWEISE -->
-<div id="tab-proofs" class="tab-content">
-  <div class="card">
-    <div class="card-title">
-      <span>Erfasste Fotobeweise & Protokolle</span>
-      <span id="proofsCountBadge" style="font-size: 12px; color: var(--accent); font-weight:600;">0 Nachweise</span>
+  <!-- Hauptbereich -->
+  <main class="main-content">
+    <div class="content-header">
+      <h2 class="content-title" id="pageTitleHeading">Live-Monitor</h2>
+      <div class="header-actions">
+        <button class="action-btn" onclick="toggleTheme()">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Theme
+        </button>
+        <button class="action-btn" onclick="logout()" style="color:var(--danger)">Abmelden</button>
+      </div>
     </div>
 
-    <div class="filter-container">
-      <input type="text" id="proofSearchInput" placeholder="Suche..." oninput="filterAndRenderProofs()">
-      <input type="date" id="proofDateFilter" onchange="filterAndRenderProofs()">
-      <select id="proofDriverFilter" onchange="filterAndRenderProofs()"><option value="">Alle Fahrer</option></select>
-    </div>
-
-    <div id="batchActionBar" class="batch-action-bar">
-      <span id="selectedCountText" style="font-size: 13px; font-weight: 600; color: var(--accent);">0 ausgewählt</span>
-      <button class="btn-success" onclick="exportSelectedProofsPDF()" style="padding: 6px 12px; font-size: 12px;">PDF Export</button>
-    </div>
-
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 30px; text-align: center;"><input type="checkbox" id="selectAllCheckbox" class="custom-checkbox" onchange="toggleSelectAllProofs(this)"></th>
-            <th style="width: 55px;">Foto</th>
-            <th>Adresse</th>
-            <th>Fahrer</th>
-            <th>Tour</th>
-            <th>Zeitstempel</th>
-            <th>Status</th>
-            <th style="text-align: right;">Aktion</th>
-          </tr>
-        </thead>
-        <tbody id="proofsTableBody">
-          <tr><td colspan="8" style="color: var(--text-muted); text-align: center;">Lade Daten...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- TAB 5: FIRMENDATEN -->
-<div id="tab-company" class="tab-content">
-  <div class="card">
-    <div class="card-title">Unternehmensdaten & Branding für PDF</div>
-    <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
-      <div class="grid-2">
-        <div>
-          <label>Firmenname</label>
-          <input type="text" id="compName" required>
-          <label>Untertitel / Slogan</label>
-          <input type="text" id="compSubtitle">
-          <label>Inhaber</label>
-          <input type="text" id="compOwner">
-          <label>Straße & Hausnummer</label>
-          <input type="text" id="compStreet" required>
-          <label>PLZ & Ort</label>
-          <input type="text" id="compCity" required>
+    <!-- TAB 1: LIVE MONITOR -->
+    <div id="pane-live" class="tab-pane active">
+      <div class="card">
+        <div class="card-header">
+          <span>Aktive Live-Touren in Echtzeit</span>
+          <span class="status-tag status-done">● Verbunden</span>
         </div>
-        <div>
-          <label>E-Mail</label>
-          <input type="email" id="compEmail">
-          <label>Telefon</label>
-          <input type="text" id="compPhone">
-          <label>Steuernummer / USt-IdNr.</label>
-          <input type="text" id="compTax">
-          <label>Firmenlogo</label>
-          <div class="logo-upload-box" onclick="document.getElementById('compLogoInput').click()">
-            <div style="font-size: 12px; font-weight: 600;">Logo auswählen (PNG/JPG)</div>
-            <img id="compLogoPreview" class="logo-preview-box" alt="Logo">
-          </div>
-          <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
-          <button type="button" class="btn-danger" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; padding: 6px; font-size:11px; margin-bottom: 10px;">Logo entfernen</button>
+        <div id="liveToursContainer">
+          <p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p>
         </div>
       </div>
-      <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Firmendaten speichern</button>
-    </form>
-  </div>
-</div>
+    </div>
 
+    <!-- TAB 2: FAHRER -->
+    <div id="pane-team" class="tab-pane">
+      <div class="grid-2">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-header">Neuen Fahrer anlegen</div>
+          <form id="addWorkerForm" onsubmit="addEmployee(event)">
+            <label>Name</label>
+            <input type="text" id="empName" placeholder="Max Mustermann" required>
+            <label>Benutzername</label>
+            <input type="text" id="empUsername" placeholder="max" required>
+            <label>Passwort</label>
+            <input type="password" id="empPassword" placeholder="••••••••" required>
+            <button type="submit" id="addEmpBtn" class="btn-main">Fahrer erstellen</button>
+          </form>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-header">Fahrerliste</div>
+          <div class="table-container">
+            <table>
+              <thead><tr><th>Name</th><th>User</th><th>Status</th><th style="text-align:right;">Aktion</th></tr></thead>
+              <tbody id="employeeTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: TOUR PLANER -->
+    <div id="pane-planer" class="tab-pane">
+      <div class="card">
+        <div class="card-header">Tour erstellen & Zuweisen</div>
+        <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
+          <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
+          <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
+            <button class="action-btn" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
+            <button class="action-btn" onclick="document.getElementById('bossFileInput').click()">Datei</button>
+          </div>
+          <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
+          <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
+          <div id="scanStatusMsg" style="font-size:11px; color:var(--success); font-weight:600; margin-top:6px; display:none;">✓ Eingelesen</div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label>Tour-Titel</label>
+            <input type="text" id="tourTitle" placeholder="z. B. Tour Nord">
+            <label>Fahrer</label>
+            <select id="tourAssignee"></select>
+            <label>Adressen (zeilenweise)</label>
+            <textarea id="tourAddresses" style="height:100px;" placeholder="Hauptstraße 1..."></textarea>
+          </div>
+          <div>
+            <label>Hinweise</label>
+            <textarea id="tourNotes" style="height:90px;" placeholder="Optionale Anweisungen..."></textarea>
+            <button class="btn-main" onclick="createAndSendTour()" style="margin-top:22px;">Tour übermitteln</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: NACHWEISE -->
+    <div id="pane-proofs" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <span>Erfasste Fotobeweise & Protokolle</span>
+          <span id="proofsCountBadge" style="color:var(--accent);">0 Nachweise</span>
+        </div>
+
+        <div class="filter-grid">
+          <input type="text" id="proofSearchInput" placeholder="Suche..." oninput="filterAndRenderProofs()">
+          <input type="date" id="proofDateFilter" onchange="filterAndRenderProofs()">
+          <select id="proofDriverFilter" onchange="filterAndRenderProofs()"><option value="">Alle Fahrer</option></select>
+        </div>
+
+        <div id="batchActionBar" class="batch-bar">
+          <span id="selectedCountText" style="font-weight:600; color:var(--accent);">0 ausgewählt</span>
+          <button class="action-btn" onclick="exportSelectedProofsPDF()" style="background:var(--success); color:#fff; border:none;">PDF Export</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:30px; text-align:center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllProofs(this)"></th>
+                <th style="width:50px;">Foto</th>
+                <th>Adresse</th>
+                <th>Fahrer</th>
+                <th>Tour</th>
+                <th>Zeitstempel</th>
+                <th>Status</th>
+                <th style="text-align:right;">Aktion</th>
+              </tr>
+            </thead>
+            <tbody id="proofsTableBody"><tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Lade Daten...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: FIRMENDATEN -->
+    <div id="pane-company" class="tab-pane">
+      <div class="card">
+        <div class="card-header">Unternehmensdaten für PDF-Header</div>
+        <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
+          <div class="grid-2">
+            <div>
+              <label>Firmenname</label>
+              <input type="text" id="compName" required>
+              <label>Untertitel / Slogan</label>
+              <input type="text" id="compSubtitle">
+              <label>Inhaber</label>
+              <input type="text" id="compOwner">
+              <label>Straße & Hausnummer</label>
+              <input type="text" id="compStreet" required>
+              <label>PLZ & Ort</label>
+              <input type="text" id="compCity" required>
+            </div>
+            <div>
+              <label>E-Mail</label>
+              <input type="email" id="compEmail">
+              <label>Telefon</label>
+              <input type="text" id="compPhone">
+              <label>Steuernummer / USt-IdNr.</label>
+              <input type="text" id="compTax">
+              <label>Firmenlogo</label>
+              <div style="border: 2px dashed var(--border); border-radius:8px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
+                <div style="font-size:11px; font-weight:600;">Logo auswählen</div>
+                <img id="compLogoPreview" style="max-width:120px; max-height:45px; object-fit:contain; margin-top:6px; display:none;" alt="Logo">
+              </div>
+              <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
+              <button type="button" class="btn-danger-sub" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:8px;">Logo entfernen</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-main" style="margin-top:14px;">Firmendaten speichern</button>
+        </form>
+      </div>
+    </div>
+  </main>
 </div>
 
 <!-- MODAL FÜR GROSSANSICHT -->
-<div id="proofModal" class="modal-overlay" style="display: none;">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h3>Fotobeweis-Details</h3>
-      <button class="modal-close" onclick="closeProofModal()">✕</button>
+<div id="proofModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <strong>Fotobeweis-Details</strong>
+      <button onclick="closeProofModal()" style="background:none; border:none; color:var(--text-sub); cursor:pointer; font-size:16px;">✕</button>
     </div>
-    <div class="modal-body">
-      <img id="modalImage" src="" alt="Großansicht">
-      <div class="modal-info-list">
-        <div><strong>Adresse:</strong> <span id="modalAddress"></span></div>
-        <div><strong>Fahrer:</strong> <span id="modalDriver"></span></div>
-        <div><strong>Tour:</strong> <span id="modalTour"></span></div>
-        <div><strong>Zeit:</strong> <span id="modalTime"></span></div>
-        <div><strong>Status:</strong> <span id="modalStatus" style="color:var(--success); font-weight:600;"></span></div>
-      </div>
-      <button class="btn-primary" onclick="downloadSingleProofPDF()" style="width:100%;">Einzel-PDF herunterladen</button>
+    <img id="modalImage" style="width:100%; max-height:240px; object-fit:contain; background:#000; border-radius:8px; margin-bottom:12px;" alt="Beweis">
+    <div style="font-size:12px; display:flex; flex-direction:column; gap:6px; background:var(--input-bg); padding:10px; border-radius:8px; margin-bottom:14px;">
+      <div><strong>Adresse:</strong> <span id="modalAddress"></span></div>
+      <div><strong>Fahrer:</strong> <span id="modalDriver"></span></div>
+      <div><strong>Tour:</strong> <span id="modalTour"></span></div>
+      <div><strong>Zeit:</strong> <span id="modalTime"></span></div>
+      <div><strong>Status:</strong> <span id="modalStatus" style="color:var(--success);"></span></div>
     </div>
+    <button class="btn-main" onclick="downloadSingleProofPDF()">Einzel-PDF herunterladen</button>
   </div>
 </div>
 
@@ -455,10 +512,7 @@ window.onload = async () => {
   currentChef = session.user;
 
   const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', currentChef.id).maybeSingle();
-  if (!profile || profile.role !== 'chef') {
-    window.location.href = 'TourApp.html';
-    return;
-  }
+  if (!profile || profile.role !== 'chef') { window.location.href = 'TourApp.html'; return; }
 
   loadCompanyProfile();
   await loadDriversFromSupabase();
@@ -564,7 +618,7 @@ function renderDriverList() {
     const name = driver.full_name || cleanUsername;
 
     if (tbody) {
-      tbody.innerHTML += `<tr><td><strong>${name}</strong></td><td>${cleanUsername}</td><td><span style="color:var(--success); font-weight:600;">Aktiv</span></td><td style="text-align: right;"><button class="btn-danger" style="padding: 4px 10px; font-size: 11px;" onclick="deleteDriver('${driver.id}', '${name}')">Löschen</button></td></tr>`;
+      tbody.innerHTML += `<tr><td><strong>${name}</strong></td><td>${cleanUsername}</td><td><span style="color:var(--success); font-weight:600;">Aktiv</span></td><td style="text-align: right;"><button class="btn-danger-sub" onclick="deleteDriver('${driver.id}', '${name}')">Löschen</button></td></tr>`;
     }
     if (select) select.innerHTML += `<option value="${driver.id}">${name} (${cleanUsername})</option>`;
     if (driverFilter) driverFilter.innerHTML += `<option value="${name.toLowerCase()}">${name}</option>`;
@@ -579,10 +633,19 @@ async function deleteDriver(id, name) {
 }
 
 function switchTab(event, tabId) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
   event.currentTarget.classList.add('active');
+
+  const titles = {
+    'pane-live': 'Live-Monitor',
+    'pane-team': 'Fahrer-Verwaltung',
+    'pane-planer': 'Tour-Planer & OCR',
+    'pane-proofs': 'Nachweise & Audit',
+    'pane-company': 'Firmendaten & Logo'
+  };
+  document.getElementById('pageTitleHeading').innerText = titles[tabId] || 'Command Center';
 }
 
 async function addEmployee(e) {
@@ -681,12 +744,14 @@ function renderTours(tours) {
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     const driverName = t.profiles?.full_name || t.profiles?.email?.split('@')[0] || 'Fahrer';
     return `
-      <div class="tour-monitor-card">
+      <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:10px; padding:14px; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong>${driverName}</strong> <span style="font-size:11px; color:var(--text-sub);">(${t.title})</span>
-          <span class="status-badge status-erledigt">${t.status}</span>
+          <span class="status-tag status-done">${t.status}</span>
         </div>
-        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div>
+        <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden; margin:10px 0 6px 0;">
+          <div style="background:var(--success); height:100%; width:${pct}%;"></div>
+        </div>
         <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sub);">
           <span>Stopps: ${done}/${total}</span><span>${pct}%</span>
         </div>
@@ -743,14 +808,14 @@ function renderProofTable(items) {
     const checked = selectedProofIds.has(s.id) ? 'checked' : '';
     return `
       <tr>
-        <td style="text-align: center;"><input type="checkbox" class="custom-checkbox" data-id="${s.id}" ${checked} onchange="toggleSelectProof('${s.id}')"></td>
-        <td>${s.photo_url ? `<img src="${s.photo_url}" class="proof-table-img" onclick="openProofModal(${idx})">` : `<div class="proof-table-img-placeholder">Kein</div>`}</td>
+        <td style="text-align: center;"><input type="checkbox" data-id="${s.id}" ${checked} onchange="toggleSelectProof('${s.id}')"></td>
+        <td>${s.photo_url ? `<img src="${s.photo_url}" style="width:36px; height:36px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="openProofModal(${idx})">` : `<span style="font-size:10px; color:var(--text-muted);">Kein</span>`}</td>
         <td><strong>${s.address}</strong></td>
         <td>${s.driverName}</td>
         <td>${s.tourTitle}</td>
         <td>${new Date(s.created_at).toLocaleString('de-DE')}</td>
-        <td><span class="status-badge ${s.status === 'erledigt' ? 'status-erledigt' : 'status-offen'}">${s.status}</span></td>
-        <td style="text-align: right;"><button class="btn-secondary" onclick="openProofModal(${idx})" style="padding: 4px 10px; font-size:11px;">Details</button></td>
+        <td><span class="status-tag ${s.status === 'erledigt' ? 'status-done' : 'status-open'}">${s.status}</span></td>
+        <td style="text-align: right;"><button class="action-btn" onclick="openProofModal(${idx})" style="padding:4px 8px; font-size:11px;">Details</button></td>
       </tr>
     `;
   }).join('');
