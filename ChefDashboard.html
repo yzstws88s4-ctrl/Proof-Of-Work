@@ -23,34 +23,36 @@
 :root {
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #030712;
-  --surface: #111827;
-  --surface-hover: #1f2937;
+  --surface: rgba(17, 24, 39, 0.7);
+  --surface-solid: #111827;
+  --surface-hover: rgba(31, 41, 55, 0.8);
   --border: rgba(255, 255, 255, 0.08);
   --text-main: #f9fafb;
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
   --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.3);
-  --input-bg: #030712;
+  --accent-glow: rgba(99, 102, 241, 0.35);
+  --input-bg: rgba(3, 7, 18, 0.6);
   --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.1);
+  --success-bg: rgba(16, 185, 129, 0.12);
   --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.1);
+  --warning-bg: rgba(245, 158, 11, 0.12);
   --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.1);
-  --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
 }
 
 [data-theme="light"] {
   --bg: #f1f5f9;
-  --surface: #ffffff;
+  --surface: rgba(255, 255, 255, 0.8);
+  --surface-solid: #ffffff;
   --surface-hover: #f8fafc;
   --border: rgba(0, 0, 0, 0.08);
   --text-main: #0f172a;
   --text-sub: #475569;
   --text-muted: #94a3b8;
   --input-bg: #f8fafc;
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -59,7 +61,7 @@ body {
   font-family: var(--font);
   background-color: var(--bg);
   color: var(--text-main);
-  margin: 0; padding: 20px 16px;
+  margin: 0; padding: 16px;
   display: flex; justify-content: center;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -70,60 +72,91 @@ body {
   max-width: 900px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-/* Zentraler Logo-Hub (Header) */
+/* Header & Utility Bar */
+.top-utility-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; z-index: 30;
+}
+
+.utility-pill {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
+  padding: 8px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; box-shadow: var(--shadow); backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+.utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+/* High-End Central Hub Header */
 .hub-header {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  padding: 10px 0;
+  margin-top: -10px;
+  z-index: 20;
+}
+
+/* Pulsierender Logo Ring */
+.hub-logo-container {
+  position: relative;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
 
 .hub-logo-ring {
-  width: 88px; height: 88px;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  width: 96px; height: 96px;
+  background: var(--surface-solid);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 800; font-size: 32px;
-  cursor: pointer;
-  box-shadow: 0 0 30px var(--accent-glow), 0 10px 20px rgba(0,0,0,0.4);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 35px var(--accent-glow), var(--shadow);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-  border: 3px solid rgba(255, 255, 255, 0.15);
-  z-index: 20;
+  overflow: hidden; padding: 12px;
 }
-.hub-logo-ring:hover { transform: scale(1.06); box-shadow: 0 0 40px var(--accent); }
-.hub-logo-ring:active { transform: scale(0.95); }
+
+.hub-logo-ring img {
+  width: 100%; height: 100%; object-fit: contain;
+}
+
+.hub-logo-container:hover .hub-logo-ring {
+  transform: scale(1.05);
+  box-shadow: 0 0 50px var(--accent);
+}
 
 .hub-subtitle {
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--text-sub); margin-top: 10px; display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-sub); margin-top: 12px; display: flex; align-items: center; gap: 6px;
+  background: var(--surface); padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+  backdrop-filter: blur(10px); cursor: pointer; transition: all 0.2s ease;
 }
+.hub-subtitle:hover { border-color: var(--accent); color: var(--text-main); }
 
-/* Radialer / Dropdown Modul-Fächer (Animation) */
-.modules-radial-menu {
+/* Dropdown / Fächer-Navigation */
+.modules-dropdown-menu {
   position: absolute;
-  top: 105px;
+  top: 140px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 280px;
-  background: var(--surface);
+  width: 100%;
+  max-width: 320px;
+  background: var(--surface-solid);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 12px;
   box-shadow: var(--shadow);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px) scale(0.95);
+  transform: translateY(-15px) scale(0.95);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 100;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
 }
 
-.modules-radial-menu.open {
+.modules-dropdown-menu.open {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
@@ -133,35 +166,23 @@ body {
   background: var(--input-bg);
   border: 1px solid var(--border);
   color: var(--text-sub);
-  padding: 10px 14px;
-  border-radius: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 12px;
   text-align: left;
   transition: all 0.2s ease;
 }
 .module-option-btn:hover { background: var(--surface-hover); color: var(--text-main); border-color: var(--accent); }
-.module-option-btn.active { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 4px 14px var(--accent-glow); }
-
-/* Utility Bar Oben Rechts/Links */
-.top-utility-bar {
-  display: flex; justify-content: space-between; align-items: center;
-  width: 100%; margin-bottom: -10px; font-size: 13px; font-weight: 600;
-}
-.utility-pill {
-  background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
-  padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-  box-shadow: var(--shadow);
-}
-.utility-pill:hover { border-color: var(--accent); }
+.module-option-btn.active { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 4px 16px var(--accent-glow); }
 
 /* Content Cards */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 24px;
   padding: 24px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
@@ -169,7 +190,7 @@ body {
 
 .card-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 20px; font-size: 13px; font-weight: 700; text-transform: uppercase;
+  margin-bottom: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.05em; color: var(--text-sub);
 }
 
@@ -182,38 +203,38 @@ body {
 label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 
 input, select, textarea {
-  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px;
-  padding: 11px 14px; color: var(--text-main); font-family: inherit; font-size: 13px; margin-bottom: 14px;
+  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; color: var(--text-main); font-family: inherit; font-size: 13px; margin-bottom: 14px;
   transition: border-color 0.2s;
 }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
 button.btn-main {
-  background: var(--accent); color: white; border: none; border-radius: 10px;
-  padding: 11px 16px; font-weight: 700; font-size: 13px; cursor: pointer;
+  background: var(--accent); color: white; border: none; border-radius: 12px;
+  padding: 12px 18px; font-weight: 700; font-size: 13px; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-  box-shadow: 0 4px 14px var(--accent-glow); transition: opacity 0.2s;
+  box-shadow: 0 4px 16px var(--accent-glow); transition: opacity 0.2s;
 }
-button.btn-main:hover { opacity: 0.9; }
+button.btn-main:hover { opacity: 0.92; }
 
 .btn-danger-compact {
   background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;
+  padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
 }
 
-/* Tabellen & Chips */
-.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--input-bg); }
+/* Tabellen & Status Chips */
+.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--input-bg); }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-th, td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-th { background: var(--surface); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th { background: var(--surface-solid); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
 tr:last-child td { border-bottom: none; }
 
-.status-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.status-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
 .status-chip.done { background: var(--success-bg); color: var(--success); }
 .status-chip.open { background: var(--warning-bg); color: var(--warning); }
 
 .batch-toolbar {
-  display: none; background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); border-radius: 10px;
+  display: none; background: rgba(99, 102, 241, 0.12); border: 1px solid var(--accent); border-radius: 12px;
   padding: 12px 16px; margin-bottom: 16px; align-items: center; justify-content: space-between; font-size: 13px;
 }
 .batch-toolbar.active { display: flex; }
@@ -223,19 +244,19 @@ tr:last-child td { border-bottom: none; }
 
 /* Modals */
 .modal-backdrop {
-  position: fixed; inset: 0; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(8px);
+  position: fixed; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(10px);
   display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
 }
-.modal-window { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 440px; overflow: hidden; padding: 20px; box-shadow: var(--shadow); }
+.modal-window { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 24px; width: 100%; max-width: 440px; overflow: hidden; padding: 20px; box-shadow: var(--shadow); }
 
-.icon-svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
 
-  <!-- Utility Bar (Theme & Logout) -->
+  <!-- Utility Bar (Design & Abmelden) -->
   <div class="top-utility-bar">
     <button class="utility-pill" onclick="toggleTheme()">
       <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Design
@@ -245,17 +266,21 @@ tr:last-child td { border-bottom: none; }
     </button>
   </div>
 
-  <!-- Zentraler Logo-Hub mit Aufklapp-Menü -->
+  <!-- Zentrales Logo Command Hub -->
   <header class="hub-header">
-    <div class="hub-logo-ring" onclick="toggleHubMenu(event)" title="Modul-Menü öffnen">
-      V
+    <div class="hub-logo-container" onclick="toggleHubMenu(event)">
+      <div class="hub-logo-ring">
+        <img src="logo.png" alt="Veribase Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <span style="display:none; font-weight:800; font-size:32px; color:#fff;">V</span>
+      </div>
     </div>
-    <div class="hub-subtitle" id="activeModuleLabel" onclick="toggleHubMenu(event)" style="cursor:pointer;">
-      <span>Live-Monitor</span> <span style="font-size:10px;">▼</span>
+    
+    <div class="hub-subtitle" id="activeModuleLabel" onclick="toggleHubMenu(event)">
+      <span>Live-Monitor</span> <span style="font-size:9px;">▼</span>
     </div>
 
-    <!-- Radialer / Animierter Modul-Fächer -->
-    <div id="hubDropdownMenu" class="modules-radial-menu">
+    <!-- Ausklappbares Navigations-Menü -->
+    <div id="hubDropdownMenu" class="modules-dropdown-menu">
       <button class="module-option-btn active" onclick="selectModule('pane-live', 'Live-Monitor', event)">
         <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Live-Monitor
       </button>
@@ -274,7 +299,7 @@ tr:last-child td { border-bottom: none; }
     </div>
   </header>
 
-  <!-- UNTERER INHALTSBEREICH -->
+  <!-- Inhaltsbereich -->
   <main>
     <!-- TAB 1: LIVE MONITOR -->
     <div id="pane-live" class="tab-pane active">
@@ -320,9 +345,9 @@ tr:last-child td { border-bottom: none; }
     <div id="pane-planer" class="tab-pane">
       <div class="card">
         <div class="card-header">Tour erstellen & Zuweisen</div>
-        <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
+        <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:14px; padding:18px; text-align:center; margin-bottom:18px;">
           <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
-          <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
+          <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
             <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
             <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">Datei</button>
           </div>
@@ -414,7 +439,7 @@ tr:last-child td { border-bottom: none; }
               <label>Steuernummer / USt-IdNr.</label>
               <input type="text" id="compTax">
               <label>Firmenlogo</label>
-              <div style="border: 2px dashed var(--border); border-radius:10px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
+              <div style="border: 2px dashed var(--border); border-radius:12px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
                 <div style="font-size:11px; font-weight:600;">Logo auswählen</div>
                 <img id="compLogoPreview" style="max-width:120px; max-height:45px; object-fit:contain; margin-top:6px; display:none;" alt="Logo">
               </div>
@@ -436,8 +461,8 @@ tr:last-child td { border-bottom: none; }
       <strong>Fotobeweis-Details</strong>
       <button onclick="closeProofModal()" style="background:none; border:none; color:var(--text-sub); cursor:pointer; font-size:16px;">✕</button>
     </div>
-    <img id="modalImage" style="width:100%; max-height:240px; object-fit:contain; background:#000; border-radius:8px; margin-bottom:12px;" alt="Beweis">
-    <div style="font-size:12px; display:flex; flex-direction:column; gap:6px; background:var(--input-bg); padding:10px; border-radius:8px; margin-bottom:14px;">
+    <img id="modalImage" style="width:100%; max-height:240px; object-fit:contain; background:#000; border-radius:12px; margin-bottom:12px;" alt="Beweis">
+    <div style="font-size:12px; display:flex; flex-direction:column; gap:6px; background:var(--input-bg); padding:12px; border-radius:12px; margin-bottom:14px;">
       <div><strong>Adresse:</strong> <span id="modalAddress"></span></div>
       <div><strong>Fahrer:</strong> <span id="modalDriver"></span></div>
       <div><strong>Tour:</strong> <span id="modalTour"></span></div>
@@ -485,7 +510,6 @@ function toggleHubMenu(event) {
   menu.classList.toggle('open');
 }
 
-// Schließt das Menü bei Klick außerhalb
 window.addEventListener('click', () => {
   const menu = document.getElementById('hubDropdownMenu');
   if (menu) menu.classList.remove('open');
@@ -706,7 +730,7 @@ function renderTours(tours) {
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     const driverName = t.profiles?.full_name || t.profiles?.email?.split('@')[0] || 'Fahrer';
     return `
-      <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:10px; padding:14px; margin-bottom:10px;">
+      <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:12px; padding:14px; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong>${driverName}</strong> <span style="font-size:11px; color:var(--text-sub);">(${t.title})</span>
           <span class="status-chip done">${t.status}</span>
