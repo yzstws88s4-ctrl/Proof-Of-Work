@@ -23,7 +23,6 @@
 :root {
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #030712;
-  --sidebar-bg: #090d16;
   --surface: #111827;
   --surface-hover: #1f2937;
   --border: rgba(255, 255, 255, 0.08);
@@ -31,7 +30,7 @@
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
   --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.15);
+  --accent-glow: rgba(99, 102, 241, 0.3);
   --input-bg: #030712;
   --success: #10b981;
   --success-bg: rgba(16, 185, 129, 0.1);
@@ -39,12 +38,11 @@
   --warning-bg: rgba(245, 158, 11, 0.1);
   --danger: #ef4444;
   --danger-bg: rgba(239, 68, 68, 0.1);
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="light"] {
   --bg: #f1f5f9;
-  --sidebar-bg: #ffffff;
   --surface: #ffffff;
   --surface-hover: #f8fafc;
   --border: rgba(0, 0, 0, 0.08);
@@ -52,7 +50,7 @@
   --text-sub: #475569;
   --text-muted: #94a3b8;
   --input-bg: #f8fafc;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -61,142 +59,118 @@ body {
   font-family: var(--font);
   background-color: var(--bg);
   color: var(--text-main);
-  margin: 0; padding: 0;
-  display: flex;
+  margin: 0; padding: 20px 16px;
+  display: flex; justify-content: center;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Neues Modernes Layout mit Sidebar & Main Content */
-.app-layout {
-  display: flex;
+.app-container {
   width: 100%;
-  min-height: 100vh;
-}
-
-aside {
-  width: 260px;
-  background-color: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
+  max-width: 900px;
   display: flex;
   flex-direction: column;
-  padding: 24px 16px;
-  flex-shrink: 0;
+  gap: 24px;
 }
 
-@media (max-width: 900px) {
-  .app-layout { flex-direction: column; }
-  aside { width: 100%; height: auto; padding: 16px; flex-direction: row; align-items: center; justify-content: space-between; overflow-x: auto; }
-  .sidebar-nav { display: flex; gap: 8px; margin-top: 0 !important; }
-  .brand-area { margin-bottom: 0 !important; }
-}
-
-.brand-area {
+/* Zentraler Logo-Hub (Header) */
+.hub-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 32px;
+  position: relative;
+  padding: 10px 0;
 }
 
-.brand-icon {
-  width: 38px; height: 38px;
-  background: var(--accent);
-  border-radius: 10px;
+.hub-logo-ring {
+  width: 88px; height: 88px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 800; font-size: 16px;
-  box-shadow: 0 4px 12px var(--accent-glow);
+  color: #fff; font-weight: 800; font-size: 32px;
+  cursor: pointer;
+  box-shadow: 0 0 30px var(--accent-glow), 0 10px 20px rgba(0,0,0,0.4);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  z-index: 20;
+}
+.hub-logo-ring:hover { transform: scale(1.06); box-shadow: 0 0 40px var(--accent); }
+.hub-logo-ring:active { transform: scale(0.95); }
+
+.hub-subtitle {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-sub); margin-top: 10px; display: flex; align-items: center; gap: 6px;
 }
 
-.brand-title { font-size: 15px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
-.brand-sub { font-size: 11px; color: var(--text-sub); margin: 0; font-weight: 600; text-transform: uppercase; }
-
-.sidebar-nav {
+/* Radialer / Dropdown Modul-Fächer (Animation) */
+.modules-radial-menu {
+  position: absolute;
+  top: 105px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 10px;
-  flex-grow: 1;
-}
-
-.nav-item {
-  background: transparent;
-  border: none;
-  color: var(--text-sub);
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-align: left;
-  transition: all 0.2s ease;
-  width: 100%;
-}
-
-.nav-item:hover { background-color: var(--surface-hover); color: var(--text-main); }
-.nav-item.active { background-color: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
-
-.main-content {
-  flex-grow: 1;
-  padding: 32px;
-  max-width: 1100px;
-  overflow-y: auto;
-}
-
-@media (max-width: 768px) {
-  .main-content { padding: 16px; }
-}
-
-/* Top Bar im Content */
-.content-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
-
-.content-title { font-size: 20px; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
-
-.header-actions { display: flex; gap: 8px; }
-
-.action-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
-  transition: all 0.2s;
-}
-.action-btn:hover { border-color: var(--accent); }
-
-/* Cards & Grid */
-.card {
+  gap: 8px;
+  width: 280px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 20px;
+  padding: 12px;
   box-shadow: var(--shadow);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.95);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 100;
+  backdrop-filter: blur(16px);
+}
+
+.modules-radial-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.module-option-btn {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  color: var(--text-sub);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+.module-option-btn:hover { background: var(--surface-hover); color: var(--text-main); border-color: var(--accent); }
+.module-option-btn.active { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 4px 14px var(--accent-glow); }
+
+/* Utility Bar Oben Rechts/Links */
+.top-utility-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; margin-bottom: -10px; font-size: 13px; font-weight: 600;
+}
+.utility-pill {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
+  padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  box-shadow: var(--shadow);
+}
+.utility-pill:hover { border-color: var(--accent); }
+
+/* Content Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
 }
 
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-sub);
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-sub);
 }
 
 .tab-pane { display: none; }
@@ -208,126 +182,106 @@ aside {
 label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 
 input, select, textarea {
-  width: 100%;
-  background: var(--input-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: var(--text-main);
-  font-family: inherit;
-  font-size: 13px;
-  margin-bottom: 14px;
+  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px;
+  padding: 11px 14px; color: var(--text-main); font-family: inherit; font-size: 13px; margin-bottom: 14px;
   transition: border-color 0.2s;
 }
-input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
 button.btn-main {
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 11px 16px;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  width: 100%;
-  transition: opacity 0.2s;
+  background: var(--accent); color: white; border: none; border-radius: 10px;
+  padding: 11px 16px; font-weight: 700; font-size: 13px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  box-shadow: 0 4px 14px var(--accent-glow); transition: opacity 0.2s;
 }
 button.btn-main:hover { opacity: 0.9; }
 
-.btn-danger-sub {
-  background: var(--danger-bg);
-  color: var(--danger);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
+.btn-danger-compact {
+  background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;
 }
 
-/* Tabellen */
-.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+/* Tabellen & Chips */
+.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--input-bg); }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
 th, td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-th { background: var(--input-bg); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+th { background: var(--surface); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
 tr:last-child td { border-bottom: none; }
 
-.status-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-.status-done { background: var(--success-bg); color: var(--success); }
-.status-open { background: var(--warning-bg); color: var(--warning); }
+.status-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.status-chip.done { background: var(--success-bg); color: var(--success); }
+.status-chip.open { background: var(--warning-bg); color: var(--warning); }
 
-.batch-bar {
-  display: none; background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); border-radius: 8px;
-  padding: 10px 14px; margin-bottom: 14px; align-items: center; justify-content: space-between; font-size: 13px;
+.batch-toolbar {
+  display: none; background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); border-radius: 10px;
+  padding: 12px 16px; margin-bottom: 16px; align-items: center; justify-content: space-between; font-size: 13px;
 }
-.batch-bar.active { display: flex; }
+.batch-toolbar.active { display: flex; }
 
-.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 @media (max-width: 600px) { .filter-grid { grid-template-columns: 1fr; } }
 
 /* Modals */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(6px);
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
 }
-.modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 440px; overflow: hidden; padding: 20px; box-shadow: var(--shadow); }
+.modal-window { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 440px; overflow: hidden; padding: 20px; box-shadow: var(--shadow); }
 
 .icon-svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 </head>
 <body>
 
-<div class="app-layout">
-  <!-- Sidebar Navigation -->
-  <aside>
-    <div>
-      <div class="brand-area">
-        <div class="brand-icon">V</div>
-        <div>
-          <h1 class="brand-title">Veribase</h1>
-          <p class="brand-sub">Operations</p>
-        </div>
-      </div>
-      <div class="sidebar-nav">
-        <button class="nav-item active" onclick="switchTab(event, 'pane-live')">
-          <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Live-Monitor
-        </button>
-        <button class="nav-item" onclick="switchTab(event, 'pane-team')">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Fahrer-Verwaltung
-        </button>
-        <button class="nav-item" onclick="switchTab(event, 'pane-planer')">
-          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg> Tour-Planer & OCR
-        </button>
-        <button class="nav-item" onclick="switchTab(event, 'pane-proofs')">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nachweise & Audit
-        </button>
-        <button class="nav-item" onclick="switchTab(event, 'pane-company')">
-          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Firmendaten
-        </button>
-      </div>
-    </div>
-  </aside>
+<div class="app-container">
 
-  <!-- Hauptbereich -->
-  <main class="main-content">
-    <div class="content-header">
-      <h2 class="content-title" id="pageTitleHeading">Live-Monitor</h2>
-      <div class="header-actions">
-        <button class="action-btn" onclick="toggleTheme()">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Theme
-        </button>
-        <button class="action-btn" onclick="logout()" style="color:var(--danger)">Abmelden</button>
-      </div>
+  <!-- Utility Bar (Theme & Logout) -->
+  <div class="top-utility-bar">
+    <button class="utility-pill" onclick="toggleTheme()">
+      <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Design
+    </button>
+    <button class="utility-pill" onclick="logout()" style="color: var(--danger); border-color: rgba(239,68,68,0.2);">
+      Abmelden
+    </button>
+  </div>
+
+  <!-- Zentraler Logo-Hub mit Aufklapp-Menü -->
+  <header class="hub-header">
+    <div class="hub-logo-ring" onclick="toggleHubMenu(event)" title="Modul-Menü öffnen">
+      V
+    </div>
+    <div class="hub-subtitle" id="activeModuleLabel" onclick="toggleHubMenu(event)" style="cursor:pointer;">
+      <span>Live-Monitor</span> <span style="font-size:10px;">▼</span>
     </div>
 
+    <!-- Radialer / Animierter Modul-Fächer -->
+    <div id="hubDropdownMenu" class="modules-radial-menu">
+      <button class="module-option-btn active" onclick="selectModule('pane-live', 'Live-Monitor', event)">
+        <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Live-Monitor
+      </button>
+      <button class="module-option-btn" onclick="selectModule('pane-team', 'Fahrer-Verwaltung', event)">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Fahrer-Verwaltung
+      </button>
+      <button class="module-option-btn" onclick="selectModule('pane-planer', 'Tour-Planer & OCR', event)">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg> Tour-Planer & OCR
+      </button>
+      <button class="module-option-btn" onclick="selectModule('pane-proofs', 'Nachweise & Audit', event)">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nachweise & Audit
+      </button>
+      <button class="module-option-btn" onclick="selectModule('pane-company', 'Firmendaten', event)">
+        <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Firmendaten
+      </button>
+    </div>
+  </header>
+
+  <!-- UNTERER INHALTSBEREICH -->
+  <main>
     <!-- TAB 1: LIVE MONITOR -->
     <div id="pane-live" class="tab-pane active">
       <div class="card">
         <div class="card-header">
           <span>Aktive Live-Touren in Echtzeit</span>
-          <span class="status-tag status-done">● Verbunden</span>
+          <span class="status-chip done">● Verbunden</span>
         </div>
         <div id="liveToursContainer">
           <p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p>
@@ -369,8 +323,8 @@ tr:last-child td { border-bottom: none; }
         <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
           <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
           <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
-            <button class="action-btn" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
-            <button class="action-btn" onclick="document.getElementById('bossFileInput').click()">Datei</button>
+            <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
+            <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">Datei</button>
           </div>
           <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
           <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
@@ -409,9 +363,9 @@ tr:last-child td { border-bottom: none; }
           <select id="proofDriverFilter" onchange="filterAndRenderProofs()"><option value="">Alle Fahrer</option></select>
         </div>
 
-        <div id="batchActionBar" class="batch-bar">
+        <div id="batchActionBar" class="batch-toolbar">
           <span id="selectedCountText" style="font-weight:600; color:var(--accent);">0 ausgewählt</span>
-          <button class="action-btn" onclick="exportSelectedProofsPDF()" style="background:var(--success); color:#fff; border:none;">PDF Export</button>
+          <button class="utility-pill" onclick="exportSelectedProofsPDF()" style="background:var(--success); color:#fff; border:none;">PDF Export</button>
         </div>
 
         <div class="table-container">
@@ -460,12 +414,12 @@ tr:last-child td { border-bottom: none; }
               <label>Steuernummer / USt-IdNr.</label>
               <input type="text" id="compTax">
               <label>Firmenlogo</label>
-              <div style="border: 2px dashed var(--border); border-radius:8px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
+              <div style="border: 2px dashed var(--border); border-radius:10px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
                 <div style="font-size:11px; font-weight:600;">Logo auswählen</div>
                 <img id="compLogoPreview" style="max-width:120px; max-height:45px; object-fit:contain; margin-top:6px; display:none;" alt="Logo">
               </div>
               <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
-              <button type="button" class="btn-danger-sub" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:8px;">Logo entfernen</button>
+              <button type="button" class="btn-danger-compact" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:8px;">Logo entfernen</button>
             </div>
           </div>
           <button type="submit" class="btn-main" style="margin-top:14px;">Firmendaten speichern</button>
@@ -476,8 +430,8 @@ tr:last-child td { border-bottom: none; }
 </div>
 
 <!-- MODAL FÜR GROSSANSICHT -->
-<div id="proofModal" class="modal-overlay" style="display:none;">
-  <div class="modal-box">
+<div id="proofModal" class="modal-backdrop" style="display:none;">
+  <div class="modal-window">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
       <strong>Fotobeweis-Details</strong>
       <button onclick="closeProofModal()" style="background:none; border:none; color:var(--text-sub); cursor:pointer; font-size:16px;">✕</button>
@@ -523,6 +477,30 @@ window.onload = async () => {
 function subscribeRealtime() {
   supabaseClient.channel('public:stops').on('postgres_changes', { event: '*', schema: 'public', table: 'stops' }, () => loadToursFromSupabase()).subscribe();
   supabaseClient.channel('public:tours').on('postgres_changes', { event: '*', schema: 'public', table: 'tours' }, () => loadToursFromSupabase()).subscribe();
+}
+
+function toggleHubMenu(event) {
+  event.stopPropagation();
+  const menu = document.getElementById('hubDropdownMenu');
+  menu.classList.toggle('open');
+}
+
+// Schließt das Menü bei Klick außerhalb
+window.addEventListener('click', () => {
+  const menu = document.getElementById('hubDropdownMenu');
+  if (menu) menu.classList.remove('open');
+});
+
+function selectModule(paneId, titleText, event) {
+  event.stopPropagation();
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.module-option-btn').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById(paneId).classList.add('active');
+  event.currentTarget.classList.add('active');
+  
+  document.getElementById('activeModuleLabel').querySelector('span').innerText = titleText;
+  document.getElementById('hubDropdownMenu').classList.remove('open');
 }
 
 function loadCompanyProfile() {
@@ -618,7 +596,7 @@ function renderDriverList() {
     const name = driver.full_name || cleanUsername;
 
     if (tbody) {
-      tbody.innerHTML += `<tr><td><strong>${name}</strong></td><td>${cleanUsername}</td><td><span style="color:var(--success); font-weight:600;">Aktiv</span></td><td style="text-align: right;"><button class="btn-danger-sub" onclick="deleteDriver('${driver.id}', '${name}')">Löschen</button></td></tr>`;
+      tbody.innerHTML += `<tr><td><strong>${name}</strong></td><td>${cleanUsername}</td><td><span style="color:var(--success); font-weight:600;">Aktiv</span></td><td style="text-align: right;"><button class="btn-danger-compact" onclick="deleteDriver('${driver.id}', '${name}')">Löschen</button></td></tr>`;
     }
     if (select) select.innerHTML += `<option value="${driver.id}">${name} (${cleanUsername})</option>`;
     if (driverFilter) driverFilter.innerHTML += `<option value="${name.toLowerCase()}">${name}</option>`;
@@ -630,22 +608,6 @@ async function deleteDriver(id, name) {
   await supabaseClient.from('profiles').update({ is_active: false }).eq('id', id);
   await loadDriversFromSupabase();
   await loadToursFromSupabase();
-}
-
-function switchTab(event, tabId) {
-  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-  event.currentTarget.classList.add('active');
-
-  const titles = {
-    'pane-live': 'Live-Monitor',
-    'pane-team': 'Fahrer-Verwaltung',
-    'pane-planer': 'Tour-Planer & OCR',
-    'pane-proofs': 'Nachweise & Audit',
-    'pane-company': 'Firmendaten & Logo'
-  };
-  document.getElementById('pageTitleHeading').innerText = titles[tabId] || 'Command Center';
 }
 
 async function addEmployee(e) {
@@ -747,7 +709,7 @@ function renderTours(tours) {
       <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:10px; padding:14px; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong>${driverName}</strong> <span style="font-size:11px; color:var(--text-sub);">(${t.title})</span>
-          <span class="status-tag status-done">${t.status}</span>
+          <span class="status-chip done">${t.status}</span>
         </div>
         <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden; margin:10px 0 6px 0;">
           <div style="background:var(--success); height:100%; width:${pct}%;"></div>
@@ -814,8 +776,8 @@ function renderProofTable(items) {
         <td>${s.driverName}</td>
         <td>${s.tourTitle}</td>
         <td>${new Date(s.created_at).toLocaleString('de-DE')}</td>
-        <td><span class="status-tag ${s.status === 'erledigt' ? 'status-done' : 'status-open'}">${s.status}</span></td>
-        <td style="text-align: right;"><button class="action-btn" onclick="openProofModal(${idx})" style="padding:4px 8px; font-size:11px;">Details</button></td>
+        <td><span class="status-chip ${s.status === 'erledigt' ? 'done' : 'open'}">${s.status}</span></td>
+        <td style="text-align: right;"><button class="utility-pill" onclick="openProofModal(${idx})" style="padding:4px 8px; font-size:11px;">Details</button></td>
       </tr>
     `;
   }).join('');
