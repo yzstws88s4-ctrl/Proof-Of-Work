@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html lang="de" data-theme="dark">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Veribase – Command Center</title>
-
-<meta name="apple-mobile-web-app-title" content="Veribase">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="logo.png">
-<link rel="icon" type="image/png" href="logo.png">
-<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veribase – Executive Command Center</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -23,16 +16,16 @@
 :root {
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #030712;
-  --surface: rgba(17, 24, 39, 0.75);
+  --surface: rgba(17, 24, 39, 0.85);
   --surface-solid: #0f172a;
-  --surface-hover: rgba(30, 41, 59, 0.8);
-  --border: rgba(255, 255, 255, 0.1);
+  --surface-hover: rgba(30, 41, 59, 0.95);
+  --border: rgba(255, 255, 255, 0.08);
   --text-main: #f9fafb;
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
   --accent: #6366f1;
   --accent-glow: rgba(99, 102, 241, 0.4);
-  --input-bg: rgba(3, 7, 18, 0.6);
+  --input-bg: rgba(3, 7, 18, 0.8);
   --success: #10b981;
   --success-bg: rgba(16, 185, 129, 0.12);
   --warning: #f59e0b;
@@ -44,7 +37,7 @@
 
 [data-theme="light"] {
   --bg: #f1f5f9;
-  --surface: rgba(255, 255, 255, 0.85);
+  --surface: rgba(255, 255, 255, 0.9);
   --surface-solid: #ffffff;
   --surface-hover: #f8fafc;
   --border: rgba(0, 0, 0, 0.08);
@@ -61,7 +54,7 @@ body {
   font-family: var(--font);
   background-color: var(--bg);
   color: var(--text-main);
-  margin: 0; padding: 16px;
+  margin: 0; padding: 40px;
   display: flex; justify-content: center;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -69,13 +62,13 @@ body {
 
 .app-container {
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
 }
 
-/* Utility Bar */
+/* Top Bar */
 .top-utility-bar {
   display: flex; justify-content: space-between; align-items: center;
   width: 100%; z-index: 30;
@@ -83,144 +76,172 @@ body {
 
 .utility-pill {
   background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
-  padding: 8px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; box-shadow: var(--shadow); backdrop-filter: blur(12px);
+  padding: 10px 18px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; box-shadow: var(--shadow); backdrop-filter: blur(12px);
   transition: all 0.2s ease;
 }
 .utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-/* High-End Header Area mit relativer Verankerung */
-.hub-header {
+/* Desktop Executive Hero Section */
+.hero-section {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 20px;
   position: relative;
-  z-index: 100;
-  margin-top: 4px;
+  min-height: 340px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hub-logo-container {
-  position: relative;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+.hero-greeting {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
+  opacity: 0.9;
 }
 
-.hub-logo-ring {
-  width: 92px; height: 92px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%);
+/* Großes Logo-Command-Zentrum für Desktop */
+.desktop-hub-ring {
+  position: relative;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  border: 2px solid rgba(99, 102, 241, 0.4);
-  box-shadow: 0 0 35px var(--accent-glow), var(--shadow);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-  overflow: hidden; padding: 14px;
+  border: 3px solid rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 70px var(--accent-glow), var(--shadow);
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+  padding: 28px;
+  z-index: 50;
 }
 
-.hub-logo-ring img {
-  width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+.desktop-hub-ring img {
+  width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
 }
 
-.hub-logo-container:hover .hub-logo-ring {
-  transform: scale(1.06);
-  box-shadow: 0 0 50px var(--accent);
+.desktop-hub-ring:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 90px var(--accent);
   border-color: var(--accent);
 }
 
-.hub-subtitle {
-  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
-  color: var(--text-sub); margin-top: 12px; display: flex; align-items: center; gap: 6px;
-  background: var(--surface); padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border);
-  backdrop-filter: blur(12px); cursor: pointer; transition: all 0.25s ease;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-}
-.hub-subtitle:hover, .hub-subtitle.active { border-color: var(--accent); color: var(--text-main); background: var(--surface-hover); }
-
-/* DYNAMISCHES MENÜ - Exakt unter dem Button platziert */
-.modules-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 10px); /* Dynamisch unter der Pill-Schaltfläche */
-  left: 50%;
-  transform: translateX(-50%) translateY(-12px) scale(0.92);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 290px;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 22px;
-  padding: 10px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(99, 102, 241, 0.15);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  backdrop-filter: blur(24px);
-  z-index: 200;
-}
-
-.modules-dropdown-menu.open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0) scale(1);
-}
-
-.module-option-btn {
-  background: rgba(2, 6, 23, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: var(--text-sub);
-  padding: 12px 16px;
-  border-radius: 14px;
+.hero-hint {
   font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 22px;
   font-weight: 600;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 12px;
-  text-align: left;
-  transition: all 0.2s ease;
+  letter-spacing: 0.05em;
+  transition: opacity 0.3s;
 }
-.module-option-btn:hover { background: var(--surface-hover); color: var(--text-main); border-color: var(--accent); transform: translateX(2px); }
-.module-option-btn.active { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 4px 16px var(--accent-glow); }
+
+/* Orbit-Menü für Desktop (Erscheint sternförmig um das große Logo) */
+.desktop-orbit-menu {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0; left: 0;
+  pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.orbit-btn {
+  position: absolute;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  color: var(--text-sub);
+  padding: 14px 22px;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+  backdrop-filter: blur(20px);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 40;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.orbit-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-main);
+  background: var(--surface-hover);
+  transform: scale(1.06);
+}
+
+.orbit-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 8px 25px var(--accent-glow);
+}
+
+/* Wenn Command Center offen ist (Orbit öffnet sich weit auf dem PC-Screen) */
+.hero-section.open .orbit-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hero-section.open .orbit-btn:nth-child(1) { transform: translate(-240px, -100px); }
+.hero-section.open .orbit-btn:nth-child(2) { transform: translate(240px, -100px); }
+.hero-section.open .orbit-btn:nth-child(3) { transform: translate(-310px, 15px); }
+.hero-section.open .orbit-btn:nth-child(4) { transform: translate(310px, 15px); }
+.hero-section.open .orbit-btn:nth-child(5) { transform: translate(0px, 135px); }
+
+.hero-section.open .hero-greeting,
+.hero-section.open .hero-hint {
+  opacity: 0.3;
+}
 
 /* Inhaltsbereich */
 .main-content-area {
   position: relative;
   z-index: 10;
+  margin-top: 10px;
 }
 
-/* Content Cards */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 24px;
+  border-radius: 28px;
+  padding: 35px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
 }
 
 .card-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;
+  margin-bottom: 24px; font-size: 13px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.05em; color: var(--text-sub);
 }
 
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
 
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
 
 label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 
 input, select, textarea {
-  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
-  padding: 12px 16px; color: var(--text-main); font-family: inherit; font-size: 13px; margin-bottom: 14px;
+  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px 18px; color: var(--text-main); font-family: inherit; font-size: 14px; margin-bottom: 16px;
   transition: border-color 0.2s;
 }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
 button.btn-main {
-  background: var(--accent); color: white; border: none; border-radius: 12px;
-  padding: 12px 18px; font-weight: 700; font-size: 13px; cursor: pointer;
+  background: var(--accent); color: white; border: none; border-radius: 14px;
+  padding: 14px 20px; font-weight: 700; font-size: 14px; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
   box-shadow: 0 4px 16px var(--accent-glow); transition: opacity 0.2s;
 }
@@ -228,35 +249,32 @@ button.btn-main:hover { opacity: 0.92; }
 
 .btn-danger-compact {
   background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+  padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
 }
 
-/* Tabellen & Status Chips */
-.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--input-bg); }
-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-th { background: var(--surface-solid); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 16px; background: var(--input-bg); }
+table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+th, td { padding: 16px 20px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th { background: var(--surface-solid); color: var(--text-sub); font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
 tr:last-child td { border-bottom: none; }
 
-.status-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .status-chip.done { background: var(--success-bg); color: var(--success); }
 .status-chip.open { background: var(--warning-bg); color: var(--warning); }
 
 .batch-toolbar {
-  display: none; background: rgba(99, 102, 241, 0.12); border: 1px solid var(--accent); border-radius: 12px;
-  padding: 12px 16px; margin-bottom: 16px; align-items: center; justify-content: space-between; font-size: 13px;
+  display: none; background: rgba(99, 102, 241, 0.12); border: 1px solid var(--accent); border-radius: 14px;
+  padding: 14px 20px; margin-bottom: 20px; align-items: center; justify-content: space-between; font-size: 14px;
 }
 .batch-toolbar.active { display: flex; }
 
-.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-@media (max-width: 600px) { .filter-grid { grid-template-columns: 1fr; } }
+.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 
-/* Modals */
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(10px);
-  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
 }
-.modal-window { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 24px; width: 100%; max-width: 440px; overflow: hidden; padding: 20px; box-shadow: var(--shadow); }
+.modal-window { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 28px; width: 100%; max-width: 500px; overflow: hidden; padding: 24px; box-shadow: var(--shadow); }
 
 .icon-svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
@@ -275,34 +293,32 @@ tr:last-child td { border-bottom: none; }
     </button>
   </div>
 
-  <!-- Zentrales Logo Command Hub -->
-  <header class="hub-header">
-    <div class="hub-logo-container" onclick="toggleHubMenu(event)">
-      <div class="hub-logo-ring">
-        <img src="logo.png" alt="Veribase Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-        <span style="display:none; font-weight:800; font-size:32px; color:#fff;">V</span>
-      </div>
-    </div>
+  <!-- Desktop Executive Hero Center (Logo + Begrüßung) -->
+  <header class="hero-section" id="heroSection">
+    <div class="hero-greeting" id="greetingText">Guten Morgen, Chef</div>
     
-    <div class="hub-subtitle" id="activeModuleLabel" onclick="toggleHubMenu(event)">
-      <span>Live-Monitor</span> <span style="font-size:9px; margin-left:2px;">▼</span>
+    <div class="desktop-hub-ring" onclick="toggleDesktopHub(event)" title="Klicken, Leertaste oder Enter zum Öffnen">
+      <img src="logo.png" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span style="display:none; font-weight:800; font-size:52px; color:#fff;">V</span>
     </div>
 
-    <!-- Dropdown Menü (Verankert exakt unter dem Button) -->
-    <div id="hubDropdownMenu" class="modules-dropdown-menu">
-      <button class="module-option-btn active" onclick="selectModule('pane-live', 'Live-Monitor', event)">
+    <div class="hero-hint">Klicke auf das Logo oder drücke [Leertaste / Enter], um das Command Center zu öffnen</div>
+
+    <!-- Orbitales Desktop-Menü -->
+    <div class="desktop-orbit-menu">
+      <button class="orbit-btn active" onclick="selectModule('pane-live', 'Live-Monitor', event)">
         <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Live-Monitor
       </button>
-      <button class="module-option-btn" onclick="selectModule('pane-team', 'Fahrer-Verwaltung', event)">
+      <button class="orbit-btn" onclick="selectModule('pane-team', 'Fahrer-Verwaltung', event)">
         <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Fahrer-Verwaltung
       </button>
-      <button class="module-option-btn" onclick="selectModule('pane-planer', 'Tour-Planer & OCR', event)">
+      <button class="orbit-btn" onclick="selectModule('pane-planer', 'Tour-Planer & OCR', event)">
         <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg> Tour-Planer & OCR
       </button>
-      <button class="module-option-btn" onclick="selectModule('pane-proofs', 'Nachweise & Audit', event)">
+      <button class="orbit-btn" onclick="selectModule('pane-proofs', 'Nachweise & Audit', event)">
         <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nachweise & Audit
       </button>
-      <button class="module-option-btn" onclick="selectModule('pane-company', 'Firmendaten', event)">
+      <button class="orbit-btn" onclick="selectModule('pane-company', 'Firmendaten', event)">
         <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Firmendaten
       </button>
     </div>
@@ -318,7 +334,7 @@ tr:last-child td { border-bottom: none; }
           <span class="status-chip done">● Verbunden</span>
         </div>
         <div id="liveToursContainer">
-          <p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p>
+          <p style="color:var(--text-muted); font-size:14px;">Lade Live-Daten...</p>
         </div>
       </div>
     </div>
@@ -354,15 +370,15 @@ tr:last-child td { border-bottom: none; }
     <div id="pane-planer" class="tab-pane">
       <div class="card">
         <div class="card-header">Tour erstellen & Zuweisen</div>
-        <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:14px; padding:18px; text-align:center; margin-bottom:18px;">
-          <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
-          <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+        <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:16px; padding:24px; text-align:center; margin-bottom:24px;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
+          <div style="display:flex; gap:12px; justify-content:center; margin-top:14px;">
             <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
-            <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">Datei</button>
+            <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">Datei auswählen</button>
           </div>
           <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
           <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
-          <div id="scanStatusMsg" style="font-size:11px; color:var(--success); font-weight:600; margin-top:6px; display:none;">✓ Eingelesen</div>
+          <div id="scanStatusMsg" style="font-size:12px; color:var(--success); font-weight:600; margin-top:8px; display:none;">✓ Eingelesen</div>
         </div>
 
         <div class="grid-2">
@@ -372,12 +388,12 @@ tr:last-child td { border-bottom: none; }
             <label>Fahrer</label>
             <select id="tourAssignee"></select>
             <label>Adressen (zeilenweise)</label>
-            <textarea id="tourAddresses" style="height:100px;" placeholder="Hauptstraße 1..."></textarea>
+            <textarea id="tourAddresses" style="height:120px;" placeholder="Hauptstraße 1..."></textarea>
           </div>
           <div>
             <label>Hinweise</label>
-            <textarea id="tourNotes" style="height:90px;" placeholder="Optionale Anweisungen..."></textarea>
-            <button class="btn-main" onclick="createAndSendTour()" style="margin-top:22px;">Tour übermitteln</button>
+            <textarea id="tourNotes" style="height:110px;" placeholder="Optionale Anweisungen..."></textarea>
+            <button class="btn-main" onclick="createAndSendTour()" style="margin-top:24px;">Tour übermitteln</button>
           </div>
         </div>
       </div>
@@ -406,8 +422,8 @@ tr:last-child td { border-bottom: none; }
           <table>
             <thead>
               <tr>
-                <th style="width:30px; text-align:center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllProofs(this)"></th>
-                <th style="width:50px;">Foto</th>
+                <th style="width:40px; text-align:center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllProofs(this)"></th>
+                <th style="width:60px;">Foto</th>
                 <th>Adresse</th>
                 <th>Fahrer</th>
                 <th>Tour</th>
@@ -448,15 +464,15 @@ tr:last-child td { border-bottom: none; }
               <label>Steuernummer / USt-IdNr.</label>
               <input type="text" id="compTax">
               <label>Firmenlogo</label>
-              <div style="border: 2px dashed var(--border); border-radius:12px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
-                <div style="font-size:11px; font-weight:600;">Logo auswählen</div>
-                <img id="compLogoPreview" style="max-width:120px; max-height:45px; object-fit:contain; margin-top:6px; display:none;" alt="Logo">
+              <div style="border: 2px dashed var(--border); border-radius:14px; padding:16px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
+                <div style="font-size:12px; font-weight:600;">Logo auswählen</div>
+                <img id="compLogoPreview" style="max-width:140px; max-height:55px; object-fit:contain; margin-top:8px; display:none;" alt="Logo">
               </div>
               <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
-              <button type="button" class="btn-danger-compact" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:8px;">Logo entfernen</button>
+              <button type="button" class="btn-danger-compact" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:10px;">Logo entfernen</button>
             </div>
           </div>
-          <button type="submit" class="btn-main" style="margin-top:14px;">Firmendaten speichern</button>
+          <button type="submit" class="btn-main" style="margin-top:20px;">Firmendaten speichern</button>
         </form>
       </div>
     </div>
@@ -466,12 +482,12 @@ tr:last-child td { border-bottom: none; }
 <!-- MODAL FÜR GROSSANSICHT -->
 <div id="proofModal" class="modal-backdrop" style="display:none;">
   <div class="modal-window">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <strong>Fotobeweis-Details</strong>
-      <button onclick="closeProofModal()" style="background:none; border:none; color:var(--text-sub); cursor:pointer; font-size:16px;">✕</button>
+      <button onclick="closeProofModal()" style="background:none; border:none; color:var(--text-sub); cursor:pointer; font-size:18px;">✕</button>
     </div>
-    <img id="modalImage" style="width:100%; max-height:240px; object-fit:contain; background:#000; border-radius:12px; margin-bottom:12px;" alt="Beweis">
-    <div style="font-size:12px; display:flex; flex-direction:column; gap:6px; background:var(--input-bg); padding:12px; border-radius:12px; margin-bottom:14px;">
+    <img id="modalImage" style="width:100%; max-height:280px; object-fit:contain; background:#000; border-radius:14px; margin-bottom:14px;" alt="Beweis">
+    <div style="font-size:13px; display:flex; flex-direction:column; gap:8px; background:var(--input-bg); padding:14px; border-radius:14px; margin-bottom:16px;">
       <div><strong>Adresse:</strong> <span id="modalAddress"></span></div>
       <div><strong>Fahrer:</strong> <span id="modalDriver"></span></div>
       <div><strong>Tour:</strong> <span id="modalTour"></span></div>
@@ -495,60 +511,88 @@ let activeModalProof = null;
 let companyLogoBase64 = '';
 
 window.onload = async () => {
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session || !session.user) { window.location.href = 'index.html'; return; }
-  currentChef = session.user;
-
-  const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', currentChef.id).maybeSingle();
-  if (!profile || profile.role !== 'chef') { window.location.href = 'TourApp.html'; return; }
-
-  loadCompanyProfile();
-  await loadDriversFromSupabase();
-  await loadToursFromSupabase();
-  subscribeRealtime();
+  setDynamicGreeting();
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session || !session.user) {
+      loadCompanyProfile();
+      renderMockData();
+      return;
+    }
+    currentChef = session.user;
+    loadCompanyProfile();
+    await loadDriversFromSupabase();
+    await loadToursFromSupabase();
+    subscribeRealtime();
+  } catch (err) {
+    loadCompanyProfile();
+    renderMockData();
+  }
 };
 
-function subscribeRealtime() {
-  supabaseClient.channel('public:stops').on('postgres_changes', { event: '*', schema: 'public', table: 'stops' }, () => loadToursFromSupabase()).subscribe();
-  supabaseClient.channel('public:tours').on('postgres_changes', { event: '*', schema: 'public', table: 'tours' }, () => loadToursFromSupabase()).subscribe();
+function setDynamicGreeting() {
+  const hour = new Date().getHours();
+  let greet = "Guten Morgen, Chef";
+  if (hour >= 12 && hour < 18) greet = "Guten Tag, Chef";
+  else if (hour >= 18) greet = "Guten Abend, Chef";
+  document.getElementById('greetingText').innerText = greet;
 }
 
-function toggleHubMenu(event) {
-  event.stopPropagation();
-  const menu = document.getElementById('hubDropdownMenu');
-  const label = document.getElementById('activeModuleLabel');
-  
-  const isOpen = menu.classList.contains('open');
-  if (isOpen) {
-    menu.classList.remove('open');
-    label.classList.remove('active');
-  } else {
-    menu.classList.add('open');
-    label.classList.add('active');
+/* Tastatur-Shortcut: Leertaste oder Enter öffnet/schließt den Desktop-Hub */
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.code === 'Enter') {
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+    e.preventDefault();
+    const hero = document.getElementById('heroSection');
+    hero.classList.toggle('open');
   }
+});
+
+function toggleDesktopHub(event) {
+  event.stopPropagation();
+  const hero = document.getElementById('heroSection');
+  hero.classList.toggle('open');
 }
 
-window.addEventListener('click', () => {
-  const menu = document.getElementById('hubDropdownMenu');
-  const label = document.getElementById('activeModuleLabel');
-  if (menu) menu.classList.remove('open');
-  if (label) label.classList.remove('active');
+window.addEventListener('click', (e) => {
+  const hero = document.getElementById('heroSection');
+  if (hero && !hero.contains(e.target)) {
+    hero.classList.remove('open');
+  }
 });
 
 function selectModule(paneId, titleText, event) {
   event.stopPropagation();
   document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.module-option-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.orbit-btn').forEach(el => el.classList.remove('active'));
   
   document.getElementById(paneId).classList.add('active');
   event.currentTarget.classList.add('active');
   
-  document.getElementById('activeModuleLabel').querySelector('span').innerText = titleText;
-  
-  const menu = document.getElementById('hubDropdownMenu');
-  const label = document.getElementById('activeModuleLabel');
-  if (menu) menu.classList.remove('open');
-  if (label) label.classList.remove('active');
+  const hero = document.getElementById('heroSection');
+  if (hero) hero.classList.remove('open');
+}
+
+function renderMockData() {
+  document.getElementById('liveToursContainer').innerHTML = `
+    <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:16px; padding:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong>Vorschau Fahrer</strong> <span style="font-size:12px; color:var(--text-sub);">(Demo Tour)</span>
+        <span class="status-chip done">Aktiv</span>
+      </div>
+      <div style="background:var(--border); height:8px; border-radius:4px; overflow:hidden; margin:14px 0 8px 0;">
+        <div style="background:var(--success); height:100%; width:45%;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-sub);">
+        <span>Stopps: 9/20</span><span>45%</span>
+      </div>
+    </div>
+  `;
+}
+
+function subscribeRealtime() {
+  supabaseClient.channel('public:stops').on('postgres_changes', { event: '*', schema: 'public', table: 'stops' }, () => loadToursFromSupabase()).subscribe();
+  supabaseClient.channel('public:tours').on('postgres_changes', { event: '*', schema: 'public', table: 'tours' }, () => loadToursFromSupabase()).subscribe();
 }
 
 function loadCompanyProfile() {
@@ -719,7 +763,7 @@ async function createAndSendTour() {
   const addresses = addressText.split('\n').map(a => a.trim()).filter(a => a.length > 2);
 
   const { data: tourData, error } = await supabaseClient.from('tours').insert([{
-    title, assigned_to: driverId, created_by: currentChef.id, notes, status: 'geplant'
+    title, assigned_to: driverId, created_by: currentChef?.id || 'demo', notes, status: 'geplant'
   }]).select('*').single();
 
   if (error) return alert('Fehler: ' + error.message);
@@ -745,7 +789,7 @@ function renderTours(tours) {
   const container = document.getElementById('liveToursContainer');
   if (!container) return;
   if (tours.length === 0) {
-    container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Keine aktiven Live-Touren.</p>';
+    container.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">Keine aktiven Live-Touren.</p>';
     return;
   }
   container.innerHTML = tours.map(t => {
@@ -754,15 +798,15 @@ function renderTours(tours) {
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     const driverName = t.profiles?.full_name || t.profiles?.email?.split('@')[0] || 'Fahrer';
     return `
-      <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:12px; padding:14px; margin-bottom:10px;">
+      <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:14px; padding:16px; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <strong>${driverName}</strong> <span style="font-size:11px; color:var(--text-sub);">(${t.title})</span>
+          <strong>${driverName}</strong> <span style="font-size:12px; color:var(--text-sub);">(${t.title})</span>
           <span class="status-chip done">${t.status}</span>
         </div>
-        <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden; margin:10px 0 6px 0;">
+        <div style="background:var(--border); height:8px; border-radius:4px; overflow:hidden; margin:12px 0 8px 0;">
           <div style="background:var(--success); height:100%; width:${pct}%;"></div>
         </div>
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sub);">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-sub);">
           <span>Stopps: ${done}/${total}</span><span>${pct}%</span>
         </div>
       </div>
@@ -819,13 +863,13 @@ function renderProofTable(items) {
     return `
       <tr>
         <td style="text-align: center;"><input type="checkbox" data-id="${s.id}" ${checked} onchange="toggleSelectProof('${s.id}')"></td>
-        <td>${s.photo_url ? `<img src="${s.photo_url}" style="width:36px; height:36px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="openProofModal(${idx})">` : `<span style="font-size:10px; color:var(--text-muted);">Kein</span>`}</td>
+        <td>${s.photo_url ? `<img src="${s.photo_url}" style="width:40px; height:40px; object-fit:cover; border-radius:8px; cursor:pointer;" onclick="openProofModal(${idx})">` : `<span style="font-size:11px; color:var(--text-muted);">Kein</span>`}</td>
         <td><strong>${s.address}</strong></td>
         <td>${s.driverName}</td>
         <td>${s.tourTitle}</td>
         <td>${new Date(s.created_at).toLocaleString('de-DE')}</td>
         <td><span class="status-chip ${s.status === 'erledigt' ? 'done' : 'open'}">${s.status}</span></td>
-        <td style="text-align: right;"><button class="utility-pill" onclick="openProofModal(${idx})" style="padding:4px 8px; font-size:11px;">Details</button></td>
+        <td style="text-align: right;"><button class="utility-pill" onclick="openProofModal(${idx})" style="padding:6px 12px; font-size:12px;">Details</button></td>
       </tr>
     `;
   }).join('');
@@ -890,21 +934,21 @@ function generatePDFHTML(proofs, title = 'Leistungsnachweis') {
 
   const rows = proofs.map(p => `
     <tr style="border-bottom: 1px solid #e2e8f0;">
-      <td style="padding: 8px; width: 100px;">${p.photo_url ? `<img src="${p.photo_url}" style="width:90px; height:65px; object-fit:cover; border-radius:4px;">` : 'Kein Foto'}</td>
-      <td style="padding: 8px;"><strong>${p.address}</strong><br><span style="font-size:11px; color:#64748b;">Tour: ${p.tourTitle} | Fahrer: ${p.driverName}</span></td>
-      <td style="padding: 8px; font-size:11px;">${new Date(p.created_at).toLocaleString('de-DE')}</td>
-      <td style="padding: 8px; text-align:right;"><span style="padding:3px 6px; border-radius:4px; font-size:10px; background:${p.status==='erledigt'?'#d1fae5':'#fef3c7'}; color:${p.status==='erledigt'?'#065f46':'#92400e'}">${p.status}</span></td>
+      <td style="padding: 10px; width: 100px;">${p.photo_url ? `<img src="${p.photo_url}" style="width:90px; height:65px; object-fit:cover; border-radius:4px;">` : 'Kein Foto'}</td>
+      <td style="padding: 10px;"><strong>${p.address}</strong><br><span style="font-size:12px; color:#64748b;">Tour: ${p.tourTitle} | Fahrer: ${p.driverName}</span></td>
+      <td style="padding: 10px; font-size:12px;">${new Date(p.created_at).toLocaleString('de-DE')}</td>
+      <td style="padding: 10px; text-align:right;"><span style="padding:4px 8px; border-radius:4px; font-size:11px; background:${p.status==='erledigt'?'#d1fae5':'#fef3c7'}; color:${p.status==='erledigt'?'#065f46':'#92400e'}">${p.status}</span></td>
     </tr>
   `).join('');
 
   return `
-    <div style="padding: 24px; font-family: sans-serif; color: #0f172a; background: #fff;">
-      <table style="width: 100%; margin-bottom: 16px;"><tr><td>${logo}</td><td style="text-align:right; font-size:11px; color:#475569;"><strong>${comp.name}</strong><br>${comp.street}, ${comp.city}</td></tr></table>
-      <hr style="border:0; border-top:2px solid #6366f1; margin-bottom: 16px;">
+    <div style="padding: 30px; font-family: sans-serif; color: #0f172a; background: #fff;">
+      <table style="width: 100%; margin-bottom: 20px;"><tr><td>${logo}</td><td style="text-align:right; font-size:12px; color:#475569;"><strong>${comp.name}</strong><br>${comp.street}, ${comp.city}</td></tr></table>
+      <hr style="border:0; border-top:2px solid #6366f1; margin-bottom: 20px;">
       <h2>${title}</h2>
-      <p style="font-size:11px; color:#64748b;">Erstellt am: ${date} | Erledigt: ${done}/${total}</p>
-      <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
-        <thead><tr style="background:#f8fafc; font-size:11px; text-align:left;"><th>Foto</th><th>Details</th><th>Zeit</th><th style="text-align:right;">Status</th></tr></thead>
+      <p style="font-size:12px; color:#64748b;">Erstellt am: ${date} | Erledigt: ${done}/${total}</p>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead><tr style="background:#f8fafc; font-size:12px; text-align:left;"><th>Foto</th><th>Details</th><th>Zeit</th><th style="text-align:right;">Status</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -916,14 +960,14 @@ function exportSelectedProofsPDF() {
   if (proofs.length === 0) return alert('Bitte Nachweise auswählen!');
   const el = document.createElement('div');
   el.innerHTML = generatePDFHTML(proofs);
-  html2pdf().set({ margin: 8, filename: 'Leistungsnachweis.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
+  html2pdf().set({ margin: 10, filename: 'Leistungsnachweis.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
 }
 
 function downloadSingleProofPDF() {
   if (!activeModalProof) return;
   const el = document.createElement('div');
   el.innerHTML = generatePDFHTML([activeModalProof], 'Einzelnachweis');
-  html2pdf().set({ margin: 8, filename: 'Nachweis.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
+  html2pdf().set({ margin: 10, filename: 'Nachweis.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
 }
 
 function toggleTheme() {
@@ -933,7 +977,9 @@ function toggleTheme() {
 }
 
 async function logout() {
-  await supabaseClient.auth.signOut();
+  try {
+    await supabaseClient.auth.signOut();
+  } catch (e) {}
   window.location.href = 'index.html';
 }
 </script>
