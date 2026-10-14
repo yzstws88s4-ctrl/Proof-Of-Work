@@ -24,7 +24,7 @@
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
   --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.45);
+  --accent-glow: rgba(99, 102, 241, 0.5);
   --input-bg: rgba(3, 7, 18, 0.8);
   --success: #10b981;
   --success-bg: rgba(16, 185, 129, 0.12);
@@ -82,16 +82,16 @@ body {
 }
 .utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-/* Großflächiger Desktop Hero & Hauptkomponente */
+/* Sehr großer, dominanter Desktop Hero & Hauptkomponente */
 .hero-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 60px 20px;
+  padding: 50px 20px;
   position: relative;
-  min-height: 400px;
+  min-height: 440px;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -101,45 +101,45 @@ body {
   color: var(--text-sub);
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   opacity: 0.9;
 }
 
-/* Großflächiges Logo als Hauptkomponente (logo1.png ohne Hintergrund) */
+/* Extragroßes Logo-Zentrum mit transparentem logo1.png */
 .desktop-hub-ring {
   position: relative;
-  width: 220px; height: 220px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%);
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(3, 7, 18, 0.9) 100%);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   border: 4px solid rgba(99, 102, 241, 0.6);
-  box-shadow: 0 0 90px var(--accent-glow), var(--shadow);
+  box-shadow: 0 0 100px var(--accent-glow), var(--shadow);
   cursor: pointer;
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-  padding: 30px;
+  padding: 35px;
   z-index: 50;
 }
 
 .desktop-hub-ring img {
-  width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.6));
+  width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
 }
 
 .desktop-hub-ring:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 110px var(--accent);
+  transform: scale(1.06);
+  box-shadow: 0 0 130px var(--accent);
   border-color: var(--accent);
 }
 
 .hero-hint {
   font-size: 13px;
   color: var(--text-muted);
-  margin-top: 25px;
+  margin-top: 28px;
   font-weight: 600;
   letter-spacing: 0.05em;
   transition: opacity 0.3s;
 }
 
-/* Orbitales Desktop-Menü (fliegt großräumig um das Logo) */
+/* Orbitales Desktop-Menü (fliegt großräumig um das extragroße Logo) */
 .desktop-orbit-menu {
   position: absolute;
   width: 100%;
@@ -154,7 +154,7 @@ body {
   background: var(--surface-solid);
   border: 1px solid var(--border);
   color: var(--text-sub);
-  padding: 15px 24px;
+  padding: 16px 26px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 700;
@@ -185,21 +185,21 @@ body {
   box-shadow: 0 10px 30px var(--accent-glow);
 }
 
-/* Wenn Command Center offen ist */
+/* Wenn Command Center offen ist (weitere Abstände wegen dem extragroßen Logo) */
 .hero-section.open .orbit-btn {
   opacity: 1;
   pointer-events: auto;
 }
 
-.hero-section.open .orbit-btn:nth-child(1) { transform: translate(-280px, -110px); }
-.hero-section.open .orbit-btn:nth-child(2) { transform: translate(280px, -110px); }
-.hero-section.open .orbit-btn:nth-child(3) { transform: translate(-360px, 20px); }
-.hero-section.open .orbit-btn:nth-child(4) { transform: translate(360px, 20px); }
-.hero-section.open .orbit-btn:nth-child(5) { transform: translate(0px, 155px); }
+.hero-section.open .orbit-btn:nth-child(1) { transform: translate(-320px, -130px); }
+.hero-section.open .orbit-btn:nth-child(2) { transform: translate(320px, -130px); }
+.hero-section.open .orbit-btn:nth-child(3) { transform: translate(-410px, 15px); }
+.hero-section.open .orbit-btn:nth-child(4) { transform: translate(410px, 15px); }
+.hero-section.open .orbit-btn:nth-child(5) { transform: translate(0px, 175px); }
 
 .hero-section.open .hero-greeting,
 .hero-section.open .hero-hint {
-  opacity: 0.25;
+  opacity: 0.2;
 }
 
 /* Inhaltsbereich */
@@ -293,12 +293,12 @@ tr:last-child td { border-bottom: none; }
     </button>
   </div>
 
-  <!-- Großflächiges Desktop Executive Hero Center (Mit logo1.png ohne Hintergrund) -->
+  <!-- Extragroßes Desktop Executive Hero Center (Verwendet zwingend logo1.png ohne Hintergrund) -->
   <header class="hero-section" id="heroSection">
     <div class="hero-greeting" id="greetingText">Guten Morgen, Chef</div>
     
     <div class="desktop-hub-ring" onclick="toggleDesktopHub(event)" title="Klicken, Leertaste oder Enter zum Öffnen">
-      <img src="logo1.png" alt="Veribase Logo" onerror="this.src='logo.png';">
+      <img src="logo1.png" alt="Veribase Logo">
     </div>
 
     <div class="hero-hint">Klicke auf das Logo oder drücke [Leertaste / Enter], um das Command Center zu öffnen</div>
