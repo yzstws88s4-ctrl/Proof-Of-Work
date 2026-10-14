@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Veribase - Login</title>
+  <title>Veribase</title>
 
   <!-- PWA & Homescreen Settings (iOS & Android) -->
   <meta name="apple-mobile-web-app-title" content="Veribase">
@@ -12,6 +12,14 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest.json">
+
+  <!-- Sofortiges Laden des Dark Modes im Head, um jegliches Aufblitzen zu verhindern -->
+  <script>
+    if (!localStorage.getItem('veribase_theme')) {
+      localStorage.setItem('veribase_theme', 'dark');
+    }
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -42,6 +50,7 @@
       color: var(--text);
       margin: 0; padding: 20px;
       display: flex; justify-content: center; align-items: center; min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
     .login-container { width: 100%; max-width: 400px; position: relative; }
     .theme-toggle-btn {
@@ -50,8 +59,66 @@
       width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
     .theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; box-shadow: var(--shadow); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
     .title-group { text-align: center; margin-bottom: 24px; }
+    
+    /* Logo-Container mit Clipping für den Glow-Effekt */
+    .logo-wrapper {
+      position: relative;
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 14px auto;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    .login-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: var(--card);
+    }
+
+    /* Der geschwungene Lichtstreifen (Ping-Pong-Effekt im Logo) */
+    .logo-wrapper::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -150%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.65) 50%,
+        transparent 65%
+      );
+      transform: rotate(25deg);
+      pointer-events: none;
+    }
+
+    /* Sofortige Aktivierung der Ping-Pong-Animation */
+    .logo-wrapper.glow-active::after {
+      animation: logoShinePingPong 1.4s ease-in-out forwards !important;
+    }
+
+    @keyframes logoShinePingPong {
+      0% { left: -150%; }
+      50% { left: 100%; }
+      100% { left: -150%; }
+    }
+
     .title { font-size: 24px; font-weight: 700; margin: 0 0 6px 0; }
     .subtitle { font-size: 13px; color: var(--text-muted); margin: 0; }
     label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
@@ -68,8 +135,11 @@
     <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
   </button>
 
-  <div class="card">
+  <div class="card" id="loginCard">
     <div class="title-group">
+      <div class="logo-wrapper" id="logoWrapper">
+        <img src="logo.png" alt="Veribase Logo" class="login-logo">
+      </div>
       <h1 class="title">Veribase</h1>
       <p class="subtitle">Anmeldung für Chefs & Fahrer</p>
     </div>
@@ -101,19 +171,26 @@
 
   function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme');
-    document.documentElement.setAttribute('data-theme', current === 'dark' ? '' : 'dark');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('veribase_theme', next);
   }
 
   async function handleLogin(e) {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     const errorMsg = document.getElementById('errorMsg');
+    const logoWrapper = document.getElementById('logoWrapper');
     
     let identifier = document.getElementById('username').value.trim().toLowerCase();
     const password = document.getElementById('password').value;
 
-    errorMsg.innerText = 'Prüfe Zugangsdaten...';
     btn.disabled = true;
+
+    // Animation SOFORT beim Klick starten, ohne Verzögerung
+    logoWrapper.classList.add('glow-active');
+    errorMsg.style.color = 'var(--primary)';
+    errorMsg.innerText = 'Anmeldung läuft...';
 
     if (!identifier.includes('@')) {
       identifier = `${identifier}@app.local`;
@@ -125,12 +202,19 @@
     });
 
     if (authError) {
+      logoWrapper.classList.remove('glow-active'); // Animation bei Fehler stoppen
+      errorMsg.style.color = '#ef4444';
       errorMsg.innerText = 'Login fehlgeschlagen: Zugangsdaten ungültig.';
       btn.disabled = false;
       return;
     }
 
-    await redirectUser(authData.user.id);
+    errorMsg.innerText = 'Login erfolgreich!';
+
+    // Kurz warten, bis der Ping-Pong-Effekt sauber durchgelaufen ist, dann weiterleiten
+    setTimeout(async () => {
+      await redirectUser(authData.user.id);
+    }, 1200);
   }
 
   async function redirectUser(userId) {
@@ -143,6 +227,7 @@
       .maybeSingle();
 
     if (profileError || !profile) {
+      errorMsg.style.color = '#ef4444';
       errorMsg.innerText = 'Profil konnte nicht geladen werden.';
       document.getElementById('submitBtn').disabled = false;
       return;
