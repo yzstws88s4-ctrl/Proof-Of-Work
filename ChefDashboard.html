@@ -24,9 +24,9 @@
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #030712;
   --surface: rgba(17, 24, 39, 0.75);
-  --surface-solid: #111827;
-  --surface-hover: rgba(31, 41, 55, 0.9);
-  --border: rgba(255, 255, 255, 0.08);
+  --surface-solid: #0f172a;
+  --surface-hover: rgba(30, 41, 59, 0.8);
+  --border: rgba(255, 255, 255, 0.1);
   --text-main: #f9fafb;
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
@@ -72,7 +72,7 @@ body {
   max-width: 900px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 /* Utility Bar */
@@ -89,17 +89,16 @@ body {
 }
 .utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-/* High-End Hub Header */
+/* High-End Header Area mit relativer Verankerung */
 .hub-header {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  z-index: 50;
-  margin-top: 5px;
+  z-index: 100;
+  margin-top: 4px;
 }
 
-/* Nahtloser Logo Ring ohne quadratischen Hintergrund-Konflikt */
 .hub-logo-container {
   position: relative;
   cursor: pointer;
@@ -130,45 +129,48 @@ body {
 .hub-subtitle {
   font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
   color: var(--text-sub); margin-top: 12px; display: flex; align-items: center; gap: 6px;
-  background: var(--surface); padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border);
-  backdrop-filter: blur(12px); cursor: pointer; transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background: var(--surface); padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border);
+  backdrop-filter: blur(12px); cursor: pointer; transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
-.hub-subtitle:hover { border-color: var(--accent); color: var(--text-main); }
+.hub-subtitle:hover, .hub-subtitle.active { border-color: var(--accent); color: var(--text-main); background: var(--surface-hover); }
 
-/* Perfekt zentriertes HUD Fächer-Menü */
+/* DYNAMISCHES MENÜ - Exakt unter dem Button platziert */
 .modules-dropdown-menu {
   position: absolute;
-  top: 135px;
+  top: calc(100% + 10px); /* Dynamisch unter der Pill-Schaltfläche */
+  left: 50%;
+  transform: translateX(-50%) translateY(-12px) scale(0.92);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 280px;
-  background: var(--surface-solid);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 12px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+  width: 290px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 22px;
+  padding: 10px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(99, 102, 241, 0.15);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px) scale(0.95);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 100;
-  backdrop-filter: blur(20px);
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(24px);
+  z-index: 200;
 }
 
 .modules-dropdown-menu.open {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0) scale(1);
 }
 
 .module-option-btn {
-  background: var(--input-bg);
-  border: 1px solid var(--border);
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   color: var(--text-sub);
   padding: 12px 16px;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -176,8 +178,14 @@ body {
   text-align: left;
   transition: all 0.2s ease;
 }
-.module-option-btn:hover { background: var(--surface-hover); color: var(--text-main); border-color: var(--accent); }
+.module-option-btn:hover { background: var(--surface-hover); color: var(--text-main); border-color: var(--accent); transform: translateX(2px); }
 .module-option-btn.active { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 4px 16px var(--accent-glow); }
+
+/* Inhaltsbereich */
+.main-content-area {
+  position: relative;
+  z-index: 10;
+}
 
 /* Content Cards */
 .card {
@@ -277,10 +285,10 @@ tr:last-child td { border-bottom: none; }
     </div>
     
     <div class="hub-subtitle" id="activeModuleLabel" onclick="toggleHubMenu(event)">
-      <span>Live-Monitor</span> <span style="font-size:9px;">▼</span>
+      <span>Live-Monitor</span> <span style="font-size:9px; margin-left:2px;">▼</span>
     </div>
 
-    <!-- Dropdown Menü -->
+    <!-- Dropdown Menü (Verankert exakt unter dem Button) -->
     <div id="hubDropdownMenu" class="modules-dropdown-menu">
       <button class="module-option-btn active" onclick="selectModule('pane-live', 'Live-Monitor', event)">
         <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Live-Monitor
@@ -301,7 +309,7 @@ tr:last-child td { border-bottom: none; }
   </header>
 
   <!-- Inhaltsbereich -->
-  <main>
+  <main class="main-content-area">
     <!-- TAB 1: LIVE MONITOR -->
     <div id="pane-live" class="tab-pane active">
       <div class="card">
@@ -508,12 +516,23 @@ function subscribeRealtime() {
 function toggleHubMenu(event) {
   event.stopPropagation();
   const menu = document.getElementById('hubDropdownMenu');
-  menu.classList.toggle('open');
+  const label = document.getElementById('activeModuleLabel');
+  
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) {
+    menu.classList.remove('open');
+    label.classList.remove('active');
+  } else {
+    menu.classList.add('open');
+    label.classList.add('active');
+  }
 }
 
 window.addEventListener('click', () => {
   const menu = document.getElementById('hubDropdownMenu');
+  const label = document.getElementById('activeModuleLabel');
   if (menu) menu.classList.remove('open');
+  if (label) label.classList.remove('active');
 });
 
 function selectModule(paneId, titleText, event) {
@@ -525,7 +544,11 @@ function selectModule(paneId, titleText, event) {
   event.currentTarget.classList.add('active');
   
   document.getElementById('activeModuleLabel').querySelector('span').innerText = titleText;
-  document.getElementById('hubDropdownMenu').classList.remove('open');
+  
+  const menu = document.getElementById('hubDropdownMenu');
+  const label = document.getElementById('activeModuleLabel');
+  if (menu) menu.classList.remove('open');
+  if (label) label.classList.remove('active');
 }
 
 function loadCompanyProfile() {
