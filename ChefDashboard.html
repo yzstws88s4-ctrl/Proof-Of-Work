@@ -24,7 +24,7 @@
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
   --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.4);
+  --accent-glow: rgba(99, 102, 241, 0.45);
   --input-bg: rgba(3, 7, 18, 0.8);
   --success: #10b981;
   --success-bg: rgba(16, 185, 129, 0.12);
@@ -32,7 +32,7 @@
   --warning-bg: rgba(245, 158, 11, 0.12);
   --danger: #ef4444;
   --danger-bg: rgba(239, 68, 68, 0.12);
-  --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  --shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
 }
 
 [data-theme="light"] {
@@ -45,7 +45,7 @@
   --text-sub: #475569;
   --text-muted: #94a3b8;
   --input-bg: #f8fafc;
-  --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+  --shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -62,10 +62,10 @@ body {
 
 .app-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1300px;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 35px;
 }
 
 /* Top Bar */
@@ -82,64 +82,64 @@ body {
 }
 .utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-/* Desktop Executive Hero Section */
+/* Großflächiger Desktop Hero & Hauptkomponente */
 .hero-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 50px 20px;
+  padding: 60px 20px;
   position: relative;
-  min-height: 340px;
+  min-height: 400px;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero-greeting {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-sub);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 16px;
+  letter-spacing: 0.2em;
+  margin-bottom: 20px;
   opacity: 0.9;
 }
 
-/* Großes Logo-Command-Zentrum für Desktop */
+/* Großflächiges Logo als Hauptkomponente (logo1.png ohne Hintergrund) */
 .desktop-hub-ring {
   position: relative;
-  width: 180px; height: 180px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  border: 3px solid rgba(99, 102, 241, 0.6);
-  box-shadow: 0 0 70px var(--accent-glow), var(--shadow);
+  border: 4px solid rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 90px var(--accent-glow), var(--shadow);
   cursor: pointer;
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-  padding: 28px;
+  padding: 30px;
   z-index: 50;
 }
 
 .desktop-hub-ring img {
-  width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+  width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.6));
 }
 
 .desktop-hub-ring:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 90px var(--accent);
+  box-shadow: 0 0 110px var(--accent);
   border-color: var(--accent);
 }
 
 .hero-hint {
   font-size: 13px;
   color: var(--text-muted);
-  margin-top: 22px;
+  margin-top: 25px;
   font-weight: 600;
   letter-spacing: 0.05em;
   transition: opacity 0.3s;
 }
 
-/* Orbit-Menü für Desktop (Erscheint sternförmig um das große Logo) */
+/* Orbitales Desktop-Menü (fliegt großräumig um das Logo) */
 .desktop-orbit-menu {
   position: absolute;
   width: 100%;
@@ -154,21 +154,21 @@ body {
   background: var(--surface-solid);
   border: 1px solid var(--border);
   color: var(--text-sub);
-  padding: 14px 22px;
-  border-radius: 18px;
-  font-size: 13px;
+  padding: 15px 24px;
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.8);
   backdrop-filter: blur(20px);
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   opacity: 0;
   pointer-events: none;
   z-index: 40;
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 12px;
 }
 
 .orbit-btn:hover {
@@ -182,66 +182,66 @@ body {
   background: var(--accent);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 8px 25px var(--accent-glow);
+  box-shadow: 0 10px 30px var(--accent-glow);
 }
 
-/* Wenn Command Center offen ist (Orbit öffnet sich weit auf dem PC-Screen) */
+/* Wenn Command Center offen ist */
 .hero-section.open .orbit-btn {
   opacity: 1;
   pointer-events: auto;
 }
 
-.hero-section.open .orbit-btn:nth-child(1) { transform: translate(-240px, -100px); }
-.hero-section.open .orbit-btn:nth-child(2) { transform: translate(240px, -100px); }
-.hero-section.open .orbit-btn:nth-child(3) { transform: translate(-310px, 15px); }
-.hero-section.open .orbit-btn:nth-child(4) { transform: translate(310px, 15px); }
-.hero-section.open .orbit-btn:nth-child(5) { transform: translate(0px, 135px); }
+.hero-section.open .orbit-btn:nth-child(1) { transform: translate(-280px, -110px); }
+.hero-section.open .orbit-btn:nth-child(2) { transform: translate(280px, -110px); }
+.hero-section.open .orbit-btn:nth-child(3) { transform: translate(-360px, 20px); }
+.hero-section.open .orbit-btn:nth-child(4) { transform: translate(360px, 20px); }
+.hero-section.open .orbit-btn:nth-child(5) { transform: translate(0px, 155px); }
 
 .hero-section.open .hero-greeting,
 .hero-section.open .hero-hint {
-  opacity: 0.3;
+  opacity: 0.25;
 }
 
 /* Inhaltsbereich */
 .main-content-area {
   position: relative;
   z-index: 10;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 28px;
-  padding: 35px;
+  border-radius: 30px;
+  padding: 40px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
 }
 
 .card-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 24px; font-size: 13px; font-weight: 700; text-transform: uppercase;
+  margin-bottom: 25px; font-size: 14px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.05em; color: var(--text-sub);
 }
 
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
 
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
 @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
 
-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+label { display: block; font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
 
 input, select, textarea {
   width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 14px;
-  padding: 14px 18px; color: var(--text-main); font-family: inherit; font-size: 14px; margin-bottom: 16px;
+  padding: 16px 20px; color: var(--text-main); font-family: inherit; font-size: 14px; margin-bottom: 18px;
   transition: border-color 0.2s;
 }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
 button.btn-main {
   background: var(--accent); color: white; border: none; border-radius: 14px;
-  padding: 14px 20px; font-weight: 700; font-size: 14px; cursor: pointer;
+  padding: 16px 22px; font-weight: 700; font-size: 14px; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
   box-shadow: 0 4px 16px var(--accent-glow); transition: opacity 0.2s;
 }
@@ -252,9 +252,9 @@ button.btn-main:hover { opacity: 0.92; }
   padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
 }
 
-.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 16px; background: var(--input-bg); }
+.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 18px; background: var(--input-bg); }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-th, td { padding: 16px 20px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th, td { padding: 18px 22px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 th { background: var(--surface-solid); color: var(--text-sub); font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
 tr:last-child td { border-bottom: none; }
 
@@ -264,17 +264,17 @@ tr:last-child td { border-bottom: none; }
 
 .batch-toolbar {
   display: none; background: rgba(99, 102, 241, 0.12); border: 1px solid var(--accent); border-radius: 14px;
-  padding: 14px 20px; margin-bottom: 20px; align-items: center; justify-content: space-between; font-size: 14px;
+  padding: 16px 22px; margin-bottom: 22px; align-items: center; justify-content: space-between; font-size: 14px;
 }
 .batch-toolbar.active { display: flex; }
 
-.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; margin-bottom: 22px; }
 
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(10px);
   display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
 }
-.modal-window { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 28px; width: 100%; max-width: 500px; overflow: hidden; padding: 24px; box-shadow: var(--shadow); }
+.modal-window { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 30px; width: 100%; max-width: 520px; overflow: hidden; padding: 30px; box-shadow: var(--shadow); }
 
 .icon-svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
@@ -293,13 +293,12 @@ tr:last-child td { border-bottom: none; }
     </button>
   </div>
 
-  <!-- Desktop Executive Hero Center (Logo + Begrüßung) -->
+  <!-- Großflächiges Desktop Executive Hero Center (Mit logo1.png ohne Hintergrund) -->
   <header class="hero-section" id="heroSection">
     <div class="hero-greeting" id="greetingText">Guten Morgen, Chef</div>
     
     <div class="desktop-hub-ring" onclick="toggleDesktopHub(event)" title="Klicken, Leertaste oder Enter zum Öffnen">
-      <img src="logo.png" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <span style="display:none; font-weight:800; font-size:52px; color:#fff;">V</span>
+      <img src="logo1.png" alt="Veribase Logo" onerror="this.src='logo.png';">
     </div>
 
     <div class="hero-hint">Klicke auf das Logo oder drücke [Leertaste / Enter], um das Command Center zu öffnen</div>
@@ -370,7 +369,7 @@ tr:last-child td { border-bottom: none; }
     <div id="pane-planer" class="tab-pane">
       <div class="card">
         <div class="card-header">Tour erstellen & Zuweisen</div>
-        <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:16px; padding:24px; text-align:center; margin-bottom:24px;">
+        <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:16px; padding:25px; text-align:center; margin-bottom:25px;">
           <div style="font-size:13px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
           <div style="display:flex; gap:12px; justify-content:center; margin-top:14px;">
             <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
@@ -463,7 +462,7 @@ tr:last-child td { border-bottom: none; }
               <input type="text" id="compPhone">
               <label>Steuernummer / USt-IdNr.</label>
               <input type="text" id="compTax">
-              <label>Firmenlogo</label>
+              <label>Firmennachweis / Logo</label>
               <div style="border: 2px dashed var(--border); border-radius:14px; padding:16px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
                 <div style="font-size:12px; font-weight:600;">Logo auswählen</div>
                 <img id="compLogoPreview" style="max-width:140px; max-height:55px; object-fit:contain; margin-top:8px; display:none;" alt="Logo">
@@ -575,7 +574,7 @@ function selectModule(paneId, titleText, event) {
 
 function renderMockData() {
   document.getElementById('liveToursContainer').innerHTML = `
-    <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:16px; padding:18px;">
+    <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:16px; padding:20px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <strong>Vorschau Fahrer</strong> <span style="font-size:12px; color:var(--text-sub);">(Demo Tour)</span>
         <span class="status-chip done">Aktiv</span>
@@ -798,7 +797,7 @@ function renderTours(tours) {
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     const driverName = t.profiles?.full_name || t.profiles?.email?.split('@')[0] || 'Fahrer';
     return `
-      <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:14px; padding:16px; margin-bottom:12px;">
+      <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:16px; padding:18px; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong>${driverName}</strong> <span style="font-size:12px; color:var(--text-sub);">(${t.title})</span>
           <span class="status-chip done">${t.status}</span>
