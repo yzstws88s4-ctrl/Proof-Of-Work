@@ -1248,15 +1248,11 @@ async function handleOcrImage(event) {
       return;
     }
 
-    // Zeilen bereinigen und leere Zeilen entfernen
     const rawLines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     const extractedAddresses = [];
-
-    // Wir suchen gezielt nach deutschen PLZ (5 Ziffern, meist 5xxxx oder ähnlich)
     const plzRegex = /\b(5\d{4})\b/;
 
     rawLines.forEach(line => {
-      // Ignoriere typische Header/UI-Zeilen
       const lower = line.toLowerCase();
       if (lower.includes('tour') || lower.includes('ort') || lower.includes('adresse') || 
           lower.includes('name') || lower.includes('ziehen') || lower.includes('morgengold') ||
@@ -1266,16 +1262,26 @@ async function handleOcrImage(event) {
 
       const match = line.match(plzRegex);
       if (match) {
-        // Alles vor der PLZ (wie fortlaufende Nummern "1.", "22" etc.) wegschneiden
         const plzIndex = line.indexOf(match[1]);
         let addressPart = line.substring(plzIndex).trim();
 
-        // Den Namen am Ende abschneiden (oft durch Komma getrennt oder am Ende der Zeile nach der Hausnummer)
-        // Beispiel: "51766 Ründeroth Cronenburg 8 Wloch, Fabian" -> Wir wollen nur bis zur Hausnummer
-        // Da Hausnummern meist Zahlen sind, trennen wir vor dem Namen (oft nach dem Komma oder bei Namen-Teil).
+        // SCHLÜSSELÄNDERUNG: Nachnamen rigoros entfernen!
+        // Da hinter der Hausnummer oft ein Komma (z.B. "Wloch, Fabian") oder direkt der Name folgt,
+        // schneiden wir alles ab dem ersten Komma ab. 
         const commaIndex = addressPart.indexOf(',');
         if (commaIndex > -1) {
           addressPart = addressPart.substring(0, commaIndex).trim();
+        } else {
+          // Falls kein Komma da ist, suchen wir die letzte Ziffer der Hausnummer und schneiden danach ab.
+          // Beispiel: "... Cronenburg 8 Wloch" -> Wir behalten alles bis zur Hausnummer.
+          const houseNumberMatch = addressPart.match(/\d+[a-zA-Z]?/g);
+          if (houseNumberMatch && houseNumberMatch.length > 0) {
+            const lastNum = houseNumberMatch[houseNumberMatch.length - 1];
+            const lastNumIdx = addressPart.lastIndexOf(lastNum);
+            if (lastNumIdx > -1) {
+              addressPart = addressPart.substring(0, lastNumIdx + lastNum.length).trim();
+            }
+          }
         }
 
         if (addressPart.length > 5) {
@@ -1287,13 +1293,12 @@ async function handleOcrImage(event) {
     closeModal();
 
     if (extractedAddresses.length > 0) {
-      // Duplikate filtern
       const uniqueAddresses = [...new Set(extractedAddresses)];
       
       const existing = document.getElementById('addressInput').value;
       const newText = uniqueAddresses.join('\n');
       document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-      showModal("Erfolg", `${uniqueAddresses.length} Adressen sauber im Format PLZ Ort Adresse extrahiert!`);
+      showModal("Erfolg", `${uniqueAddresses.length} Adressen (nur PLZ Ort Straße) extrahiert!`);
     } else {
       alert("Keine passenden Adressen mit PLZ im Bild gefunden.");
     }
