@@ -105,7 +105,6 @@ body {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* BASIS BUTTON STYLES */
 button, .nav-link-btn {
   width: 100%;
   padding: 15px 18px;
@@ -456,7 +455,6 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="gps-status" id="gpsStatusText">GPS wird initialisiert...</div>
     </div>
 
-    <!-- PROMINENTER NAVIGATIONS-BUTTON -->
     <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
       <svg class="icon-svg" style="width:22px; height:22px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       JETZT NAVIGIEREN
@@ -465,7 +463,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
     <input type="file" id="modalReplaceCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleModalReplaceCapture(event)">
 
-    <!-- 20% / 80% LAYOUT -->
     <div class="stop-actions-grid">
       <button class="btn-secondary" id="prevStopBtn" onclick="previousStop()" title="Vorheriger Stopp">
         <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
@@ -580,6 +577,16 @@ window.onload = async () => {
   const savedTheme = localStorage.getItem('veribase_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
+  // ZUSTAND DES FOTOBEWEIS-TOGGLES LOKAL PERSISTIEREN
+  const savedProofToggle = localStorage.getItem('veribase_photo_proof_enabled');
+  if (savedProofToggle !== null) {
+    document.getElementById('photoProofToggle').checked = (savedProofToggle === 'true');
+  }
+
+  document.getElementById('photoProofToggle').addEventListener('change', (e) => {
+    localStorage.setItem('veribase_photo_proof_enabled', e.target.checked);
+  });
+
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) {
     window.location.href = 'index.html';
@@ -600,13 +607,11 @@ window.onload = async () => {
   initGPS();
   await loadTourHistory();
 
-  // AUTOMATISCHE WIEDERHERSTELLUNG BEIM NEULADEN / APP-WECHSEL
   await restoreActiveTourSession();
 };
 
 async function restoreActiveTourSession() {
   try {
-    // 1. Suche nach einer Tour des Fahrers mit Status 'geplant' oder 'aktiv' in Supabase
     const { data: tours } = await supabaseClient
       .from('tours')
       .select('*, stops(*)')
@@ -631,13 +636,11 @@ async function restoreActiveTourSession() {
           blob: null
         }));
 
-        // Versuche den letzten Stopp-Index aus dem lokalen Speicher wiederherzustellen
         const savedIndex = localStorage.getItem(`active_tour_index_${activeTour.id}`);
         if (savedIndex !== null) {
           currentStopIndex = parseInt(savedIndex, 10);
           if (currentStopIndex >= tourStops.length) currentStopIndex = tourStops.length - 1;
         } else {
-          // Finde den ersten offenen Stopp
           const firstOpenIdx = tourStops.findIndex(s => !s.done);
           currentStopIndex = firstOpenIdx !== -1 ? firstOpenIdx : 0;
         }
@@ -709,7 +712,6 @@ async function startManualTour() {
 
   const lines = input.split('\n').map(l => l.trim()).filter(l => l.length > 2);
 
-  // Wenn noch keine Supabase Tour ID existiert, direkt in Supabase anlegen, damit sie sofort persistent ist
   if (!currentSupabaseTourId) {
     const { data: newTour, error } = await supabaseClient
       .from('tours')
@@ -1076,7 +1078,6 @@ async function completeCurrentStop(localUrl, blob, noteText = '') {
   }
   current.photo_url = uploadedUrl;
 
-  // SOFORTIGE DATENBANK-AKTUALISIERUNG (Echtzeit-Sicherung)
   if (current.id) {
     await supabaseClient.from('stops').update({
       status: 'erledigt',
@@ -1085,7 +1086,6 @@ async function completeCurrentStop(localUrl, blob, noteText = '') {
       completed_at: new Date().toISOString()
     }).eq('id', current.id);
   } else if (currentSupabaseTourId) {
-    // Falls der Stopp manuell hinzugefügt wurde und noch keine ID hat
     const { data: newStop } = await supabaseClient.from('stops').insert([{
       tour_id: currentSupabaseTourId,
       address: current.address,
