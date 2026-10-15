@@ -25,7 +25,6 @@
 <style>
 :root {
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* Gedämpfter, matter Light Mode */
   --bg: #e2e8f0;
   --surface: #f1f5f9;
   --text: #0f172a;
@@ -70,7 +69,7 @@ body {
   min-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Verteilt den Platz perfekt auf dem Bildschirm */
+  justify-content: space-between;
 }
 
 /* Header */
@@ -108,14 +107,14 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  justify-content: space-evenly; /* Teilt den Platz zwischen den Blöcken gleichmäßig auf */
-  margin: 12px 0;
+  justify-content: space-evenly;
+  margin: 10px 0;
 }
 
 .main-inputs-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .section-label {
@@ -124,7 +123,7 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   margin-left: 2px;
 }
 
@@ -171,8 +170,8 @@ html[data-theme="light"] .btn-success {
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
 html[data-theme="dark"] .btn-navigate {
-  min-height: 72px;
-  font-size: 19px;
+  min-height: 66px;
+  font-size: 18px;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -182,8 +181,8 @@ html[data-theme="dark"] .btn-navigate {
 }
 
 html[data-theme="light"] .btn-navigate {
-  min-height: 72px;
-  font-size: 19px;
+  min-height: 66px;
+  font-size: 18px;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -193,7 +192,7 @@ html[data-theme="light"] .btn-navigate {
 }
 
 .btn-complete-action {
-  min-height: 60px;
+  min-height: 56px;
   font-size: 15px;
   font-weight: 700;
 }
@@ -253,16 +252,16 @@ input:checked + .slider:before { transform: translateX(18px); }
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 16px;
+  padding: 14px;
   text-align: center;
 }
 
 .dest-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; letter-spacing: 0.06em; }
-.dest-text { font-size: 18px; font-weight: 800; margin-top: 3px; word-break: break-word; }
-.gps-status { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+.dest-text { font-size: 17px; font-weight: 800; margin-top: 2px; word-break: break-word; }
+.gps-status { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
 
 .stop-list {
-  max-height: 200px;
+  max-height: 150px;
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -270,7 +269,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 }
 
 .stop-item {
-  padding: 11px 13px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -285,10 +284,10 @@ input:checked + .slider:before { transform: translateX(18px); }
 .stop-item.done .stop-name { text-decoration: line-through; }
 .stop-item.active { background: var(--input-bg); font-weight: 700; color: var(--text); border-left: 4px solid var(--switch-active); }
 
-.proof-gallery-container { display: flex; flex-direction: column; gap: 8px; }
+.proof-gallery-container { display: flex; flex-direction: column; gap: 6px; }
 .proof-item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-.proof-item-card img { width: 100%; max-height: 150px; object-fit: cover; display: block; }
-.proof-item-info { padding: 9px; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
+.proof-item-card img { width: 100%; max-height: 110px; object-fit: cover; display: block; }
+.proof-item-info { padding: 8px; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
 
 .modal-overlay {
   display: none;
@@ -398,7 +397,7 @@ input:checked + .slider:before { transform: translateX(18px); }
         <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         Live-Tour vom Chef laden
       </button>
-      <button class="btn-success" onclick="startManualTour()" style="font-weight: 700; padding: 15px;">
+      <button class="btn-success" onclick="startManualTour()" style="font-weight: 700; padding: 14px;">
         <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         TOUR JETZT STARTEN
       </button>
@@ -421,7 +420,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       </div>
 
       <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
-        <svg class="icon-svg" style="width:22px; height:22px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        <svg class="icon-svg" style="width:20px; height:20px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
         JETZT NAVIGIEREN
       </a>
 
@@ -430,7 +429,7 @@ input:checked + .slider:before { transform: translateX(18px); }
         STOPP ERLEDIGT ✓
       </button>
 
-      <button id="prevStopBtn" onclick="previousStop()" style="padding: 11px; font-size: 12px;">
+      <button id="prevStopBtn" onclick="previousStop()" style="padding: 10px; font-size: 12px;">
         <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         Vorherigen Stopp zurückholen
       </button>
@@ -438,22 +437,22 @@ input:checked + .slider:before { transform: translateX(18px); }
       <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
       <input type="file" id="modalReplaceCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleModalReplaceCapture(event)">
 
-      <div style="margin-top: 4px;">
+      <div style="margin-top: 2px;">
         <div class="section-label">Stopps (Tippen für Notiz / Foto)</div>
         <div class="stop-list" id="stopListContainer"></div>
       </div>
 
-      <div style="margin-top: 4px;">
+      <div style="margin-top: 2px;">
         <div class="section-label">Fotobeweise (<span id="photoCount">0</span>)</div>
         <div class="proof-gallery-container" id="galleryGrid"></div>
       </div>
     </div>
 
     <div>
-      <button class="btn-success" style="padding: 13px; margin-bottom: 8px;" id="finishTourBtn" onclick="finishAndSaveTour()">
+      <button class="btn-success" style="padding: 12px; margin-bottom: 6px;" id="finishTourBtn" onclick="finishAndSaveTour()">
         Tour beenden & Speichern
       </button>
-      <button onclick="cancelAndReturn()" style="padding: 11px;">
+      <button onclick="cancelAndReturn()" style="padding: 10px;">
         Abbrechen
       </button>
     </div>
