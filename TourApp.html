@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Veribase - Touren App</title>
 
-<!-- PWA & Homescreen Settings (iOS & Android) -->
 <meta name="apple-mobile-web-app-title" content="Veribase">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,7 +13,6 @@
 <link rel="icon" type="image/png" href="logo1.png">
 <link rel="manifest" href="manifest.json">
 
-<!-- Sofortiges Laden des Dark Modes im Head -->
 <script>
   if (!localStorage.getItem('veribase_theme')) {
     localStorage.setItem('veribase_theme', 'dark');
@@ -27,14 +25,14 @@
 <style>
 :root {
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* Gedämpfter, augenschonender heller Modus (Soft & Warm/Grau statt grellweiß) */
-  --bg: #eef2f6;
+  /* Super weicher, gedämpfter heller Modus (Augenschonend) */
+  --bg: #e2e8f0;
   --surface: #ffffff;
-  --text: #1e293b;
+  --text: #0f172a;
   --text-muted: #64748b;
   --border: #cbd5e1;
-  --input-bg: #e2e8f0;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --input-bg: #f8fafc;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
   --switch-active: #10b981;
 }
 
@@ -56,7 +54,7 @@ body {
   background-color: var(--bg);
   color: var(--text);
   margin: 0;
-  padding: 14px 10px;
+  padding: 12px 10px;
   display: flex;
   justify-content: center;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -64,21 +62,27 @@ body {
 
 .container { width: 100%; max-width: 480px; padding-bottom: 40px; }
 
+/* Sauberer Header mit Fokus auf den Namen */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
-  padding: 0 2px;
+  margin-bottom: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
 }
 
-.logo-img { height: 32px; width: auto; object-fit: contain; display: block; }
-.driver-badge { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 1px; display: block; }
+.user-greeting-box { display: flex; flex-direction: column; gap: 1px; }
+.driver-welcome { font-size: 16px; font-weight: 800; color: var(--text); display: block; letter-spacing: -0.02em; }
+.driver-subtitle { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 
-.header-actions { display: flex; gap: 8px; }
+.header-actions { display: flex; gap: 6px; }
 
 .theme-toggle-btn, .logout-btn {
-  background: var(--surface);
+  background: var(--input-bg);
   border: 1px solid var(--border);
   color: var(--text);
   height: 36px;
@@ -87,10 +91,9 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 0 10px;
+  padding: 0 12px;
   font-size: 12px;
   font-weight: 600;
-  box-shadow: var(--shadow);
 }
 
 .theme-toggle-btn { width: 36px; padding: 0; }
@@ -149,9 +152,9 @@ html[data-theme="dark"] .btn-success {
 html[data-theme="dark"] .btn-success:hover { background: #f1f5f9; }
 
 html[data-theme="light"] .btn-success {
-  background: #1e293b;
+  background: #0f172a;
   color: #ffffff;
-  box-shadow: 0 4px 20px rgba(30, 41, 59, 0.2);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.2);
   border: none;
 }
 
@@ -170,7 +173,6 @@ html[data-theme="light"] .btn-success {
 
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-/* EXTRADICKER & HERVORHEBENDER NAVIGIEREN-BUTTON */
 html[data-theme="dark"] .btn-navigate {
   min-height: 72px;
   font-size: 19px;
@@ -206,7 +208,7 @@ html[data-theme="light"] .btn-navigate {
 
 textarea, input[type="text"] {
   width: 100%;
-  background: var(--input-bg);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px;
@@ -222,7 +224,7 @@ textarea { height: 95px; resize: vertical; }
 select {
   width: 100%;
   padding: 12px;
-  background: var(--input-bg);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   color: var(--text);
@@ -353,12 +355,11 @@ input:checked + .slider:before { transform: translateX(18px); }
 <body>
 
 <div class="container">
+  <!-- Neuer sauberer Header: Nur Name & Untertitel -->
   <div class="header">
-    <div class="title-group">
-      <!-- LOGO ANSTATT TEXT -->
-      <img src="logo1.png" alt="Veribase" class="logo-img" onerror="this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
-      <h1 id="fallbackTitle" class="title" style="display:none; font-size: 20px; font-weight: 800; margin: 0;">Veribase</h1>
-      <span class="driver-badge" id="driverWelcomeDisplay">Hallo ...</span>
+    <div class="user-greeting-box">
+      <span class="driver-welcome" id="driverWelcomeDisplay">Hallo Bj</span>
+      <span class="driver-subtitle">Morgengold Tour</span>
     </div>
     <div class="header-actions">
       <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
@@ -368,7 +369,6 @@ input:checked + .slider:before { transform: translateX(18px); }
     </div>
   </div>
 
-  <!-- SETUP VIEW (STARTSEITE) -->
   <div class="app-view-container" id="setup-view">
     <div class="section-label">Tour starten</div>
     
@@ -413,7 +413,6 @@ input:checked + .slider:before { transform: translateX(18px); }
       TOUR JETZT STARTEN
     </button>
 
-    <!-- ARCHIV -->
     <div style="margin-top: 12px;">
       <div class="section-label">Vergangene Touren</div>
       <div id="tourHistoryContainer" style="display: flex; flex-direction: column; gap: 8px;">
@@ -422,7 +421,6 @@ input:checked + .slider:before { transform: translateX(18px); }
     </div>
   </div>
 
-  <!-- TOUR AKTIV VIEW -->
   <div class="app-view-container" id="tour-view">
     <div class="current-destination">
       <div class="dest-label" id="stopCounter">Stopp 1 von 16</div>
@@ -430,19 +428,16 @@ input:checked + .slider:before { transform: translateX(18px); }
       <div class="gps-status" id="gpsStatusText">GPS aktiv</div>
     </div>
 
-    <!-- EXTRADICKER NAVIGATION-BUTTON -->
     <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
       <svg class="icon-svg" style="width:22px; height:22px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       JETZT NAVIGIEREN
     </a>
 
-    <!-- ABSCHLIESSEN-BUTTON -->
     <button class="btn-success btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
       <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
       STOPP ERLEDIGT ✓
     </button>
 
-    <!-- VORHERIGER STOPP -->
     <button class="btn-secondary" id="prevStopBtn" onclick="previousStop()" style="padding: 11px; font-size: 12px;">
       <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       Vorherigen Stopp zurückholen
@@ -472,7 +467,6 @@ input:checked + .slider:before { transform: translateX(18px); }
 
 <canvas id="proofCanvas" style="display:none;"></canvas>
 
-<!-- FOTO MODAL -->
 <div class="modal-overlay" id="proofPreviewModal">
   <div class="modal-box">
     <div style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Fotobeweis erfasst</div>
@@ -484,7 +478,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   </div>
 </div>
 
-<!-- STOPP BEARBEITEN MODAL -->
 <div class="modal-overlay" id="noteEditModal">
   <div class="modal-box" style="max-height: 85vh; overflow-y: auto;">
     <div style="font-size: 15px; font-weight: 700; margin-bottom: 2px;" id="noteModalTitle">Stopp bearbeiten</div>
@@ -508,7 +501,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   </div>
 </div>
 
-<!-- DETAILS MODAL -->
 <div class="modal-overlay" id="tourDetailModal">
   <div class="modal-box" style="max-height: 85vh;">
     <h3 id="detailTourTitle" style="margin-top:0; margin-bottom: 8px; font-size: 15px;">Tour Details</h3>
@@ -520,7 +512,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   </div>
 </div>
 
-<!-- ALLGEMEINES MODAL -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box" style="text-align: center;">
     <div style="font-size:15px; font-weight:700;" id="modalTitle">Hinweis</div>
