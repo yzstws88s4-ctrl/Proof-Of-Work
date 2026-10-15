@@ -174,7 +174,6 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   box-shadow: 0 4px 16px var(--accent-glow);
 }
 
-/* Spezieller Stil für den Stopp-Erledigt-Button (Clean / Kontrast zu Lila) */
 .btn-complete-action {
   min-height: 52px;
   font-size: 14px;
@@ -443,7 +442,6 @@ input:checked + .slider:before { transform: translateX(18px); }
         JETZT NAVIGIEREN
       </a>
 
-      <!-- Button angepasst: Kein Häkchen links, sondern sauber zentriert im helleren/weißen Look -->
       <button class="btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
         STOPP ERLEDIGT ✓
       </button>
@@ -1250,20 +1248,38 @@ async function handleOcrImage(event) {
       return;
     }
 
-    const lines = fullText.split('\n');
+    // Zeilen bereinigen und leere Zeilen entfernen
+    const rawLines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     const extractedAddresses = [];
-    const addressRegex = /\d+/; 
 
-    lines.forEach(line => {
-      let cleaned = line.trim();
-      
-      if (cleaned.length < 5) return;
-      if (cleaned.toLowerCase().includes('veribase') || cleaned.toLowerCase().includes('stopp') || cleaned.toLowerCase().includes('uhr')) return;
-      
-      if (addressRegex.test(cleaned)) {
-        cleaned = cleaned.replace(/^[\d\-\.\)]+\s*/, '');
-        if (cleaned.length > 4) {
-          extractedAddresses.push(cleaned);
+    // Wir suchen gezielt nach deutschen PLZ (5 Ziffern, meist 5xxxx oder ähnlich)
+    const plzRegex = /\b(5\d{4})\b/;
+
+    rawLines.forEach(line => {
+      // Ignoriere typische Header/UI-Zeilen
+      const lower = line.toLowerCase();
+      if (lower.includes('tour') || lower.includes('ort') || lower.includes('adresse') || 
+          lower.includes('name') || lower.includes('ziehen') || lower.includes('morgengold') ||
+          lower.includes('freitag') || lower.includes('samstag') || lower.includes('sonntag')) {
+        return;
+      }
+
+      const match = line.match(plzRegex);
+      if (match) {
+        // Alles vor der PLZ (wie fortlaufende Nummern "1.", "22" etc.) wegschneiden
+        const plzIndex = line.indexOf(match[1]);
+        let addressPart = line.substring(plzIndex).trim();
+
+        // Den Namen am Ende abschneiden (oft durch Komma getrennt oder am Ende der Zeile nach der Hausnummer)
+        // Beispiel: "51766 Ründeroth Cronenburg 8 Wloch, Fabian" -> Wir wollen nur bis zur Hausnummer
+        // Da Hausnummern meist Zahlen sind, trennen wir vor dem Namen (oft nach dem Komma oder bei Namen-Teil).
+        const commaIndex = addressPart.indexOf(',');
+        if (commaIndex > -1) {
+          addressPart = addressPart.substring(0, commaIndex).trim();
+        }
+
+        if (addressPart.length > 5) {
+          extractedAddresses.push(addressPart);
         }
       }
     });
@@ -1271,12 +1287,15 @@ async function handleOcrImage(event) {
     closeModal();
 
     if (extractedAddresses.length > 0) {
+      // Duplikate filtern
+      const uniqueAddresses = [...new Set(extractedAddresses)];
+      
       const existing = document.getElementById('addressInput').value;
-      const newText = extractedAddresses.join('\n');
+      const newText = uniqueAddresses.join('\n');
       document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-      showModal("Erfolg", `${extractedAddresses.length} Adressen wurden erfolgreich und sauber aus dem Screenshot extrahiert!`);
+      showModal("Erfolg", `${uniqueAddresses.length} Adressen sauber im Format PLZ Ort Adresse extrahiert!`);
     } else {
-      alert("Keine eindeutigen Adressen im Screenshot gefunden. Bitte versuche es noch einmal.");
+      alert("Keine passenden Adressen mit PLZ im Bild gefunden.");
     }
 
   } catch (err) {
