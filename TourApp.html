@@ -578,56 +578,46 @@ window.onload = async () => {
 
   initGPS();
   await loadTourHistory();
-  await restoreActiveTourSession();
+  await restoreActiveTourSession(); // Intelligente Wiederherstellung
 };
 
 async function restoreActiveTourSession() {
   try {
-    if (localStorage.getItem('veribase_force_home') === 'true') {
-      localStorage.removeItem('veribase_force_home');
+    const activeTourId = localStorage.getItem('veribase_active_tour_id');
+    if (!activeTourId) return; // Wenn keine Tour aktiv war, auf Setup-View bleiben!
+
+    const { data: tour } = await supabaseClient
+      .from('tours')
+      .select('*, stops(*)')
+      .eq('id', activeTourId)
+      .maybeSingle();
+
+    if (!tour || tour.status !== 'aktiv') {
+      localStorage.removeItem('veribase_active_tour_id');
+      localStorage.removeItem('veribase_active_stop_index');
       return;
     }
 
-    const { data: tours } = await supabaseClient
-      .from('tours')
-      .select('*, stops(*)')
-      .eq('assigned_to', currentUser.id)
-      .eq('status', 'aktiv')
-      .order('created_at', { ascending: false })
-      .limit(1);
+    currentSupabaseTourId = tour.id;
+    if (tour.stops && tour.stops.length > 0) {
+      const sortedStops = tour.stops.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+      
+      tourStops = sortedStops.map(s => ({
+        id: s.id,
+        address: s.address,
+        notes: s.notes || '',
+        done: s.status === 'erledigt',
+        photo_url: s.photo_url || null,
+        blob: null
+      }));
 
-    if (tours && tours.length > 0) {
-      const activeTour = tours[0];
-      currentSupabaseTourId = activeTour.id;
+      const savedIndex = parseInt(localStorage.getItem(`veribase_stop_index_${tour.id}`) || '0', 10);
+      currentStopIndex = savedIndex < tourStops.length ? savedIndex : 0;
 
-      if (activeTour.stops && activeTour.stops.length > 0) {
-        const sortedStops = activeTour.stops.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
-        
-        tourStops = sortedStops.map(s => ({
-          id: s.id,
-          address: s.address,
-          notes: s.notes || '',
-          done: s.status === 'erledigt',
-          photo_url: s.photo_url || null,
-          blob: null
-        }));
-
-        const firstOpenIdx = tourStops.findIndex(s => !s.done);
-        
-        if (firstOpenIdx === -1) {
-          localStorage.removeItem(`active_tour_index_${activeTour.id}`);
-          currentSupabaseTourId = null;
-          return;
-        }
-
-        currentStopIndex = firstOpenIdx;
-        localStorage.setItem(`active_tour_index_${activeTour.id}`, currentStopIndex);
-
-        updateGalleryGrid();
-        document.getElementById('setup-view').style.display = 'none';
-        document.getElementById('tour-view').style.display = 'flex';
-        renderTourUI();
-      }
+      updateGalleryGrid();
+      document.getElementById('setup-view').style.display = 'none';
+      document.getElementById('tour-view').style.display = 'flex';
+      renderTourUI();
     }
   } catch (err) {
     console.error("Wiederherstellungsfehler:", err);
@@ -727,7 +717,10 @@ async function startManualTour() {
   }));
 
   currentStopIndex = 0;
-  localStorage.setItem(`active_tour_index_${currentSupabaseTourId}`, currentStopIndex);
+  
+  // Aktive Tour im localStorage merken
+  localStorage.setItem('veribase_active_tour_id', currentSupabaseTourId);
+  localStorage.setItem(`veribase_stop_index_${currentSupabaseTourId}`, currentStopIndex);
 
   document.getElementById('galleryGrid').innerHTML = '';
   document.getElementById('photoCount').innerText = '0';
@@ -795,7 +788,7 @@ function previousStop() {
     tourStops[currentStopIndex].done = false;
     
     if (currentSupabaseTourId) {
-      localStorage.setItem(`active_tour_index_${currentSupabaseTourId}`, currentStopIndex);
+      localStorage.setItem(`veribase_stop_index_${currentSupabaseTourId}`, currentStopIndex);
       if (tourStops[currentStopIndex].id) {
         supabaseClient.from('stops').update({ status: 'offen', completed_at: null }).eq('id', tourStops[currentStopIndex].id);
       }
@@ -1080,7 +1073,7 @@ async function completeCurrentStop(localUrl, blob, noteText = '') {
   }
 
   if (currentSupabaseTourId) {
-    localStorage.setItem(`active_tour_index_${currentSupabaseTourId}`, currentStopIndex);
+    localStorage.setItem(`veribase_stop_index_${currentSupabaseTourId}`, currentStopIndex);
   }
 
   renderTourUI();
@@ -1127,10 +1120,10 @@ async function finishAndSaveTour() {
         })
         .eq('id', tourId);
 
-      localStorage.removeItem(`active_tour_index_${tourId}`);
+      // Session sauber löschen, damit man wieder auf dem Startbildschirm landet
+      localStorage.removeItem('veribase_active_tour_id');
+      localStorage.removeItem(`veribase_stop_index_${tourId}`);
     }
-
-    localStorage.setItem('veribase_force_home', 'true');
 
     alert("Tour erfolgreich gespeichert!");
     cancelAndReturn();
@@ -1144,9 +1137,9 @@ async function finishAndSaveTour() {
 
 function cancelAndReturn() {
   if (currentSupabaseTourId) {
-    localStorage.removeItem(`active_tour_index_${currentSupabaseTourId}`);
+    localStorage.removeItem('veribase_active_tour_id');
+    localStorage.removeItem(`veribase_stop_index_${currentSupabaseTourId}`);
   }
-  localStorage.setItem('veribase_force_home', 'true');
 
   tourStops = [];
   currentSupabaseTourId = null;
