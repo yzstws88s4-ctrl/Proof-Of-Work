@@ -1236,18 +1236,53 @@ async function handleOcrImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  showModal("KI-Scan", "Analysiere Screenshot und filtere Adressen heraus...");
+
   try {
     const worker = await Tesseract.createWorker('deu');
     const ret = await worker.recognize(file);
     await worker.terminate();
 
-    const text = ret.data.text;
-    if (text) {
-      const existing = document.getElementById('addressInput').value;
-      document.getElementById('addressInput').value = existing ? existing + '\n' + text : text;
+    const fullText = ret.data.text;
+    if (!fullText) {
+      closeModal();
+      alert("Es konnte kein Text auf dem Bild erkannt werden.");
+      return;
     }
+
+    const lines = fullText.split('\n');
+    const extractedAddresses = [];
+    const addressRegex = /\d+/; 
+
+    lines.forEach(line => {
+      let cleaned = line.trim();
+      
+      if (cleaned.length < 5) return;
+      if (cleaned.toLowerCase().includes('veribase') || cleaned.toLowerCase().includes('stopp') || cleaned.toLowerCase().includes('uhr')) return;
+      
+      if (addressRegex.test(cleaned)) {
+        cleaned = cleaned.replace(/^[\d\-\.\)]+\s*/, '');
+        if (cleaned.length > 4) {
+          extractedAddresses.push(cleaned);
+        }
+      }
+    });
+
+    closeModal();
+
+    if (extractedAddresses.length > 0) {
+      const existing = document.getElementById('addressInput').value;
+      const newText = extractedAddresses.join('\n');
+      document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
+      showModal("Erfolg", `${extractedAddresses.length} Adressen wurden erfolgreich und sauber aus dem Screenshot extrahiert!`);
+    } else {
+      alert("Keine eindeutigen Adressen im Screenshot gefunden. Bitte versuche es noch einmal.");
+    }
+
   } catch (err) {
+    closeModal();
     console.error("OCR-Fehler: " + err.message);
+    alert("Fehler bei der Texterkennung.");
   }
 }
 
