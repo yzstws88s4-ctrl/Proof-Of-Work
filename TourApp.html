@@ -20,30 +20,43 @@
   document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
 </script>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 :root {
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #e2e8f0;
   --surface: #f1f5f9;
+  --surface-solid: #ffffff;
   --text: #0f172a;
-  --text-muted: #64748b;
+  --text-sub: #64748b;
+  --text-muted: #94a3b8;
   --border: #cbd5e1;
+  --accent-line: rgba(99, 102, 241, 0.4);
   --input-bg: #ffffff;
-  --shadow: none;
-  --switch-active: #10b981;
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  --switch-active: #6366f1;
 }
 
 html[data-theme="dark"] {
-  --bg: #0b0f19;
-  --surface: #131b2e;
-  --text: #f8fafc;
-  --text-muted: #94a3b8;
-  --border: #1e293b;
-  --input-bg: #090d16;
-  --shadow: none;
-  --switch-active: #3b82f6;
+  --bg: #030712;
+  --surface: rgba(17, 24, 39, 0.75);
+  --surface-solid: #0f172a;
+  --text: #f9fafb;
+  --text-sub: #9ca3af;
+  --text-muted: #4b5563;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent-line: rgba(99, 102, 241, 0.35);
+  --input-bg: rgba(3, 7, 18, 0.8);
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  --switch-active: #6366f1;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -61,6 +74,7 @@ body {
   display: flex;
   justify-content: center;
   transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
 }
 
 .container { 
@@ -81,16 +95,16 @@ body {
 }
 
 .user-greeting-box { display: flex; flex-direction: column; }
-.driver-welcome { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
+.driver-welcome { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
 
 .header-actions { display: flex; gap: 8px; }
 
 .theme-toggle-btn, .logout-btn {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
   color: var(--text);
   height: 38px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -98,6 +112,8 @@ body {
   padding: 0 12px;
   font-size: 12px;
   font-weight: 600;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
 }
 
 .theme-toggle-btn { width: 38px; padding: 0; }
@@ -114,13 +130,13 @@ body {
 .main-inputs-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .section-label {
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--text-sub);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-bottom: 3px;
@@ -130,10 +146,10 @@ body {
 button, .nav-link-btn {
   width: 100%;
   padding: 13px 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
   border-radius: 12px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -143,64 +159,51 @@ button, .nav-link-btn {
   box-sizing: border-box;
   background: var(--surface);
   color: var(--text);
-  transition: opacity 0.1s ease;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
 }
 
 button:active, .nav-link-btn:active { opacity: 0.7; }
 button:disabled { opacity: 0.3; cursor: not-allowed; }
 
-html[data-theme="dark"] .btn-success {
-  background: #ffffff;
-  color: #0f172a;
-  border: none;
-}
-
-html[data-theme="light"] .btn-success {
-  background: #0f172a;
+.btn-success {
+  background: var(--accent);
   color: #ffffff;
   border: none;
+  box-shadow: 0 4px 16px var(--accent-glow);
 }
 
 .btn-danger {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.12);
   color: #ef4444;
   border-color: rgba(239, 68, 68, 0.3);
 }
 
-.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-html[data-theme="dark"] .btn-navigate {
-  min-height: 66px;
-  font-size: 18px;
-  font-weight: 900;
+.btn-navigate {
+  min-height: 60px;
+  font-size: 16px;
+  font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: rgba(37, 99, 235, 0.25);
-  color: #93c5fd;
-  border: 2px solid rgba(96, 165, 250, 0.5);
-}
-
-html[data-theme="light"] .btn-navigate {
-  min-height: 66px;
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: rgba(16, 185, 129, 0.15);
-  color: #065f46;
-  border: 2px solid rgba(16, 185, 129, 0.4);
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 16px var(--accent-glow);
 }
 
 .btn-complete-action {
-  min-height: 56px;
-  font-size: 15px;
+  min-height: 52px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 textarea, input[type="text"] {
   width: 100%;
   background: var(--input-bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
   border-radius: 12px;
   padding: 12px;
   color: var(--text);
@@ -208,19 +211,20 @@ textarea, input[type="text"] {
   font-size: 13px;
 }
 
-textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--text-muted); }
+textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 textarea { height: 100px; resize: vertical; }
 
 select {
   width: 100%;
   padding: 12px;
   background: var(--input-bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
   border-radius: 12px;
   color: var(--text);
   font-size: 13px;
   font-family: inherit;
 }
+select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
 .toggle-box {
   display: flex;
@@ -229,7 +233,9 @@ select {
   background: var(--surface);
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
 }
 
 .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
@@ -250,22 +256,26 @@ input:checked + .slider:before { transform: translateX(18px); }
 
 .current-destination {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
   border-radius: 14px;
   padding: 14px;
   text-align: center;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
 }
 
-.dest-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; letter-spacing: 0.06em; }
+.dest-label { font-size: 10px; text-transform: uppercase; color: var(--text-sub); font-weight: 800; letter-spacing: 0.06em; }
 .dest-text { font-size: 17px; font-weight: 800; margin-top: 2px; word-break: break-word; }
 .gps-status { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
 
 .stop-list {
   max-height: 150px;
   overflow-y: auto;
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
   border-radius: 12px;
   background: var(--surface);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
 }
 
 .stop-item {
@@ -282,10 +292,10 @@ input:checked + .slider:before { transform: translateX(18px); }
 .stop-item:last-child { border-bottom: none; }
 .stop-item.done { opacity: 0.35; }
 .stop-item.done .stop-name { text-decoration: line-through; }
-.stop-item.active { background: var(--input-bg); font-weight: 700; color: var(--text); border-left: 4px solid var(--switch-active); }
+.stop-item.active { background: var(--input-bg); font-weight: 700; color: var(--text); border-left: 4px solid var(--accent); }
 
-.proof-gallery-container { display: flex; flex-direction: column; gap: 6px; }
-.proof-item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.proof-gallery-container { display: flex; flex-direction: column; gap: 8px; }
+.proof-item-card { background: var(--surface); border: 1px solid var(--accent-line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
 .proof-item-card img { width: 100%; max-height: 110px; object-fit: cover; display: block; }
 .proof-item-info { padding: 8px; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
 
@@ -293,8 +303,8 @@ input:checked + .slider:before { transform: translateX(18px); }
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(6px);
+  background: rgba(3, 7, 18, 0.85);
+  backdrop-filter: blur(10px);
   z-index: 999;
   align-items: center;
   justify-content: center;
@@ -302,31 +312,35 @@ input:checked + .slider:before { transform: translateX(18px); }
 }
 
 .modal-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 18px;
+  background: var(--surface-solid);
+  border: 1px solid var(--accent-line);
+  border-radius: 20px;
+  padding: 20px;
   width: 100%;
   max-width: 450px;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow);
 }
 
 .history-card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
   background: var(--surface);
   border-radius: 12px;
   padding: 10px 12px;
   cursor: pointer;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s;
 }
-.history-card:hover { border-color: var(--text-muted); }
+.history-card:hover { border-color: var(--accent); }
 
 .tour-history-scroll-box {
   max-height: 120px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .icon-svg {
@@ -380,7 +394,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       <div class="toggle-box">
         <div>
           <strong style="font-size: 12px; display: block;">Fotobeweis-Pflicht</strong>
-          <span style="font-size: 10px; color: var(--text-muted);">Foto vor Abschluss erforderlich</span>
+          <span style="font-size: 10px; color: var(--text-sub);">Foto vor Abschluss erforderlich</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="photoProofToggle" checked>
@@ -465,7 +479,7 @@ input:checked + .slider:before { transform: translateX(18px); }
   <div class="modal-box">
     <div style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Fotobeweis erfasst</div>
     <input type="text" id="modalProofNoteInput" placeholder="Notiz zum Stopp..." oninput="updateLiveStampNote()">
-    <div style="border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--border); background: #000;">
+    <div style="border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--accent-line); background: #000;">
       <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 220px; object-fit: contain;">
     </div>
     <button class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()" style="padding: 13px;">Bestätigen & Weiter</button>
@@ -475,7 +489,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 <div class="modal-overlay" id="noteEditModal">
   <div class="modal-box" style="max-height: 85vh; overflow-y: auto;">
     <div style="font-size: 15px; font-weight: 700; margin-bottom: 2px;" id="noteModalTitle">Stopp bearbeiten</div>
-    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;" id="noteModalSub">Details</div>
+    <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;" id="noteModalSub">Details</div>
     
     <textarea id="noteModalInput" placeholder="z.B. Abgabe beim Nachbarn..."></textarea>
     
@@ -484,7 +498,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       Foto aufnehmen / ersetzen
     </button>
 
-    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 8px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 8px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-line);">
       <img id="modalStopPhotoImg" src="" style="width: 100%; max-height: 150px; object-fit: cover; display: block;">
     </div>
 
@@ -499,7 +513,7 @@ input:checked + .slider:before { transform: translateX(18px); }
   <div class="modal-box" style="max-height: 85vh;">
     <h3 id="detailTourTitle" style="margin-top:0; margin-bottom: 8px; font-size: 15px;">Tour Details</h3>
     <div id="detailStopsContainer" style="overflow-y: auto; flex-grow: 1; margin-bottom: 12px; padding-right: 4px;"></div>
-    <div style="display: flex; gap: 8px; border-top: 1px solid var(--border); padding-top: 10px;">
+    <div style="display: flex; gap: 8px; border-top: 1px solid var(--accent-line); padding-top: 10px;">
       <button class="btn-danger" style="margin-bottom:0; padding: 11px;" onclick="archiveCurrentDetailTour()">Ausblenden</button>
       <button style="margin-bottom:0; padding: 11px;" onclick="closeDetailModal()">Zurück</button>
     </div>
@@ -764,9 +778,9 @@ function renderTourUI() {
     item.innerHTML = `
       <div class="stop-name" style="pointer-events: none;">
         <strong>#${idx + 1}</strong> ${stop.address}${hasPhotoBadge}
-        ${stop.notes ? `<div style="font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 2px;">Notiz: ${stop.notes}</div>` : ''}
+        ${stop.notes ? `<div style="font-size: 11px; color: var(--text-sub); font-weight: 500; margin-top: 2px;">Notiz: ${stop.notes}</div>` : ''}
       </div>
-      <div style="font-size: 11px; color: var(--text-muted); text-align: right; pointer-events: none; min-width: 65px;">
+      <div style="font-size: 11px; color: var(--text-sub); text-align: right; pointer-events: none; min-width: 65px;">
         ${stop.done ? 'Erledigt' : 'Offen'}<br>
         <span style="font-size: 10px; color: var(--text); font-weight: 600; text-decoration: underline;">Ändern</span>
       </div>
@@ -1171,9 +1185,9 @@ async function loadTourHistory() {
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
         <span>${tour.title}</span>
-        <span style="color:var(--text-muted); font-size:11px;">${dateStr}</span>
+        <span style="color:var(--text-sub); font-size:11px;">${dateStr}</span>
       </div>
-      <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+      <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">
         Erledigt: ${done}/${total} Stopps
       </div>
     `;
@@ -1188,14 +1202,14 @@ function openTourDetails(tour) {
   container.innerHTML = '';
 
   if (!tour.stops || tour.stops.length === 0) {
-    container.innerHTML = '<p style="font-size:12px; color:var(--text-muted);">Keine Stopps vorhanden.</p>';
+    container.innerHTML = '<p style="font-size:12px; color:var(--text-sub);">Keine Stopps vorhanden.</p>';
   } else {
     tour.stops.sort((a,b) => a.sequence - b.sequence).forEach(s => {
       const box = document.createElement('div');
-      box.style.cssText = "border:1px solid var(--border); padding:8px; border-radius:8px; margin-bottom:8px; background:var(--input-bg); font-size:12px;";
+      box.style.cssText = "border:1px solid var(--accent-line); padding:8px; border-radius:8px; margin-bottom:8px; background:var(--input-bg); font-size:12px;";
       box.innerHTML = `
         <strong>#${s.sequence}: ${s.address}</strong><br>
-        <span style="color:var(--text-muted);">Status: ${s.status}</span>
+        <span style="color:var(--text-sub);">Status: ${s.status}</span>
         ${s.notes ? `<br><span>Notiz: ${s.notes}</span>` : ''}
         ${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:6px; margin-top:6px; max-height:130px; object-fit:cover;">` : ''}
       `;
