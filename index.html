@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest.json">
 
-  <!-- Sofortiges Laden des Dark Modes im Head, um jegliches Aufblitzen zu verhindern -->
+  <!-- Sofortiges Laden des Dark Modes im Head -->
   <script>
     if (!localStorage.getItem('veribase_theme')) {
       localStorage.setItem('veribase_theme', 'dark');
@@ -21,73 +21,117 @@
     document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
-      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --primary: #2563eb;
-      --bg: #f8fafc;
-      --card: #ffffff;
+      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --bg: #e2e8f0;
       --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --input-bg: #f1f5f9;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-    [data-theme="dark"] {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f8fafc;
+      --text-sub: #64748b;
       --text-muted: #94a3b8;
-      --border: #334155;
-      --input-bg: #0f172a;
-      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      --border: #cbd5e1;
+      --accent-line: rgba(99, 102, 241, 0.4);
+      --input-bg: #ffffff;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --surface-glass: rgba(255, 255, 255, 0.6);
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
     }
-    * { box-sizing: border-box; }
+
+    html[data-theme="dark"] {
+      --bg: #030712;
+      --text: #f9fafb;
+      --text-sub: #9ca3af;
+      --text-muted: #4b5563;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent-line: rgba(99, 102, 241, 0.35);
+      --input-bg: rgba(17, 24, 39, 0.6);
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --surface-glass: rgba(17, 24, 39, 0.4);
+      --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
     body {
       font-family: var(--font-family);
       background-color: var(--bg);
       color: var(--text);
-      margin: 0; padding: 20px;
-      display: flex; justify-content: center; align-items: center; min-height: 100vh;
+      margin: 0;
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
       transition: background-color 0.3s ease, color 0.3s ease;
+      -webkit-font-smoothing: antialiased;
     }
-    .login-container { width: 100%; max-width: 400px; position: relative; }
+
+    .login-container {
+      width: 100%;
+      max-width: 380px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .theme-toggle-btn {
-      position: absolute; top: -60px; right: 0;
-      background: var(--card); border: 1px solid var(--border); color: var(--text);
-      width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;
-    }
-    .theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px;
+      position: absolute;
+      top: -50px;
+      right: 0;
+      background: var(--surface-glass);
+      border: 1px solid var(--accent-line);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
       box-shadow: var(--shadow);
-      transition: background-color 0.3s ease, border-color 0.3s ease;
+      transition: all 0.2s ease;
+    }
+    .theme-toggle-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* Clean Form ohne Kasten */
+    .login-form-wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
-    .title-group { text-align: center; margin-bottom: 24px; }
+    .title-group {
+      text-align: center;
+      margin-bottom: 32px;
+    }
     
-    /* Logo-Container mit Clipping für den Glow-Effekt */
+    /* Logo-Wrapper ohne harten Kasten, edel schwebend */
     .logo-wrapper {
       position: relative;
-      width: 82px;
-      height: 82px;
-      margin: 0 auto 14px auto;
-      border-radius: 18px;
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 18px auto;
+      border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 12px 30px var(--accent-glow);
+      border: 1px solid var(--accent-line);
+      background: var(--surface-glass);
+      backdrop-filter: blur(12px);
     }
 
     .login-logo {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
       display: block;
-      background: var(--card);
     }
 
     /* Der geschwungene Lichtstreifen (Ping-Pong-Effekt im Logo) */
@@ -108,7 +152,6 @@
       pointer-events: none;
     }
 
-    /* Sofortige Aktivierung der Ping-Pong-Animation */
     .logo-wrapper.glow-active::after {
       animation: logoShinePingPong 1.4s ease-in-out forwards !important;
     }
@@ -119,13 +162,87 @@
       100% { left: -150%; }
     }
 
-    .title { font-size: 24px; font-weight: 700; margin: 0 0 6px 0; }
-    .subtitle { font-size: 13px; color: var(--text-muted); margin: 0; }
-    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
-    input { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); font-size: 14px; margin-bottom: 16px; }
-    button.submit-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; background: var(--primary); color: white; cursor: pointer; }
-    button.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .error { color: #ef4444; font-size: 13px; margin-top: 12px; text-align: center; font-weight: 500; min-height: 18px; }
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.03em;
+    }
+    
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      margin-left: 2px;
+    }
+
+    input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--accent-line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    button.submit-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--accent);
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transition: all 0.2s ease;
+      margin-top: 6px;
+    }
+
+    button.submit-btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    button.submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error {
+      color: #ef4444;
+      font-size: 13px;
+      margin-top: 16px;
+      text-align: center;
+      font-weight: 600;
+      min-height: 20px;
+    }
   </style>
 </head>
 <body>
@@ -135,7 +252,7 @@
     <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
   </button>
 
-  <div class="card" id="loginCard">
+  <div class="login-form-wrapper">
     <div class="title-group">
       <div class="logo-wrapper" id="logoWrapper">
         <img src="logo.png" alt="Veribase Logo" class="login-logo">
@@ -187,9 +304,9 @@
 
     btn.disabled = true;
 
-    // Animation SOFORT beim Klick starten, ohne Verzögerung
+    // Animation SOFORT beim Klick starten
     logoWrapper.classList.add('glow-active');
-    errorMsg.style.color = 'var(--primary)';
+    errorMsg.style.color = 'var(--accent)';
     errorMsg.innerText = 'Anmeldung läuft...';
 
     if (!identifier.includes('@')) {
@@ -202,7 +319,7 @@
     });
 
     if (authError) {
-      logoWrapper.classList.remove('glow-active'); // Animation bei Fehler stoppen
+      logoWrapper.classList.remove('glow-active');
       errorMsg.style.color = '#ef4444';
       errorMsg.innerText = 'Login fehlgeschlagen: Zugangsdaten ungültig.';
       btn.disabled = false;
@@ -211,7 +328,6 @@
 
     errorMsg.innerText = 'Login erfolgreich!';
 
-    // Kurz warten, bis der Ping-Pong-Effekt sauber durchgelaufen ist, dann weiterleiten
     setTimeout(async () => {
       await redirectUser(authData.user.id);
     }, 1200);
