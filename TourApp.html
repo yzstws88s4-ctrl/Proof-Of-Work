@@ -25,14 +25,14 @@
 <style>
 :root {
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* Super weicher, gedämpfter heller Modus (Augenschonend) */
+  /* Wirklich gedämpfter, matter Light Mode (Augenschonend im Halbdunkeln) */
   --bg: #e2e8f0;
-  --surface: #ffffff;
+  --surface: #f1f5f9;
   --text: #0f172a;
   --text-muted: #64748b;
   --border: #cbd5e1;
-  --input-bg: #f8fafc;
-  --shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  --input-bg: #ffffff;
+  --shadow: none;
   --switch-active: #10b981;
 }
 
@@ -43,7 +43,7 @@ html[data-theme="dark"] {
   --text-muted: #94a3b8;
   --border: #1e293b;
   --input-bg: #090d16;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow: none;
   --switch-active: #3b82f6;
 }
 
@@ -54,7 +54,7 @@ body {
   background-color: var(--bg);
   color: var(--text);
   margin: 0;
-  padding: 12px 10px;
+  padding: 16px 12px;
   display: flex;
   justify-content: center;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -62,27 +62,23 @@ body {
 
 .container { width: 100%; max-width: 480px; padding-bottom: 40px; }
 
-/* Sauberer Header mit Fokus auf den Namen */
+/* Super cleaner Header ohne klobigen Kasten */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 16px;
-  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+  padding: 0 2px;
 }
 
-.user-greeting-box { display: flex; flex-direction: column; gap: 1px; }
-.driver-welcome { font-size: 16px; font-weight: 800; color: var(--text); display: block; letter-spacing: -0.02em; }
+.user-greeting-box { display: flex; flex-direction: column; gap: 2px; }
+.driver-welcome { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
 .driver-subtitle { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 
-.header-actions { display: flex; gap: 6px; }
+.header-actions { display: flex; gap: 8px; }
 
 .theme-toggle-btn, .logout-btn {
-  background: var(--input-bg);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   height: 36px;
@@ -102,7 +98,7 @@ body {
 .app-view-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .section-label {
@@ -111,14 +107,14 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   margin-left: 2px;
 }
 
 button, .nav-link-btn {
   width: 100%;
   padding: 13px 14px;
-  border: none;
+  border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -129,46 +125,30 @@ button, .nav-link-btn {
   gap: 8px;
   text-decoration: none;
   box-sizing: border-box;
-  transition: transform 0.1s ease;
-}
-
-button:active, .nav-link-btn:active { transform: scale(0.98); }
-button:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
-
-.btn-primary {
   background: var(--surface);
   color: var(--text);
-  border: 1px solid var(--border);
-  font-weight: 600;
-  box-shadow: var(--shadow);
+  transition: opacity 0.1s ease;
 }
+
+button:active, .nav-link-btn:active { opacity: 0.7; }
+button:disabled { opacity: 0.3; cursor: not-allowed; }
 
 html[data-theme="dark"] .btn-success {
   background: #ffffff;
   color: #0f172a;
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
   border: none;
 }
-html[data-theme="dark"] .btn-success:hover { background: #f1f5f9; }
 
 html[data-theme="light"] .btn-success {
   background: #0f172a;
   color: #ffffff;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.2);
   border: none;
 }
 
 .btn-danger {
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -179,11 +159,9 @@ html[data-theme="dark"] .btn-navigate {
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: rgba(37, 99, 235, 0.28);
+  background: rgba(37, 99, 235, 0.25);
   color: #93c5fd;
-  border-radius: 14px;
-  border: 2px solid rgba(96, 165, 250, 0.6);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+  border: 2px solid rgba(96, 165, 250, 0.5);
 }
 
 html[data-theme="light"] .btn-navigate {
@@ -194,28 +172,24 @@ html[data-theme="light"] .btn-navigate {
   text-transform: uppercase;
   background: rgba(16, 185, 129, 0.15);
   color: #065f46;
-  border-radius: 14px;
   border: 2px solid rgba(16, 185, 129, 0.4);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);
 }
 
 .btn-complete-action {
   min-height: 60px;
   font-size: 15px;
   font-weight: 700;
-  border-radius: 12px;
 }
 
 textarea, input[type="text"] {
   width: 100%;
-  background: var(--surface);
+  background: var(--input-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px;
   color: var(--text);
   font-family: inherit;
   font-size: 13px;
-  box-shadow: var(--shadow);
 }
 
 textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--text-muted); }
@@ -224,13 +198,12 @@ textarea { height: 95px; resize: vertical; }
 select {
   width: 100%;
   padding: 12px;
-  background: var(--surface);
+  background: var(--input-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
   color: var(--text);
   font-size: 13px;
   font-family: inherit;
-  box-shadow: var(--shadow);
 }
 
 .toggle-box {
@@ -241,7 +214,6 @@ select {
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
 }
 
 .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
@@ -253,7 +225,6 @@ select {
 .slider:before {
   position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
   background-color: white; transition: .25s; border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 input:checked + .slider { background-color: var(--switch-active) !important; }
@@ -267,7 +238,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   border-radius: 14px;
   padding: 16px;
   text-align: center;
-  box-shadow: var(--shadow);
 }
 
 .dest-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; letter-spacing: 0.06em; }
@@ -280,7 +250,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
-  box-shadow: var(--shadow);
 }
 
 .stop-item {
@@ -300,7 +269,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 .stop-item.active { background: var(--input-bg); font-weight: 700; color: var(--text); border-left: 4px solid var(--switch-active); }
 
 .proof-gallery-container { display: flex; flex-direction: column; gap: 8px; }
-.proof-item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.proof-item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .proof-item-card img { width: 100%; max-height: 150px; object-fit: cover; display: block; }
 .proof-item-info { padding: 9px; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
 
@@ -323,7 +292,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   padding: 18px;
   width: 100%;
   max-width: 450px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
 }
@@ -334,8 +302,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   border-radius: 12px;
   padding: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow);
 }
 .history-card:hover { border-color: var(--text-muted); }
 
@@ -355,7 +321,6 @@ input:checked + .slider:before { transform: translateX(18px); }
 <body>
 
 <div class="container">
-  <!-- Neuer sauberer Header: Nur Name & Untertitel -->
   <div class="header">
     <div class="user-greeting-box">
       <span class="driver-welcome" id="driverWelcomeDisplay">Hallo Bj</span>
@@ -373,11 +338,11 @@ input:checked + .slider:before { transform: translateX(18px); }
     <div class="section-label">Tour starten</div>
     
     <div class="btn-grid">
-      <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">
+      <button onclick="document.getElementById('ocrCameraInput').click()">
         <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         Kamera (OCR)
       </button>
-      <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">
+      <button onclick="document.getElementById('galleryInput').click()">
         <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         Aus Galerie
       </button>
@@ -404,7 +369,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       <option value="apple">Apple Maps</option>
     </select>
 
-    <button class="btn-primary" onclick="loadSupabaseTour()">
+    <button onclick="loadSupabaseTour()">
       <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       Live-Tour vom Chef laden
     </button>
@@ -438,7 +403,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       STOPP ERLEDIGT ✓
     </button>
 
-    <button class="btn-secondary" id="prevStopBtn" onclick="previousStop()" style="padding: 11px; font-size: 12px;">
+    <button id="prevStopBtn" onclick="previousStop()" style="padding: 11px; font-size: 12px;">
       <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       Vorherigen Stopp zurückholen
     </button>
@@ -459,7 +424,7 @@ input:checked + .slider:before { transform: translateX(18px); }
     <button class="btn-success" style="margin-top: 8px; padding: 13px;" id="finishTourBtn" onclick="finishAndSaveTour()">
       Tour beenden & Speichern
     </button>
-    <button class="btn-secondary" style="padding: 11px;" onclick="cancelAndReturn()">
+    <button onclick="cancelAndReturn()" style="padding: 11px;">
       Abbrechen
     </button>
   </div>
@@ -485,7 +450,7 @@ input:checked + .slider:before { transform: translateX(18px); }
     
     <textarea id="noteModalInput" placeholder="z.B. Abgabe beim Nachbarn..."></textarea>
     
-    <button class="btn-secondary" onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 8px; padding: 11px;">
+    <button onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 8px; padding: 11px;">
       <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       Foto aufnehmen / ersetzen
     </button>
@@ -496,7 +461,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 
     <div style="display: flex; gap: 8px;">
       <button class="btn-success" style="margin-bottom:0; padding: 11px;" onclick="saveStopNoteFromModal()">Speichern</button>
-      <button class="btn-secondary" style="margin-bottom:0; padding: 11px;" onclick="closeNoteModal()">Abbrechen</button>
+      <button style="margin-bottom:0; padding: 11px;" onclick="closeNoteModal()">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -507,7 +472,7 @@ input:checked + .slider:before { transform: translateX(18px); }
     <div id="detailStopsContainer" style="overflow-y: auto; flex-grow: 1; margin-bottom: 12px; padding-right: 4px;"></div>
     <div style="display: flex; gap: 8px; border-top: 1px solid var(--border); padding-top: 10px;">
       <button class="btn-danger" style="margin-bottom:0; padding: 11px;" onclick="archiveCurrentDetailTour()">Ausblenden</button>
-      <button class="btn-secondary" style="margin-bottom:0; padding: 11px;" onclick="closeDetailModal()">Zurück</button>
+      <button style="margin-bottom:0; padding: 11px;" onclick="closeDetailModal()">Zurück</button>
     </div>
   </div>
 </div>
@@ -516,7 +481,7 @@ input:checked + .slider:before { transform: translateX(18px); }
   <div class="modal-box" style="text-align: center;">
     <div style="font-size:15px; font-weight:700;" id="modalTitle">Hinweis</div>
     <div id="modalBody" style="margin: 8px 0; font-size: 12px;"></div>
-    <button class="btn-primary" onclick="closeModal()" style="margin-bottom:0; padding: 11px;">OK</button>
+    <button class="btn-success" onclick="closeModal()" style="margin-bottom:0; padding: 11px;">OK</button>
   </div>
 </div>
 
