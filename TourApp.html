@@ -1234,7 +1234,7 @@ async function handleOcrImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  showModal("KI-Scan", "Analysiere Screenshot und filtere Adressen heraus...");
+  showModal("KI-Scan", "Analysiere Screenshot und extrahiere alle 29 Stopps...");
 
   try {
     const worker = await Tesseract.createWorker('deu');
@@ -1251,35 +1251,59 @@ async function handleOcrImage(event) {
     const rawLines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     const extractedAddresses = [];
 
+    // PLZ Erkennung (5 Ziffern, typischerweise 51766, 51647, 51789 etc.)
+    const plzRegex = /\b(5\d{4})\b/;
+
     rawLines.forEach(line => {
+      // Ignoriere Kopfzeilen und Tabellen-Header
       const lower = line.toLowerCase();
-      // Ignoriere jeglichen Tabellenkopf und UI-Schrott
       if (lower.includes('tour') || lower.includes('ort') || lower.includes('adresse') || 
           lower.includes('name') || lower.includes('ziehen') || lower.includes('morgengold') ||
           lower.includes('freitag') || lower.includes('samstag') || lower.includes('sonntag') ||
-          lower.includes('uhr') || lower.length < 8) {
+          lower.includes('uhr')) {
         return;
       }
 
-      // Suche nach einer 5-stelligen PLZ
-      const plzMatch = line.match(/\b(5\d{4})\b/);
-      if (plzMatch) {
-        // Wir extrahieren alles ab der PLZ
-        let sub = line.substring(line.indexOf(plzMatch[1])).trim();
-        
-        // Da die Struktur "PLZ Ort Strasse Hausnr Name" ist, suchen wir die letzte echte Hausnummer (Zahl oder Zahl+Buchstabe).
-        // Alles was NACH der Hausnummer kommt (Nachname, Kommas) wird rigoros abgeschnitten!
-        const matches = [...sub.matchAll(/\b(\d+[a-zA-Z]?)\b/g)];
-        if (matches.length > 0) {
-          // Die letzte gefundene Zahl in der Zeile ist in 99% der Fälle die Hausnummer
-          const lastMatch = matches[matches.length - 1];
-          const cutIndex = lastMatch.index + lastMatch[0].length;
-          sub = sub.substring(0, cutIndex).trim();
+      const match = line.match(plzRegex);
+      if (match) {
+        // Ab der PLZ schneiden, damit vordere Nummern (1, 2, 20...) entfernt werden
+        let addressLine = line.substring(line.indexOf(match[1])).trim();
+
+        // Den Namen am Ende trennen:
+        // In der Morgengold-Tabelle ist der Name immer mit "Nachname, Vorname" formatiert.
+        // Wir suchen nach dem Komma im Namen oder dem Nachnamen.
+        const commaIndex = addressLine.indexOf(',');
+        if (commaIndex > -1) {
+          // Schneide vor dem Nachnamen ab (der Nachname steht direkt vor dem Komma)
+          const beforeComma = addressLine.substring(0, commaIndex).trim();
+          const lastSpace = beforeComma.lastIndexOf(' ');
+          if (lastSpace > -1) {
+            addressLine = beforeComma.substring(0, lastSpace).trim();
+          } else {
+            addressLine = beforeComma;
+          }
+        } else {
+          // Fallback: Trennung nach der Hausnummer (Zahl oder Zahl+Buchstabe)
+          const houseNumMatch = addressLine.match(/\b\d+[a-zA-Z]?\b/g);
+          if (houseNumMatch && houseNumMatch.length > 0) {
+            // Die letzte Zahl, die nach dem Ortsnamen steht, ist die Hausnummer
+            const parts = addressLine.split(/\s+/);
+            if (parts.length >= 3) {
+              let houseNumIdx = -1;
+              for (let i = 2; i < parts.length; i++) {
+                if (/^\d+[a-zA-Z]?$/.test(parts[i])) {
+                  houseNumIdx = i;
+                }
+              }
+              if (houseNumIdx !== -1) {
+                addressLine = parts.slice(0, houseNumIdx + 1).join(' ');
+              }
+            }
+          }
         }
 
-        // Validiere, dass eine gültige Adresse vorliegt (PLZ + Inhalt + Hausnummer)
-        if (sub.length > 8 && /\d/.test(sub)) {
-          extractedAddresses.push(sub);
+        if (addressLine.length > 8) {
+          extractedAddresses.push(addressLine);
         }
       }
     });
@@ -1292,9 +1316,9 @@ async function handleOcrImage(event) {
       const existing = document.getElementById('addressInput').value;
       const newText = uniqueAddresses.join('\n');
       document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-      showModal("Erfolg", `${uniqueAddresses.length} Adressen (nur PLZ, Ort, Strasse & Hausnr) extrahiert!`);
+      showModal("Erfolg", `${uniqueAddresses.length} Adressen sauber im Format PLZ Ort Adresse extrahiert!`);
     } else {
-      alert("Keine passenden Adressen mit PLZ im Bild gefunden.");
+      alert("Keine passenden Adressen im Bild gefunden.");
     }
 
   } catch (err) {
