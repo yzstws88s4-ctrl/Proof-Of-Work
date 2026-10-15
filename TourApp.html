@@ -38,13 +38,13 @@
 }
 
 html[data-theme="dark"] {
-  --bg: #0f172a;
-  --card: #1e293b;
+  --bg: #0b0f19;
+  --card: #161e2e;
   --text: #f8fafc;
   --text-muted: #94a3b8;
-  --border: #334155;
+  --border: #263548;
   --input-bg: #0f172a;
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
   --switch-active: #3b82f6;
 }
 
@@ -55,20 +55,20 @@ body {
   background-color: var(--bg);
   color: var(--text);
   margin: 0;
-  padding: 12px;
+  padding: 14px;
   display: flex;
   justify-content: center;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.container { width: 100%; max-width: 500px; }
+.container { width: 100%; max-width: 500px; padding-bottom: 30px; }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
-  padding: 0 4px;
+  margin-bottom: 16px;
+  padding: 0 2px;
 }
 
 .title { font-size: 20px; font-weight: 800; margin: 0; letter-spacing: -0.03em; }
@@ -95,7 +95,8 @@ body {
 .theme-toggle-btn { width: 38px; padding: 0; }
 .theme-toggle-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-.card {
+/* MODERNER SEITEN-BLOCK (ERSETZT DEN GROSSEN ÄUSSEREN KASTEN) */
+.app-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -162,7 +163,7 @@ html[data-theme="light"] .btn-success {
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .btn-grid button { margin-bottom: 0; padding: 12px; font-size: 14px; }
 
-/* NOCH MÄCHTIGERER, DICKERER NAVIGIEREN-BUTTON */
+/* EXTRADICKER & HERVORHEBENDER NAVIGIEREN-BUTTON */
 html[data-theme="dark"] .btn-navigate {
   min-height: 76px;
   font-size: 20px;
@@ -196,7 +197,7 @@ html[data-theme="light"] .btn-navigate {
   font-size: 16px;
   font-weight: 700;
   border-radius: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 textarea, input[type="text"] {
@@ -259,7 +260,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   text-align: center;
 }
 
@@ -362,7 +363,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 
   <!-- SETUP VIEW (STARTSEITE) -->
-  <div class="card" id="setup-view">
+  <div class="app-card" id="setup-view">
     <div style="font-weight: 700; margin-bottom: 12px; font-size: 14px;">Tour starten</div>
     <div class="btn-grid">
       <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">
@@ -415,20 +416,20 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 
   <!-- TOUR AKTIV VIEW -->
-  <div class="card" id="tour-view">
+  <div class="app-card" id="tour-view">
     <div class="current-destination">
       <div class="dest-label" id="stopCounter">Stopp 1 von 16</div>
       <div class="dest-text" id="currentStopText">Lade Stopps...</div>
       <div class="gps-status" id="gpsStatusText">GPS aktiv</div>
     </div>
 
-    <!-- 1. EXTRADICKER NAVIGATION-BUTTON -->
+    <!-- EXTRADICKER NAVIGATION-BUTTON -->
     <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
       <svg class="icon-svg" style="width:24px; height:24px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
       JETZT NAVIGIEREN
     </a>
 
-    <!-- 2. ABSCHLIESSEN-BUTTON -->
+    <!-- ABSCHLIESSEN-BUTTON -->
     <button class="btn-success btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
       <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
       STOPP ERLEDIGT ✓
