@@ -577,7 +577,6 @@ window.onload = async () => {
   const savedTheme = localStorage.getItem('veribase_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  // ZUSTAND DES FOTOBEWEIS-TOGGLES LOKAL PERSISTIEREN
   const savedProofToggle = localStorage.getItem('veribase_photo_proof_enabled');
   if (savedProofToggle !== null) {
     document.getElementById('photoProofToggle').checked = (savedProofToggle === 'true');
@@ -636,14 +635,15 @@ async function restoreActiveTourSession() {
           blob: null
         }));
 
-        const savedIndex = localStorage.getItem(`active_tour_index_${activeTour.id}`);
-        if (savedIndex !== null) {
-          currentStopIndex = parseInt(savedIndex, 10);
-          if (currentStopIndex >= tourStops.length) currentStopIndex = tourStops.length - 1;
+        // ZUVERlässige ermittlung des echten ersten offenen Stopps
+        const firstOpenIdx = tourStops.findIndex(s => !s.done);
+        if (firstOpenIdx !== -1) {
+          currentStopIndex = firstOpenIdx;
         } else {
-          const firstOpenIdx = tourStops.findIndex(s => !s.done);
-          currentStopIndex = firstOpenIdx !== -1 ? firstOpenIdx : 0;
+          currentStopIndex = tourStops.length;
         }
+
+        localStorage.setItem(`active_tour_index_${activeTour.id}`, currentStopIndex);
 
         updateGalleryGrid();
         document.getElementById('setup-view').style.display = 'none';
