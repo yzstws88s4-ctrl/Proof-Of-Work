@@ -1253,7 +1253,7 @@ async function handleOcrImage(event) {
 
     rawLines.forEach(line => {
       const lower = line.toLowerCase();
-      // Ignoriere reinem Tabellenkopf, UI oder unwichtige Zeilen
+      // Ignoriere Kopfzeilen, Datum oder UI-Müll
       if (lower.includes('tour') || lower.includes('ort') || lower.includes('adresse') || 
           lower.includes('name') || lower.includes('ziehen') || lower.includes('morgengold') ||
           lower.includes('freitag') || lower.includes('samstag') || lower.includes('sonntag') ||
@@ -1261,40 +1261,36 @@ async function handleOcrImage(event) {
         return;
       }
 
-      // Suche nach einer 5-stelligen PLZ (beginnend mit 5 oder generell)
+      // Suche nach einer 5-stelligen PLZ
       const plzMatch = line.match(/\b(5\d{4})\b/);
       if (plzMatch) {
-        // Starte ab der PLZ, damit vorne jegliche Tabellennummern (1., 2. etc.) wegfallen
         let sub = line.substring(line.indexOf(plzMatch[1])).trim();
         
-        // Schneide alles ab, wo ein Komma (Nachname, Vorname) folgt
+        // 1. Wenn ein Komma existiert (z.B. "Wloch, Fabian"), schneiden wir hier rigoros ab.
         const commaIdx = sub.indexOf(',');
         if (commaIdx > -1) {
           sub = sub.substring(0, commaIdx).trim();
         } else {
-          // Falls kein Komma existiert, suche die letzte echte Hausnummer in der Zeile 
-          // (z.B. "8", "69a", "83a") und schneide alles dahinter (den Nachnamen) sauber ab.
-          const numMatches = sub.match(/\b\d+[a-zA-Z]?\b/g);
-          if (numMatches && numMatches.length > 0) {
-            const lastNum = numMatches[numMatches.length - 1];
-            // Die PLZ enthält auch Zahlen, daher nehmen wir das Vorkommen nach dem Ortsnamen
-            const parts = sub.split(/\s+/);
-            if (parts.length >= 3) {
-              // Finde den Index der letzten Hausnummer, die nach PLZ und Ort kommt
-              let lastNumIndex = -1;
-              for (let i = 2; i < parts.length; i++) {
-                if (parts[i] === lastNum || parts[i].startsWith(lastNum)) {
-                  lastNumIndex = i;
-                }
-              }
-              if (lastNumIndex !== -1) {
-                sub = parts.slice(0, lastNumIndex + 1).join(' ');
-              }
+          // 2. Falls kein Komma da ist, finden wir die Hausnummer (Zahl am Ende der Straße) 
+          // und schneiden alles, was danach kommt (den Nachnamen), kompromisslos ab.
+          // Wir suchen nach Mustern wie "8", "69a", "83a", "10a"
+          const tokens = sub.split(/\s+/);
+          let houseNumIndex = -1;
+          
+          for (let i = 2; i < tokens.length; i++) {
+            // Prüft, ob ein Token eine Hausnummer ist (Zahl am Ende oder Zahl gefolgt von Buchstabe)
+            if (/^\d+[a-zA-Z]?$/.test(tokens[i])) {
+              houseNumIndex = i;
             }
+          }
+
+          if (houseNumIndex !== -1) {
+            // Wir behalten alles von Anfang bis zur Hausnummer
+            sub = tokens.slice(0, houseNumIndex + 1).join(' ');
           }
         }
 
-        // Validierung: Muss die PLZ und mindestens eine Hausnummer/Straße enthalten
+        // Abschließende Validierung: Muss die PLZ und mindestens eine Hausnummer/Zahl enthalten
         if (sub.length > 8 && /\d/.test(sub)) {
           extractedAddresses.push(sub);
         }
