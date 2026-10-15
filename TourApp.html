@@ -128,7 +128,6 @@ button, .nav-link-btn {
 button:active, .nav-link-btn:active { transform: scale(0.98); }
 button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-/* HIGH-END VERCEL/APPLE LOOK: PRIMARY BUTTON (Chef Tour laden -> Edler Ghost-Button) */
 .btn-primary {
   background: rgba(255, 255, 255, 0.03);
   color: var(--text);
@@ -141,7 +140,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow
   border-color: #64748b;
 }
 
-/* HIGH-END VERCEL/APPLE LOOK: SUCCESS BUTTON (Tour starten) */
 html[data-theme="dark"] .btn-success {
   background: #ffffff;
   color: #0f172a;
@@ -172,7 +170,6 @@ html[data-theme="light"] .btn-success:hover {
   background: rgba(239, 68, 68, 0.22);
 }
 
-/* SECONDARY BUTTON */
 .btn-secondary {
   background: var(--input-bg);
   color: var(--text);
@@ -183,7 +180,6 @@ html[data-theme="light"] .btn-success:hover {
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .btn-grid button { margin-bottom: 0; padding: 12px 10px; font-size: 14px; border-radius: 12px; }
 
-/* 20% / 80% Action Bar Layout */
 .stop-actions-grid {
   display: grid;
   grid-template-columns: 22% 75%;
@@ -196,7 +192,6 @@ html[data-theme="light"] .btn-success:hover {
   font-size: 14px;
 }
 
-/* JETZT NAVIGIEREN BUTTON (DYNAMISCH JE NACH THEME) */
 html[data-theme="dark"] .btn-navigate {
   min-height: 76px;
   font-size: 19px;
@@ -288,7 +283,6 @@ select {
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* TOGGLE-BUTTON FIX (DEUTLICH ERKENNBAR WENN AKTIV) */
 input:checked + .slider { background-color: var(--switch-active) !important; }
 input:checked + .slider:before { transform: translateX(20px); }
 
@@ -605,7 +599,59 @@ window.onload = async () => {
 
   initGPS();
   await loadTourHistory();
+
+  // AUTOMATISCHE WIEDERHERSTELLUNG BEIM NEULADEN / APP-WECHSEL
+  await restoreActiveTourSession();
 };
+
+async function restoreActiveTourSession() {
+  try {
+    // 1. Suche nach einer Tour des Fahrers mit Status 'geplant' oder 'aktiv' in Supabase
+    const { data: tours } = await supabaseClient
+      .from('tours')
+      .select('*, stops(*)')
+      .eq('assigned_to', currentUser.id)
+      .in('status', ['geplant', 'aktiv'])
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (tours && tours.length > 0) {
+      const activeTour = tours[0];
+      currentSupabaseTourId = activeTour.id;
+
+      if (activeTour.stops && activeTour.stops.length > 0) {
+        const sortedStops = activeTour.stops.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+        
+        tourStops = sortedStops.map(s => ({
+          id: s.id,
+          address: s.address,
+          notes: s.notes || '',
+          done: s.status === 'erledigt',
+          photo_url: s.photo_url || null,
+          blob: null
+        }));
+
+        // Versuche den letzten Stopp-Index aus dem lokalen Speicher wiederherzustellen
+        const savedIndex = localStorage.getItem(`active_tour_index_${activeTour.id}`);
+        if (savedIndex !== null) {
+          currentStopIndex = parseInt(savedIndex, 10);
+          if (currentStopIndex >= tourStops.length) currentStopIndex = tourStops.length - 1;
+        } else {
+          // Finde den ersten offenen Stopp
+          const firstOpenIdx = tourStops.findIndex(s => !s.done);
+          currentStopIndex = firstOpenIdx !== -1 ? firstOpenIdx : 0;
+        }
+
+        updateGalleryGrid();
+        document.getElementById('setup-view').style.display = 'none';
+        document.getElementById('tour-view').style.display = 'block';
+        renderTourUI();
+      }
+    }
+  } catch (err) {
+    console.error("Wiederherstellungsfehler:", err);
+  }
+}
 
 function toggleTheme() {
   const htmlEl = document.documentElement;
@@ -657,11 +703,39 @@ async function loadSupabaseTour() {
   }
 }
 
-function startManualTour() {
+async function startManualTour() {
   const input = document.getElementById('addressInput').value.trim();
   if (!input) return alert("Bitte gib mindestens eine Adresse ein.");
 
   const lines = input.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+
+  // Wenn noch keine Supabase Tour ID existiert, direkt in Supabase anlegen, damit sie sofort persistent ist
+  if (!currentSupabaseTourId) {
+    const { data: newTour, error } = await supabaseClient
+      .from('tours')
+      .insert([{
+        title: "Tour " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
+        assigned_to: currentUser.id,
+        status: 'aktiv',
+        archived_by_driver: false
+      }])
+      .select('*')
+      .single();
+
+    if (!error && newTour) {
+      currentSupabaseTourId = newTour.id;
+      const stopsToInsert = lines.map((addr, idx) => ({
+        tour_id: currentSupabaseTourId,
+        address: addr,
+        sequence: idx + 1,
+        status: 'offen'
+      }));
+      const { data: insertedStops } = await supabaseClient.from('stops').insert(stopsToInsert).select('*');
+      if (insertedStops) {
+        loadedChefStops = insertedStops;
+      }
+    }
+  }
 
   tourStops = lines.map((addr, idx) => ({
     id: (loadedChefStops[idx] && loadedChefStops[idx].id) ? loadedChefStops[idx].id : null,
@@ -673,6 +747,8 @@ function startManualTour() {
   }));
 
   currentStopIndex = 0;
+  localStorage.setItem(`active_tour_index_${currentSupabaseTourId}`, currentStopIndex);
+
   document.getElementById('galleryGrid').innerHTML = '';
   document.getElementById('photoCount').innerText = '0';
 
@@ -737,6 +813,13 @@ function previousStop() {
   if (currentStopIndex > 0) {
     currentStopIndex--;
     tourStops[currentStopIndex].done = false;
+    
+    if (currentSupabaseTourId) {
+      localStorage.setItem(`active_tour_index_${currentSupabaseTourId}`, currentStopIndex);
+      if (tourStops[currentStopIndex].id) {
+        supabaseClient.from('stops').update({ status: 'offen', completed_at: null }).eq('id', tourStops[currentStopIndex].id);
+      }
+    }
     renderTourUI();
   }
 }
@@ -767,10 +850,15 @@ function openNoteModal(index) {
   }, 150);
 }
 
-function saveStopNoteFromModal() {
+async function saveStopNoteFromModal() {
   if (editingStopIndex !== null && tourStops[editingStopIndex]) {
     const text = document.getElementById('noteModalInput').value.trim();
     tourStops[editingStopIndex].notes = text;
+    
+    const stopObj = tourStops[editingStopIndex];
+    if (stopObj.id) {
+      await supabaseClient.from('stops').update({ notes: text }).eq('id', stopObj.id);
+    }
     renderTourUI();
   }
   closeNoteModal();
@@ -822,9 +910,9 @@ async function handleModalReplaceCapture(event) {
   const stop = tourStops[editingStopIndex];
   
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     const img = new Image();
-    img.onload = () => {
+    img.onload = async () => {
       const canvas = document.getElementById('proofCanvas');
       const ctx = canvas.getContext('2d');
 
@@ -860,15 +948,33 @@ async function handleModalReplaceCapture(event) {
         ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
       });
 
-      canvas.toBlob((blob) => {
+      canvas.toBlob(async (blob) => {
+        let uploadedUrl = null;
+        if (currentSupabaseTourId) {
+          const filePath = `proofs_${currentSupabaseTourId}_stop_${editingStopIndex}_${Date.now()}.jpg`;
+          const { error: upErr } = await supabaseClient.storage.from('proofs').upload(filePath, blob, { contentType: 'image/jpeg' });
+          if (!upErr) {
+            const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
+            uploadedUrl = urlData.publicUrl;
+          }
+        }
+
         const localUrl = URL.createObjectURL(blob);
         stop.blob = blob;
-        stop.photo_url = localUrl;
+        stop.photo_url = uploadedUrl || localUrl;
         stop.done = true;
+
+        if (stop.id) {
+          await supabaseClient.from('stops').update({
+            status: 'erledigt',
+            photo_url: stop.photo_url,
+            completed_at: new Date().toISOString()
+          }).eq('id', stop.id);
+        }
 
         const imgPrevContainer = document.getElementById('modalStopPhotoPreviewContainer');
         const imgPrev = document.getElementById('modalStopPhotoImg');
-        imgPrev.src = localUrl;
+        imgPrev.src = stop.photo_url;
         imgPrevContainer.style.display = 'block';
 
         updateGalleryGrid();
@@ -951,20 +1057,57 @@ function confirmAndUploadProof() {
   document.getElementById('modalProofNoteInput').value = '';
 }
 
-function completeCurrentStop(localUrl, blob, noteText = '') {
+async function completeCurrentStop(localUrl, blob, noteText = '') {
   const current = tourStops[currentStopIndex];
   if (!current) return;
 
   current.done = true;
   if (noteText) current.notes = noteText;
   if (blob) current.blob = blob;
-  if (localUrl) current.photo_url = localUrl;
+
+  let uploadedUrl = localUrl;
+  if (blob && currentSupabaseTourId) {
+    const filePath = `proofs_${currentSupabaseTourId}_stop_${currentStopIndex}_${Date.now()}.jpg`;
+    const { error: upErr } = await supabaseClient.storage.from('proofs').upload(filePath, blob, { contentType: 'image/jpeg' });
+    if (!upErr) {
+      const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
+      uploadedUrl = urlData.publicUrl;
+    }
+  }
+  current.photo_url = uploadedUrl;
+
+  // SOFORTIGE DATENBANK-AKTUALISIERUNG (Echtzeit-Sicherung)
+  if (current.id) {
+    await supabaseClient.from('stops').update({
+      status: 'erledigt',
+      notes: current.notes || null,
+      photo_url: current.photo_url,
+      completed_at: new Date().toISOString()
+    }).eq('id', current.id);
+  } else if (currentSupabaseTourId) {
+    // Falls der Stopp manuell hinzugefügt wurde und noch keine ID hat
+    const { data: newStop } = await supabaseClient.from('stops').insert([{
+      tour_id: currentSupabaseTourId,
+      address: current.address,
+      sequence: currentStopIndex + 1,
+      status: 'erledigt',
+      notes: current.notes || null,
+      photo_url: current.photo_url,
+      completed_at: new Date().toISOString()
+    }]).select('*').single();
+    if (newStop) current.id = newStop.id;
+  }
 
   updateGalleryGrid();
 
   if (currentStopIndex < tourStops.length) {
     currentStopIndex++;
   }
+
+  if (currentSupabaseTourId) {
+    localStorage.setItem(`active_tour_index_${currentSupabaseTourId}`, currentStopIndex);
+  }
+
   renderTourUI();
 }
 
@@ -999,22 +1142,7 @@ async function finishAndSaveTour() {
   try {
     let tourId = currentSupabaseTourId;
 
-    if (!tourId) {
-      const { data: tourData, error: tErr } = await supabaseClient
-        .from('tours')
-        .insert([{
-          title: "Tour " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
-          assigned_to: currentUser.id,
-          status: 'beendet',
-          ended_at: new Date().toISOString(),
-          archived_by_driver: false
-        }])
-        .select('*')
-        .single();
-
-      if (tErr) throw tErr;
-      tourId = tourData.id;
-    } else {
+    if (tourId) {
       await supabaseClient
         .from('tours')
         .update({ 
@@ -1023,39 +1151,8 @@ async function finishAndSaveTour() {
           archived_by_driver: false
         })
         .eq('id', tourId);
-    }
 
-    for (let i = 0; i < tourStops.length; i++) {
-      const stop = tourStops[i];
-      let uploadedUrl = null;
-
-      if (stop.blob) {
-        const filePath = `proofs_${tourId}_stop_${i}_${Date.now()}.jpg`;
-        const { error: upErr } = await supabaseClient.storage.from('proofs').upload(filePath, stop.blob, { contentType: 'image/jpeg' });
-        if (!upErr) {
-          const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
-          uploadedUrl = urlData.publicUrl;
-        }
-      }
-
-      if (stop.id) {
-        await supabaseClient.from('stops').update({
-          status: stop.done ? 'erledigt' : 'offen',
-          notes: stop.notes || null,
-          photo_url: uploadedUrl || stop.photo_url,
-          completed_at: stop.done ? new Date().toISOString() : null
-        }).eq('id', stop.id);
-      } else {
-        await supabaseClient.from('stops').insert([{
-          tour_id: tourId,
-          address: stop.address,
-          sequence: i + 1,
-          status: stop.done ? 'erledigt' : 'offen',
-          notes: stop.notes || null,
-          photo_url: uploadedUrl,
-          completed_at: stop.done ? new Date().toISOString() : null
-        }]);
-      }
+      localStorage.removeItem(`active_tour_index_${tourId}`);
     }
 
     alert("Tour erfolgreich in Supabase gespeichert!");
@@ -1069,6 +1166,9 @@ async function finishAndSaveTour() {
 }
 
 function cancelAndReturn() {
+  if (currentSupabaseTourId) {
+    localStorage.removeItem(`active_tour_index_${currentSupabaseTourId}`);
+  }
   tourStops = [];
   currentSupabaseTourId = null;
   loadedChefStops = [];
@@ -1082,7 +1182,6 @@ async function loadTourHistory() {
   const container = document.getElementById('tourHistoryContainer');
   if (!container) return;
 
-  // Nur Touren laden, die der Fahrer NICHT archiviert hat (archived_by_driver = false)
   const { data: tours } = await supabaseClient
     .from('tours')
     .select('*, stops(*)')
@@ -1152,7 +1251,6 @@ async function archiveCurrentDetailTour() {
   if (!confirm("Möchtest du diese Tour aus deiner Ansicht entfernen? (Sie bleibt im Chef-Dashboard zur Auswertung erhalten).")) return;
 
   try {
-    // Nur das Flag setzen, für den Chef bleibt die Tour in der DB erhalten!
     const { error } = await supabaseClient
       .from('tours')
       .update({ archived_by_driver: true })
