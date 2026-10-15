@@ -20,6 +20,7 @@
   --surface-solid: #0f172a;
   --surface-hover: rgba(30, 41, 59, 0.95);
   --border: rgba(255, 255, 255, 0.08);
+  --accent-line: rgba(99, 102, 241, 0.35); /* Permanenter zarter Lilaton */
   --text-main: #f9fafb;
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
@@ -41,6 +42,7 @@
   --surface-solid: #ffffff;
   --surface-hover: #e8ecf4;
   --border: #cbd5e1;
+  --accent-line: rgba(99, 102, 241, 0.4);
   --text-main: #0f172a;
   --text-sub: #64748b;
   --text-muted: #94a3b8;
@@ -139,10 +141,10 @@ body {
   .dashboard-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* Modul-Kachel mit permanentem Rand und verstärktem Hover-Rand */
+/* Modul-Kachel mit permanentem lila Rand und verstärktem Hover-Effekt */
 .module-card {
   background: var(--surface);
-  border: 1px solid var(--border); /* Permanenter dünner Rand */
+  border: 1px solid var(--accent-line);
   border-radius: 20px;
   padding: 25px 20px;
   text-align: center;
@@ -161,7 +163,7 @@ body {
 
 .module-card:hover {
   transform: translateY(-6px);
-  border: 1.5px solid var(--accent); /* Etwas dicherer Rand beim Hover */
+  border: 1.5px solid var(--accent);
   background: var(--surface-hover);
   box-shadow: 0 30px 60px -12px var(--accent-glow);
 }
@@ -203,7 +205,7 @@ body {
   display: none;
   flex: 1;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-line);
   border-radius: 24px;
   padding: 30px;
   box-shadow: var(--shadow);
@@ -264,7 +266,7 @@ tr:last-child td { border-bottom: none; }
 
 .filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 
-/* BOTTOM FOOTER & TICKER */
+/* BOTTOM SECTION */
 .bottom-section {
   display: flex;
   justify-content: space-between;
@@ -277,7 +279,7 @@ tr:last-child td { border-bottom: none; }
 
 .live-ticker {
   display: flex; align-items: center; gap: 10px;
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--accent-line);
   padding: 6px 14px; border-radius: 20px; font-size: 11px; color: var(--text-sub);
   box-shadow: var(--shadow); backdrop-filter: blur(12px);
 }
@@ -295,7 +297,7 @@ tr:last-child td { border-bottom: none; }
   position: fixed; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(10px);
   display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
 }
-.modal-window { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 500px; overflow: hidden; padding: 24px; box-shadow: var(--shadow); }
+.modal-window { background: var(--surface-solid); border: 1px solid var(--accent-line); border-radius: 20px; width: 100%; max-width: 500px; overflow: hidden; padding: 24px; box-shadow: var(--shadow); }
 </style>
 </head>
 <body>
@@ -352,7 +354,7 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- HAUPT-GRID (Kacheln mit permanentem Rand & Hover-Effekt) -->
+  <!-- HAUPT-GRID -->
   <div class="dashboard-grid" id="mainDashboardGrid">
     <div class="module-card" onclick="openModule('pane-live')">
       <div class="module-svg-container"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
@@ -420,7 +422,7 @@ tr:last-child td { border-bottom: none; }
 
     <div id="pane-planer" class="tab-pane">
       <div class="card-header" style="margin-bottom:12px;">Tour erstellen & Zuweisen</div>
-      <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
+      <div style="background:var(--input-bg); border: 2px dashed var(--accent-line); border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
         <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
         <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
           <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
@@ -496,7 +498,7 @@ tr:last-child td { border-bottom: none; }
             <label>Telefon</label><input type="text" id="compPhone">
             <label>Steuernummer / USt-IdNr.</label><input type="text" id="compTax">
             <label>Firmenlogo</label>
-            <div style="border: 2px dashed var(--border); border-radius:10px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
+            <div style="border: 2px dashed var(--accent-line); border-radius:10px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
               <div style="font-size:11px; font-weight:600;">Logo auswählen</div>
               <img id="compLogoPreview" style="max-width:120px; max-height:40px; object-fit:contain; margin-top:4px; display:none;" alt="Logo">
             </div>
@@ -594,7 +596,7 @@ function closeModuleView() {
 
 function renderMockData() {
   document.getElementById('liveToursContainer').innerHTML = `
-    <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:12px; padding:14px;">
+    <div style="border:1px solid var(--accent-line); background:var(--input-bg); border-radius:12px; padding:14px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <strong>Vorschau Fahrer</strong> <span style="font-size:11px; color:var(--text-sub);">(Demo Tour)</span>
         <span class="status-chip done">Aktiv</span>
@@ -830,7 +832,7 @@ function renderTours(tours) {
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     const driverName = t.profiles?.full_name || t.profiles?.email?.split('@')[0] || 'Fahrer';
     return `
-      <div style="border:1px solid var(--border); background:var(--input-bg); border-radius:12px; padding:14px; margin-bottom:10px;">
+      <div style="border:1px solid var(--accent-line); background:var(--input-bg); border-radius:12px; padding:14px; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong>${driverName}</strong> <span style="font-size:11px; color:var(--text-sub);">(${t.title})</span>
           <span class="status-chip done">${t.status}</span>
