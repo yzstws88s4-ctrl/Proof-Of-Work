@@ -125,7 +125,7 @@ body {
 .kpi-value { font-size: 20px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
 .kpi-icon { color: var(--accent); opacity: 0.8; }
 
-/* MITTLERES GRID (Die wunderbaren Kacheln mit Abstand) */
+/* MITTLERES GRID */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -139,10 +139,10 @@ body {
   .dashboard-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* Modul-Kachel im Original-Look */
+/* Modul-Kachel mit permanentem Rand und verstärktem Hover-Rand */
 .module-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border); /* Permanenter dünner Rand */
   border-radius: 20px;
   padding: 25px 20px;
   text-align: center;
@@ -161,7 +161,7 @@ body {
 
 .module-card:hover {
   transform: translateY(-6px);
-  border-color: var(--accent);
+  border: 1.5px solid var(--accent); /* Etwas dicherer Rand beim Hover */
   background: var(--surface-hover);
   box-shadow: 0 30px 60px -12px var(--accent-glow);
 }
@@ -198,7 +198,7 @@ body {
   max-width: 200px;
 }
 
-/* Vollbild-Inhaltsbereich (nach Klick auf eine Kachel) */
+/* Vollbild-Inhaltsbereich (nach Klick) */
 .fullscreen-content-section {
   display: none;
   flex: 1;
@@ -352,7 +352,7 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- HAUPT-GRID (Die wunderschönen 5 Kacheln) -->
+  <!-- HAUPT-GRID (Kacheln mit permanentem Rand & Hover-Effekt) -->
   <div class="dashboard-grid" id="mainDashboardGrid">
     <div class="module-card" onclick="openModule('pane-live')">
       <div class="module-svg-container"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
