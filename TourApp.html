@@ -1253,7 +1253,7 @@ async function handleOcrImage(event) {
 
     rawLines.forEach(line => {
       const lower = line.toLowerCase();
-      // Ignoriere Kopfzeilen, Datum oder UI-Müll
+      // Ignoriere jeglichen Tabellenkopf und UI-Schrott
       if (lower.includes('tour') || lower.includes('ort') || lower.includes('adresse') || 
           lower.includes('name') || lower.includes('ziehen') || lower.includes('morgengold') ||
           lower.includes('freitag') || lower.includes('samstag') || lower.includes('sonntag') ||
@@ -1264,33 +1264,20 @@ async function handleOcrImage(event) {
       // Suche nach einer 5-stelligen PLZ
       const plzMatch = line.match(/\b(5\d{4})\b/);
       if (plzMatch) {
+        // Wir extrahieren alles ab der PLZ
         let sub = line.substring(line.indexOf(plzMatch[1])).trim();
         
-        // 1. Wenn ein Komma existiert (z.B. "Wloch, Fabian"), schneiden wir hier rigoros ab.
-        const commaIdx = sub.indexOf(',');
-        if (commaIdx > -1) {
-          sub = sub.substring(0, commaIdx).trim();
-        } else {
-          // 2. Falls kein Komma da ist, finden wir die Hausnummer (Zahl am Ende der Straße) 
-          // und schneiden alles, was danach kommt (den Nachnamen), kompromisslos ab.
-          // Wir suchen nach Mustern wie "8", "69a", "83a", "10a"
-          const tokens = sub.split(/\s+/);
-          let houseNumIndex = -1;
-          
-          for (let i = 2; i < tokens.length; i++) {
-            // Prüft, ob ein Token eine Hausnummer ist (Zahl am Ende oder Zahl gefolgt von Buchstabe)
-            if (/^\d+[a-zA-Z]?$/.test(tokens[i])) {
-              houseNumIndex = i;
-            }
-          }
-
-          if (houseNumIndex !== -1) {
-            // Wir behalten alles von Anfang bis zur Hausnummer
-            sub = tokens.slice(0, houseNumIndex + 1).join(' ');
-          }
+        // Da die Struktur "PLZ Ort Strasse Hausnr Name" ist, suchen wir die letzte echte Hausnummer (Zahl oder Zahl+Buchstabe).
+        // Alles was NACH der Hausnummer kommt (Nachname, Kommas) wird rigoros abgeschnitten!
+        const matches = [...sub.matchAll(/\b(\d+[a-zA-Z]?)\b/g)];
+        if (matches.length > 0) {
+          // Die letzte gefundene Zahl in der Zeile ist in 99% der Fälle die Hausnummer
+          const lastMatch = matches[matches.length - 1];
+          const cutIndex = lastMatch.index + lastMatch[0].length;
+          sub = sub.substring(0, cutIndex).trim();
         }
 
-        // Abschließende Validierung: Muss die PLZ und mindestens eine Hausnummer/Zahl enthalten
+        // Validiere, dass eine gültige Adresse vorliegt (PLZ + Inhalt + Hausnummer)
         if (sub.length > 8 && /\d/.test(sub)) {
           extractedAddresses.push(sub);
         }
@@ -1305,7 +1292,7 @@ async function handleOcrImage(event) {
       const existing = document.getElementById('addressInput').value;
       const newText = uniqueAddresses.join('\n');
       document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-      showModal("Erfolg", `${uniqueAddresses.length} Adressen (PLZ + Ort + Straße + Hausnummer) erfolgreich extrahiert!`);
+      showModal("Erfolg", `${uniqueAddresses.length} Adressen (nur PLZ, Ort, Strasse & Hausnr) extrahiert!`);
     } else {
       alert("Keine passenden Adressen mit PLZ im Bild gefunden.");
     }
