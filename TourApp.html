@@ -25,7 +25,7 @@
 <style>
 :root {
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* Wirklich gedämpfter, matter Light Mode (Augenschonend im Halbdunkeln) */
+  /* Gedämpfter, matter Light Mode */
   --bg: #e2e8f0;
   --surface: #f1f5f9;
   --text: #0f172a;
@@ -49,31 +49,40 @@ html[data-theme="dark"] {
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--bg);
   color: var(--text);
-  margin: 0;
   padding: 16px 12px;
   display: flex;
   justify-content: center;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.container { width: 100%; max-width: 480px; padding-bottom: 40px; }
+.container { 
+  width: 100%; 
+  max-width: 480px; 
+  min-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+}
 
-/* Super cleaner Header ohne klobigen Kasten */
+/* Header mit größerer Begrüßung und mehr Abstand nach unten */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 22px;
-  padding: 0 2px;
+  margin-bottom: 28px;
+  padding: 4px 2px;
 }
 
-.user-greeting-box { display: flex; flex-direction: column; gap: 2px; }
-.driver-welcome { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
-.driver-subtitle { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.user-greeting-box { display: flex; flex-direction: column; }
+.driver-welcome { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
 
 .header-actions { display: flex; gap: 8px; }
 
@@ -81,7 +90,7 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
-  height: 36px;
+  height: 38px;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -92,13 +101,21 @@ body {
   font-weight: 600;
 }
 
-.theme-toggle-btn { width: 36px; padding: 0; }
+.theme-toggle-btn { width: 38px; padding: 0; }
 .theme-toggle-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
 .app-view-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  flex: 1;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.main-inputs-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .section-label {
@@ -193,7 +210,7 @@ textarea, input[type="text"] {
 }
 
 textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--text-muted); }
-textarea { height: 95px; resize: vertical; }
+textarea { height: 90px; resize: vertical; }
 
 select {
   width: 100%;
@@ -245,7 +262,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 .gps-status { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 
 .stop-list {
-  max-height: 220px;
+  max-height: 200px;
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -300,10 +317,19 @@ input:checked + .slider:before { transform: translateX(18px); }
   border: 1px solid var(--border);
   background: var(--surface);
   border-radius: 12px;
-  padding: 12px;
+  padding: 10px 12px;
   cursor: pointer;
 }
 .history-card:hover { border-color: var(--text-muted); }
+
+/* Begrenzter Bereich für vergangene Touren, damit es nicht vom Bildschirm verschwindet */
+.tour-history-scroll-box {
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
 .icon-svg {
   width: 18px;
@@ -324,7 +350,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   <div class="header">
     <div class="user-greeting-box">
       <span class="driver-welcome" id="driverWelcomeDisplay">Hallo Bj</span>
-      <span class="driver-subtitle">Morgengold Tour</span>
     </div>
     <div class="header-actions">
       <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
@@ -335,98 +360,104 @@ input:checked + .slider:before { transform: translateX(18px); }
   </div>
 
   <div class="app-view-container" id="setup-view">
-    <div class="section-label">Tour starten</div>
-    
-    <div class="btn-grid">
-      <button onclick="document.getElementById('ocrCameraInput').click()">
-        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        Kamera (OCR)
-      </button>
-      <button onclick="document.getElementById('galleryInput').click()">
-        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        Aus Galerie
-      </button>
-    </div>
-
-    <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
-    <input type="file" id="galleryInput" accept="image/*" style="display: none;" onchange="handleOcrImage(event)">
-
-    <textarea id="addressInput" placeholder="Adressen zeilenweise einfügen..."></textarea>
-
-    <div class="toggle-box">
-      <div>
-        <strong style="font-size: 12px; display: block;">Fotobeweis-Pflicht</strong>
-        <span style="font-size: 10px; color: var(--text-muted);">Foto vor Abschluss erforderlich</span>
+    <div class="main-inputs-group">
+      <div class="section-label">Tour starten</div>
+      
+      <div class="btn-grid">
+        <button onclick="document.getElementById('ocrCameraInput').click()">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Kamera (OCR)
+        </button>
+        <button onclick="document.getElementById('galleryInput').click()">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Aus Galerie
+        </button>
       </div>
-      <label class="switch">
-        <input type="checkbox" id="photoProofToggle" checked>
-        <span class="slider"></span>
-      </label>
+
+      <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
+      <input type="file" id="galleryInput" accept="image/*" style="display: none;" onchange="handleOcrImage(event)">
+
+      <textarea id="addressInput" placeholder="Adressen zeilenweise einfügen..."></textarea>
+
+      <div class="toggle-box">
+        <div>
+          <strong style="font-size: 12px; display: block;">Fotobeweis-Pflicht</strong>
+          <span style="font-size: 10px; color: var(--text-muted);">Foto vor Abschluss erforderlich</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="photoProofToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <select id="mapAppSelect">
+        <option value="google">Google Maps</option>
+        <option value="apple">Apple Maps</option>
+      </select>
+
+      <button onclick="loadSupabaseTour()">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Live-Tour vom Chef laden
+      </button>
+      <button class="btn-success" onclick="startManualTour()" style="font-weight: 700; padding: 15px; margin-top: 2px;">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        TOUR JETZT STARTEN
+      </button>
     </div>
 
-    <select id="mapAppSelect">
-      <option value="google">Google Maps</option>
-      <option value="apple">Apple Maps</option>
-    </select>
-
-    <button onclick="loadSupabaseTour()">
-      <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-      Live-Tour vom Chef laden
-    </button>
-    <button class="btn-success" onclick="startManualTour()" style="font-weight: 700; padding: 15px; margin-top: 2px;">
-      <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      TOUR JETZT STARTEN
-    </button>
-
-    <div style="margin-top: 12px;">
+    <div style="margin-top: 10px;">
       <div class="section-label">Vergangene Touren</div>
-      <div id="tourHistoryContainer" style="display: flex; flex-direction: column; gap: 8px;">
-        <p style="color: var(--text-muted); font-size: 12px; margin-left: 2px;">Lade Archiv...</p>
+      <div class="tour-history-scroll-box" id="tourHistoryContainer">
+        <p style="color: var(--text-muted); font-size: 12px; margin-left: 2px; margin-top: 0;">Lade Archiv...</p>
       </div>
     </div>
   </div>
 
   <div class="app-view-container" id="tour-view">
-    <div class="current-destination">
-      <div class="dest-label" id="stopCounter">Stopp 1 von 16</div>
-      <div class="dest-text" id="currentStopText">Lade Stopps...</div>
-      <div class="gps-status" id="gpsStatusText">GPS aktiv</div>
+    <div class="main-inputs-group">
+      <div class="current-destination">
+        <div class="dest-label" id="stopCounter">Stopp 1 von 16</div>
+        <div class="dest-text" id="currentStopText">Lade Stopps...</div>
+        <div class="gps-status" id="gpsStatusText">GPS aktiv</div>
+      </div>
+
+      <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
+        <svg class="icon-svg" style="width:22px; height:22px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        JETZT NAVIGIEREN
+      </a>
+
+      <button class="btn-success btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        STOPP ERLEDIGT ✓
+      </button>
+
+      <button id="prevStopBtn" onclick="previousStop()" style="padding: 11px; font-size: 12px;">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Vorherigen Stopp zurückholen
+      </button>
+
+      <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
+      <input type="file" id="modalReplaceCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleModalReplaceCapture(event)">
+
+      <div style="margin-top: 4px;">
+        <div class="section-label">Stopps (Tippen für Notiz / Foto)</div>
+        <div class="stop-list" id="stopListContainer"></div>
+      </div>
+
+      <div style="margin-top: 4px;">
+        <div class="section-label">Fotobeweise (<span id="photoCount">0</span>)</div>
+        <div class="proof-gallery-container" id="galleryGrid"></div>
+      </div>
     </div>
 
-    <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
-      <svg class="icon-svg" style="width:22px; height:22px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-      JETZT NAVIGIEREN
-    </a>
-
-    <button class="btn-success btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
-      <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      STOPP ERLEDIGT ✓
-    </button>
-
-    <button id="prevStopBtn" onclick="previousStop()" style="padding: 11px; font-size: 12px;">
-      <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      Vorherigen Stopp zurückholen
-    </button>
-
-    <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
-    <input type="file" id="modalReplaceCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleModalReplaceCapture(event)">
-
-    <div style="margin-top: 4px;">
-      <div class="section-label">Stopps (Tippen für Notiz / Foto)</div>
-      <div class="stop-list" id="stopListContainer"></div>
+    <div>
+      <button class="btn-success" style="padding: 13px; margin-bottom: 8px;" id="finishTourBtn" onclick="finishAndSaveTour()">
+        Tour beenden & Speichern
+      </button>
+      <button onclick="cancelAndReturn()" style="padding: 11px;">
+        Abbrechen
+      </button>
     </div>
-
-    <div style="margin-top: 4px;">
-      <div class="section-label">Fotobeweise (<span id="photoCount">0</span>)</div>
-      <div class="proof-gallery-container" id="galleryGrid"></div>
-    </div>
-
-    <button class="btn-success" style="margin-top: 8px; padding: 13px;" id="finishTourBtn" onclick="finishAndSaveTour()">
-      Tour beenden & Speichern
-    </button>
-    <button onclick="cancelAndReturn()" style="padding: 11px;">
-      Abbrechen
-    </button>
   </div>
 </div>
 
@@ -1126,7 +1157,7 @@ async function loadTourHistory() {
     .order('created_at', { ascending: false });
 
   if (!tours || tours.length === 0) {
-    container.innerHTML = '<p style="color: var(--text-muted); font-size: 12px; margin-left: 2px;">Keine Archiv-Touren.</p>';
+    container.innerHTML = '<p style="color: var(--text-muted); font-size: 12px; margin-left: 2px; margin-top: 0;">Keine Archiv-Touren.</p>';
     return;
   }
 
