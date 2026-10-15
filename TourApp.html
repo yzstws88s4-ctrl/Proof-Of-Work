@@ -70,19 +70,19 @@ body {
   min-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* Verteilt den Platz perfekt auf dem Bildschirm */
 }
 
-/* Header mit größerer Begrüßung und mehr Abstand nach unten */
+/* Header */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 28px;
   padding: 4px 2px;
 }
 
 .user-greeting-box { display: flex; flex-direction: column; }
-.driver-welcome { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
+.driver-welcome { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
 
 .header-actions { display: flex; gap: 8px; }
 
@@ -108,14 +108,14 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: space-evenly; /* Teilt den Platz zwischen den Blöcken gleichmäßig auf */
+  margin: 12px 0;
 }
 
 .main-inputs-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .section-label {
@@ -210,7 +210,7 @@ textarea, input[type="text"] {
 }
 
 textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--text-muted); }
-textarea { height: 90px; resize: vertical; }
+textarea { height: 100px; resize: vertical; }
 
 select {
   width: 100%;
@@ -322,7 +322,6 @@ input:checked + .slider:before { transform: translateX(18px); }
 }
 .history-card:hover { border-color: var(--text-muted); }
 
-/* Begrenzter Bereich für vergangene Touren, damit es nicht vom Bildschirm verschwindet */
 .tour-history-scroll-box {
   max-height: 120px;
   overflow-y: auto;
@@ -399,13 +398,13 @@ input:checked + .slider:before { transform: translateX(18px); }
         <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         Live-Tour vom Chef laden
       </button>
-      <button class="btn-success" onclick="startManualTour()" style="font-weight: 700; padding: 15px; margin-top: 2px;">
+      <button class="btn-success" onclick="startManualTour()" style="font-weight: 700; padding: 15px;">
         <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         TOUR JETZT STARTEN
       </button>
     </div>
 
-    <div style="margin-top: 10px;">
+    <div>
       <div class="section-label">Vergangene Touren</div>
       <div class="tour-history-scroll-box" id="tourHistoryContainer">
         <p style="color: var(--text-muted); font-size: 12px; margin-left: 2px; margin-top: 0;">Lade Archiv...</p>
@@ -413,7 +412,7 @@ input:checked + .slider:before { transform: translateX(18px); }
     </div>
   </div>
 
-  <div class="app-view-container" id="tour-view">
+  <div class="app-view-container" id="tour-view" style="display:none;">
     <div class="main-inputs-group">
       <div class="current-destination">
         <div class="dest-label" id="stopCounter">Stopp 1 von 16</div>
