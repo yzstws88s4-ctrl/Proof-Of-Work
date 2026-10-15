@@ -95,7 +95,6 @@ body {
 .theme-toggle-btn { width: 38px; padding: 0; }
 .theme-toggle-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-/* MODERNES, ELEGANTES DESIGN OHNE AUSSEN-KASTEN */
 .app-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -579,11 +578,12 @@ window.onload = async () => {
 
 async function restoreActiveTourSession() {
   try {
+    // NUR NOCH NACH TTOUREN SUCHEN, DIE TATSÄCHLICH AKTIV SIND!
     const { data: tours } = await supabaseClient
       .from('tours')
       .select('*, stops(*)')
       .eq('assigned_to', currentUser.id)
-      .in('status', ['geplant', 'aktiv'])
+      .eq('status', 'aktiv')
       .order('created_at', { ascending: false })
       .limit(1);
 
@@ -604,12 +604,15 @@ async function restoreActiveTourSession() {
         }));
 
         const firstOpenIdx = tourStops.findIndex(s => !s.done);
-        if (firstOpenIdx !== -1) {
-          currentStopIndex = firstOpenIdx;
-        } else {
-          currentStopIndex = tourStops.length;
+        
+        // WENN ALLE STOPPS BEREITS ERLEDIGT SIND -> NICHT WIEDERHERSTELLEN, SONDERN AUF STARTSEITE BLEIBEN
+        if (firstOpenIdx === -1) {
+          localStorage.removeItem(`active_tour_index_${activeTour.id}`);
+          currentSupabaseTourId = null;
+          return;
         }
 
+        currentStopIndex = firstOpenIdx;
         localStorage.setItem(`active_tour_index_${activeTour.id}`, currentStopIndex);
 
         updateGalleryGrid();
