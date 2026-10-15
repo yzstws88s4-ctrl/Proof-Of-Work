@@ -578,7 +578,12 @@ window.onload = async () => {
 
 async function restoreActiveTourSession() {
   try {
-    // NUR NOCH NACH TTOUREN SUCHEN, DIE TATSÄCHLICH AKTIV SIND!
+    // WENN DER USER DIE TOUR GERADE ERST BEENDET HAT -> NICHT LADEN!
+    if (localStorage.getItem('veribase_force_home') === 'true') {
+      localStorage.removeItem('veribase_force_home');
+      return;
+    }
+
     const { data: tours } = await supabaseClient
       .from('tours')
       .select('*, stops(*)')
@@ -605,7 +610,7 @@ async function restoreActiveTourSession() {
 
         const firstOpenIdx = tourStops.findIndex(s => !s.done);
         
-        // WENN ALLE STOPPS BEREITS ERLEDIGT SIND -> NICHT WIEDERHERSTELLEN, SONDERN AUF STARTSEITE BLEIBEN
+        // WENN ALLE STOPPS ERLEDIGT SIND -> AUF STARTSEITE BLEIBEN
         if (firstOpenIdx === -1) {
           localStorage.removeItem(`active_tour_index_${activeTour.id}`);
           currentSupabaseTourId = null;
@@ -1110,6 +1115,7 @@ async function finishAndSaveTour() {
     let tourId = currentSupabaseTourId;
 
     if (tourId) {
+      // Status in Supabase auf 'beendet' setzen
       await supabaseClient
         .from('tours')
         .update({ 
@@ -1121,6 +1127,9 @@ async function finishAndSaveTour() {
 
       localStorage.removeItem(`active_tour_index_${tourId}`);
     }
+
+    // SICHERSTELLUNG: Beim Neuladen NICHT wieder automatisch reinspringen!
+    localStorage.setItem('veribase_force_home', 'true');
 
     alert("Tour erfolgreich gespeichert!");
     cancelAndReturn();
@@ -1136,6 +1145,9 @@ function cancelAndReturn() {
   if (currentSupabaseTourId) {
     localStorage.removeItem(`active_tour_index_${currentSupabaseTourId}`);
   }
+  // Auch hier das Flag setzen, damit man beim Abbrechen ebenfalls auf der Startseite landet
+  localStorage.setItem('veribase_force_home', 'true');
+
   tourStops = [];
   currentSupabaseTourId = null;
   loadedChefStops = [];
