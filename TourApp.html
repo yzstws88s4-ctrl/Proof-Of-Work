@@ -174,6 +174,17 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   box-shadow: 0 4px 16px var(--accent-glow);
 }
 
+/* Spezieller Stil für den Stopp-Erledigt-Button (Clean / Kontrast zu Lila) */
+.btn-complete-action {
+  min-height: 52px;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--surface-solid);
+  color: var(--text);
+  border: 1.5px solid var(--accent);
+  box-shadow: var(--shadow);
+}
+
 .btn-danger {
   background: rgba(239, 68, 68, 0.12);
   color: #ef4444;
@@ -192,12 +203,6 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   color: #ffffff;
   border: none;
   box-shadow: 0 4px 16px var(--accent-glow);
-}
-
-.btn-complete-action {
-  min-height: 52px;
-  font-size: 14px;
-  font-weight: 700;
 }
 
 textarea, input[type="text"] {
@@ -438,8 +443,8 @@ input:checked + .slider:before { transform: translateX(18px); }
         JETZT NAVIGIEREN
       </a>
 
-      <button class="btn-success btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
-        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      <!-- Button angepasst: Kein Häkchen links, sondern sauber zentriert im helleren/weißen Look -->
+      <button class="btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
         STOPP ERLEDIGT ✓
       </button>
 
@@ -578,13 +583,13 @@ window.onload = async () => {
 
   initGPS();
   await loadTourHistory();
-  await restoreActiveTourSession(); // Intelligente Wiederherstellung
+  await restoreActiveTourSession();
 };
 
 async function restoreActiveTourSession() {
   try {
     const activeTourId = localStorage.getItem('veribase_active_tour_id');
-    if (!activeTourId) return; // Wenn keine Tour aktiv war, auf Setup-View bleiben!
+    if (!activeTourId) return;
 
     const { data: tour } = await supabaseClient
       .from('tours')
@@ -718,7 +723,6 @@ async function startManualTour() {
 
   currentStopIndex = 0;
   
-  // Aktive Tour im localStorage merken
   localStorage.setItem('veribase_active_tour_id', currentSupabaseTourId);
   localStorage.setItem(`veribase_stop_index_${currentSupabaseTourId}`, currentStopIndex);
 
@@ -1120,7 +1124,6 @@ async function finishAndSaveTour() {
         })
         .eq('id', tourId);
 
-      // Session sauber löschen, damit man wieder auf dem Startbildschirm landet
       localStorage.removeItem('veribase_active_tour_id');
       localStorage.removeItem(`veribase_stop_index_${tourId}`);
     }
