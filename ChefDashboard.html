@@ -16,11 +16,11 @@
 :root {
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #030712;
-  --surface: rgba(17, 24, 39, 0.4);
+  --surface: rgba(17, 24, 39, 0.5);
   --surface-solid: #0f172a;
   --surface-hover: rgba(99, 102, 241, 0.08);
   --border: rgba(255, 255, 255, 0.08);
-  --accent-line: rgba(99, 102, 241, 0.4);
+  --accent-line: rgba(99, 102, 241, 0.35);
   --text-main: #f9fafb;
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
@@ -38,7 +38,7 @@
 
 [data-theme="light"] {
   --bg: #e2e8f0;
-  --surface: rgba(255, 255, 255, 0.3);
+  --surface: rgba(255, 255, 255, 0.4);
   --surface-solid: #ffffff;
   --surface-hover: rgba(99, 102, 241, 0.06);
   --border: #cbd5e1;
@@ -74,45 +74,73 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 16px;
 }
 
-/* Header (oben) */
+/* 1. TOP HEADER & METRIKEN */
+.top-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
 .top-utility-bar {
   display: flex; justify-content: space-between; align-items: center;
-  width: 100%; flex-shrink: 0;
-  padding: 4px 0 12px 0;
-  border-bottom: 1px solid var(--border);
+  width: 100%;
 }
 
 .brand-title {
-  font-size: 14px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 15px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--text-sub); display: flex; align-items: center; gap: 10px;
 }
-.brand-title img { height: 24px; object-fit: contain; }
+.brand-title img { height: 26px; object-fit: contain; }
 
 .utility-pill {
   background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
-  padding: 6px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px;
   font-size: 11px; font-weight: 600; box-shadow: var(--shadow); backdrop-filter: blur(12px);
   transition: all 0.2s ease;
 }
 .utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-/* Der zentrale Bereich (~80% Höhe für die Spalten) */
+/* Quick Metrics Row */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+}
+
+.kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); letter-spacing: 0.05em; }
+.kpi-value { font-size: 18px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
+.kpi-icon { color: var(--accent); opacity: 0.8; }
+
+/* 2. MAIN CENTER VIEWPORT (Reduzierte Spaltenhöhe) */
 .center-viewport {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin: 14px 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
+  min-height: 0; /* Verhindert Überlauf */
 }
 
-/* Nahtloses 5-Spalten Grid */
+/* 5 Nahtlose Spalten */
 .full-dashboard-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -124,7 +152,7 @@ body {
 .column-card {
   background: transparent;
   border-right: 1px solid var(--accent-line);
-  padding: 30px 20px;
+  padding: 20px 16px;
   text-align: center;
   cursor: pointer;
   display: flex;
@@ -146,10 +174,10 @@ body {
 }
 
 .column-svg {
-  width: 56px; height: 56px;
+  width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center;
   color: var(--accent);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   transition: transform 0.3s ease;
 }
 .column-card:hover .column-svg { transform: scale(1.12); }
@@ -159,28 +187,28 @@ body {
 }
 
 .column-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   color: var(--text-main);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   transition: color 0.2s;
 }
 
 .column-desc {
   font-size: 11px;
   color: var(--text-sub);
-  line-height: 1.4;
+  line-height: 1.35;
   font-weight: 500;
-  max-width: 200px;
+  max-width: 190px;
 }
 
-/* Vollbild-Inhaltsbereich (nach Klick auf eine Spalte) */
+/* Vollbild-Inhaltsbereich (nach Modul-Klick) */
 .fullscreen-content-section {
   display: none;
   flex: 1;
-  padding: 30px;
+  padding: 28px;
   overflow-y: auto;
   height: 100%;
 }
@@ -221,11 +249,11 @@ button.btn-main:hover { opacity: 0.92; }
 
 .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--input-bg); }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-th, td { padding: 14px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-th { background: var(--surface-solid); color: var(--text-sub); font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+th, td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th { background: var(--surface-solid); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
 tr:last-child td { border-bottom: none; }
 
-.status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
 .status-chip.done { background: var(--success-bg); color: var(--success); }
 .status-chip.open { background: var(--warning-bg); color: var(--warning); }
 
@@ -237,17 +265,29 @@ tr:last-child td { border-bottom: none; }
 
 .filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 
-/* Footer (unten) */
-.footer-bar {
-  display: flex; justify-content: space-between; align-items: center;
-  width: 100%; flex-shrink: 0;
-  padding: 8px 4px 2px 4px;
+/* 3. BOTTOM LIVE-TICKER & FOOTER */
+.bottom-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 4px 6px;
   font-size: 11px;
   color: var(--text-muted);
-  border-top: 1px solid var(--border);
 }
 
-.footer-links { display: flex; gap: 20px; }
+.live-ticker {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 6px 14px; border-radius: 20px; font-size: 11px; color: var(--text-sub);
+}
+
+.ticker-pulse {
+  width: 7px; height: 7px; background: var(--success); border-radius: 50%;
+  box-shadow: 0 0 8px var(--success);
+}
+
+.footer-links { display: flex; gap: 18px; }
 .footer-links a { color: var(--text-sub); text-decoration: none; transition: color 0.2s; }
 .footer-links a:hover { color: var(--accent); }
 
@@ -262,26 +302,59 @@ tr:last-child td { border-bottom: none; }
 
 <div class="app-container">
 
-  <!-- TOP HEADER (Firma & Quick Actions) -->
-  <div class="top-utility-bar">
-    <div style="display:flex; align-items:center; gap:16px;">
-      <button class="utility-pill" id="backToGridBtn" onclick="closeModuleView()" style="display:none; background:var(--accent); color:#fff; border:none;">
-        ← Zurück zur Übersicht
-      </button>
-      <div class="brand-title">
-        <img src="logo1.png" alt="Logo" onerror="this.style.display='none'"> Veribase Command Center
+  <!-- 1. TOP SECTION (Header + Quick KPIs) -->
+  <div class="top-section">
+    <div class="top-utility-bar">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <button class="utility-pill" id="backToGridBtn" onclick="closeModuleView()" style="display:none; background:var(--accent); color:#fff; border:none;">
+          ← Zurück zur Übersicht
+        </button>
+        <div class="brand-title">
+          <img src="logo1.png" alt="Logo" onerror="this.style.display='none'"> Veribase Command Center
+        </div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="utility-pill" onclick="toggleTheme()">Design wechseln</button>
+        <button class="utility-pill" onclick="logout()" style="color: var(--danger); border-color: rgba(239,68,68,0.2);">Abmelden</button>
       </div>
     </div>
-    <div style="display:flex; gap:10px;">
-      <button class="utility-pill" onclick="toggleTheme()">Design wechseln</button>
-      <button class="utility-pill" onclick="logout()" style="color: var(--danger); border-color: rgba(239,68,68,0.2);">Abmelden</button>
+
+    <!-- Live Quick KPIs -->
+    <div class="kpi-row" id="kpiOverviewRow">
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Aktive Fahrer</div>
+          <div class="kpi-value" id="kpiActiveDrivers">0</div>
+        </div>
+        <div class="kpi-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      </div>
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Geplante Touren</div>
+          <div class="kpi-value" id="kpiTotalTours">0</div>
+        </div>
+        <div class="kpi-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg></div>
+      </div>
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Abschlussquote</div>
+          <div class="kpi-value" id="kpiCompletionRate">0%</div>
+        </div>
+        <div class="kpi-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+      </div>
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Fotobeweise Heute</div>
+          <div class="kpi-value" id="kpiProofsToday">0</div>
+        </div>
+        <div class="kpi-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      </div>
     </div>
   </div>
 
-  <!-- ZENTRALER BEREICH (ca. 80% Höhe für Kacheln / Inhalt) -->
+  <!-- 2. CENTER VIEWPORT (5 Spalten mit reduzierter Höhe) -->
   <div class="center-viewport">
     
-    <!-- 5 NAHTLOSE SPALTEN (Startansicht) -->
     <div class="full-dashboard-grid" id="mainDashboardGrid">
       <div class="column-card" onclick="openModule('pane-live')">
         <div class="column-svg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
@@ -314,7 +387,7 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
-    <!-- INHALTSBEREICH (Wird bei Klick geladen) -->
+    <!-- INHALTSBEREICH (Modul Vollbild) -->
     <div class="fullscreen-content-section" id="moduleContentArea">
       <div id="pane-live" class="tab-pane">
         <div class="card-header">
@@ -440,12 +513,17 @@ tr:last-child td { border-bottom: none; }
 
   </div>
 
-  <!-- FOOTER (unten) -->
-  <div class="footer-bar">
-    <div>&copy; 2026 Veribase Operations</div>
+  <!-- 3. BOTTOM SECTION (Live Ticker + Footer Links) -->
+  <div class="bottom-section">
+    <div class="live-ticker">
+      <div class="ticker-pulse"></div>
+      <span id="tickerStatusText">System bereit. Veribase Realtime aktiv.</span>
+    </div>
+
     <div class="footer-links">
+      <a href="#" onclick="alert('Veribase Command Center v2.5')">Version 2.5</a>
       <a href="#" onclick="alert('Impressum: Veribase GbR')">Impressum</a>
-      <a href="#" onclick="alert('Datenschutz: Alle Daten werden sicher über Supabase verarbeitet.')">Datenschutz</a>
+      <a href="#" onclick="alert('Datenschutz: Supabase Verschlüsselung aktiv.')">Datenschutz</a>
     </div>
   </div>
 
@@ -505,6 +583,7 @@ function openModule(paneId) {
   document.getElementById('mainDashboardGrid').style.display = 'none';
   document.getElementById('moduleContentArea').style.display = 'block';
   document.getElementById('backToGridBtn').style.display = 'flex';
+  document.getElementById('kpiOverviewRow').style.display = 'none'; /* Versteckt KPIs im Vollbild für mehr Platz */
 
   document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
   document.getElementById(paneId).classList.add('active');
@@ -513,6 +592,7 @@ function openModule(paneId) {
 function closeModuleView() {
   document.getElementById('moduleContentArea').style.display = 'none';
   document.getElementById('backToGridBtn').style.display = 'none';
+  document.getElementById('kpiOverviewRow').style.display = 'grid';
   document.getElementById('mainDashboardGrid').style.display = 'grid';
 }
 
@@ -607,6 +687,7 @@ function getCompanyProfile() {
 async function loadDriversFromSupabase() {
   const { data: profiles } = await supabaseClient.from('profiles').select('*').eq('role', 'driver').eq('is_active', true);
   driversList = profiles || [];
+  document.getElementById('kpiActiveDrivers').innerText = driversList.length;
   renderDriverList();
 }
 
@@ -724,6 +805,19 @@ async function createAndSendTour() {
 async function loadToursFromSupabase() {
   const { data: tours } = await supabaseClient.from('tours').select('*, stops(*), profiles:assigned_to(full_name, email, is_active)');
   const activeTours = (tours || []).filter(t => t.profiles?.is_active === true && t.status !== 'beendet');
+  
+  // Update KPIs
+  document.getElementById('kpiTotalTours').innerText = activeTours.length;
+  let totalStops = 0, doneStops = 0;
+  activeTours.forEach(t => {
+    if (t.stops) {
+      totalStops += t.stops.length;
+      doneStops += t.stops.filter(s => s.status === 'erledigt').length;
+    }
+  });
+  const rate = totalStops > 0 ? Math.round((doneStops / totalStops) * 100) : 0;
+  document.getElementById('kpiCompletionRate').innerText = `${rate}%`;
+
   renderTours(activeTours);
   extractAndProcessProofs(tours || []);
 }
@@ -771,6 +865,10 @@ function extractAndProcessProofs(tours) {
       });
     }
   });
+
+  const proofsWithPhoto = allExtractedProofs.filter(p => p.photo_url);
+  document.getElementById('kpiProofsToday').innerText = proofsWithPhoto.length;
+
   filterAndRenderProofs();
 }
 
