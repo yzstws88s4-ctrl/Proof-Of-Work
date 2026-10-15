@@ -16,11 +16,10 @@
 :root {
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg: #030712;
-  --surface: rgba(17, 24, 39, 0.5);
+  --surface: rgba(17, 24, 39, 0.75);
   --surface-solid: #0f172a;
-  --surface-hover: rgba(99, 102, 241, 0.08);
+  --surface-hover: rgba(30, 41, 59, 0.95);
   --border: rgba(255, 255, 255, 0.08);
-  --accent-line: rgba(99, 102, 241, 0.35);
   --text-main: #f9fafb;
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
@@ -38,11 +37,10 @@
 
 [data-theme="light"] {
   --bg: #e2e8f0;
-  --surface: rgba(255, 255, 255, 0.4);
+  --surface: #f1f5f9;
   --surface-solid: #ffffff;
-  --surface-hover: rgba(99, 102, 241, 0.06);
+  --surface-hover: #e8ecf4;
   --border: #cbd5e1;
-  --accent-line: #6366f1;
   --text-main: #0f172a;
   --text-sub: #64748b;
   --text-muted: #94a3b8;
@@ -61,7 +59,7 @@ body {
   font-family: var(--font);
   background-color: var(--bg);
   color: var(--text-main);
-  padding: 16px 24px;
+  padding: 20px 24px;
   display: flex; justify-content: center;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -70,14 +68,14 @@ body {
 .app-container {
   width: 100%;
   max-width: 1600px;
-  height: calc(100vh - 32px);
+  height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
 }
 
-/* 1. TOP HEADER & METRIKEN */
+/* TOP SEKTION (Header + KPIs) */
 .top-section {
   display: flex;
   flex-direction: column;
@@ -98,119 +96,120 @@ body {
 
 .utility-pill {
   background: var(--surface); border: 1px solid var(--border); color: var(--text-main);
-  padding: 7px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px;
-  font-size: 11px; font-weight: 600; box-shadow: var(--shadow); backdrop-filter: blur(12px);
+  padding: 8px 16px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 600; box-shadow: var(--shadow); backdrop-filter: blur(12px);
   transition: all 0.2s ease;
 }
 .utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-/* Quick Metrics Row */
+/* KPI Leiste */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 16px;
 }
 
 .kpi-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 18px;
+  border-radius: 16px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
 }
 
 .kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); letter-spacing: 0.05em; }
-.kpi-value { font-size: 18px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
+.kpi-value { font-size: 20px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
 .kpi-icon { color: var(--accent); opacity: 0.8; }
 
-/* 2. MAIN CENTER VIEWPORT (Reduzierte Spaltenhöhe) */
-.center-viewport {
+/* MITTLERES GRID (Die wunderbaren Kacheln mit Abstand) */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+  width: 100%;
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  min-height: 0;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Modul-Kachel im Original-Look */
+.module-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(16px);
-  min-height: 0; /* Verhindert Überlauf */
-}
-
-/* 5 Nahtlose Spalten */
-.full-dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.column-card {
-  background: transparent;
-  border-right: 1px solid var(--accent-line);
-  padding: 20px 16px;
+  padding: 25px 20px;
   text-align: center;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s ease;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  overflow: hidden;
+  height: 100%;
 }
 
-.column-card:last-child { border-right: none; }
-
-.column-card:hover {
+.module-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
   background: var(--surface-hover);
+  box-shadow: 0 30px 60px -12px var(--accent-glow);
 }
 
-.column-card:hover .column-title {
-  color: var(--accent);
-}
-
-.column-svg {
-  width: 52px; height: 52px;
+.module-svg-container {
+  width: 60px; height: 60px;
   display: flex; align-items: center; justify-content: center;
   color: var(--accent);
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   transition: transform 0.3s ease;
 }
-.column-card:hover .column-svg { transform: scale(1.12); }
+.module-card:hover .module-svg-container {
+  transform: scale(1.12);
+}
 
-.column-svg svg {
+.module-svg-container svg {
   width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
 }
 
-.column-title {
-  font-size: 13px;
-  font-weight: 800;
+.module-title {
+  font-size: 14px;
+  font-weight: 700;
   color: var(--text-main);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 6px;
-  transition: color 0.2s;
+  margin-bottom: 8px;
 }
 
-.column-desc {
+.module-desc {
   font-size: 11px;
   color: var(--text-sub);
-  line-height: 1.35;
+  line-height: 1.4;
   font-weight: 500;
-  max-width: 190px;
+  max-width: 200px;
 }
 
-/* Vollbild-Inhaltsbereich (nach Modul-Klick) */
+/* Vollbild-Inhaltsbereich (nach Klick auf eine Kachel) */
 .fullscreen-content-section {
   display: none;
   flex: 1;
-  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
   overflow-y: auto;
-  height: 100%;
+  min-height: 0;
 }
 
 .card-header {
@@ -228,14 +227,14 @@ body {
 label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 
 input, select, textarea {
-  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px;
+  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
   padding: 12px 16px; color: var(--text-main); font-family: inherit; font-size: 13px; margin-bottom: 14px;
   transition: border-color 0.2s;
 }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
 button.btn-main {
-  background: var(--accent); color: white; border: none; border-radius: 10px;
+  background: var(--accent); color: white; border: none; border-radius: 12px;
   padding: 12px 18px; font-weight: 700; font-size: 13px; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
   box-shadow: 0 4px 16px var(--accent-glow); transition: opacity 0.2s;
@@ -249,7 +248,7 @@ button.btn-main:hover { opacity: 0.92; }
 
 .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--input-bg); }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-th, td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th, td { padding: 14px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 th { background: var(--surface-solid); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
 tr:last-child td { border-bottom: none; }
 
@@ -265,7 +264,7 @@ tr:last-child td { border-bottom: none; }
 
 .filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 
-/* 3. BOTTOM LIVE-TICKER & FOOTER */
+/* BOTTOM FOOTER & TICKER */
 .bottom-section {
   display: flex;
   justify-content: space-between;
@@ -280,6 +279,7 @@ tr:last-child td { border-bottom: none; }
   display: flex; align-items: center; gap: 10px;
   background: var(--surface); border: 1px solid var(--border);
   padding: 6px 14px; border-radius: 20px; font-size: 11px; color: var(--text-sub);
+  box-shadow: var(--shadow); backdrop-filter: blur(12px);
 }
 
 .ticker-pulse {
@@ -302,7 +302,7 @@ tr:last-child td { border-bottom: none; }
 
 <div class="app-container">
 
-  <!-- 1. TOP SECTION (Header + Quick KPIs) -->
+  <!-- TOP SECTION -->
   <div class="top-section">
     <div class="top-utility-bar">
       <div style="display:flex; align-items:center; gap:16px;">
@@ -319,7 +319,7 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
-    <!-- Live Quick KPIs -->
+    <!-- KPI Leiste -->
     <div class="kpi-row" id="kpiOverviewRow">
       <div class="kpi-card">
         <div>
@@ -352,168 +352,164 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- 2. CENTER VIEWPORT (5 Spalten mit reduzierter Höhe) -->
-  <div class="center-viewport">
-    
-    <div class="full-dashboard-grid" id="mainDashboardGrid">
-      <div class="column-card" onclick="openModule('pane-live')">
-        <div class="column-svg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <div class="column-title">Live-Monitor</div>
-        <div class="column-desc">Aktive Touren und Echtzeit-Fortschritt der Fahrer im Blick.</div>
-      </div>
-
-      <div class="column-card" onclick="openModule('pane-team')">
-        <div class="column-svg"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-        <div class="column-title">Fahrer-Verwaltung</div>
-        <div class="column-desc">Zugänge verwalten, neue Fahrer anlegen und Konten steuern.</div>
-      </div>
-
-      <div class="column-card" onclick="openModule('pane-planer')">
-        <div class="column-svg"><svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg></div>
-        <div class="column-title">Tour-Planer & OCR</div>
-        <div class="column-desc">Touren per Foto einlesen, Adressen erfassen und direkt zuweisen.</div>
-      </div>
-
-      <div class="column-card" onclick="openModule('pane-proofs')">
-        <div class="column-svg"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-        <div class="column-title">Nachweise & Audit</div>
-        <div class="column-desc">Fotobeweise prüfen, Lieferprotokolle einsehen und als PDF exportieren.</div>
-      </div>
-
-      <div class="column-card" onclick="openModule('pane-company')">
-        <div class="column-svg"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
-        <div class="column-title">Firmendaten</div>
-        <div class="column-desc">Unternehmensprofil, Adresse und Logo für offizielle PDF-Dokumente.</div>
-      </div>
+  <!-- HAUPT-GRID (Die wunderschönen 5 Kacheln) -->
+  <div class="dashboard-grid" id="mainDashboardGrid">
+    <div class="module-card" onclick="openModule('pane-live')">
+      <div class="module-svg-container"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="module-title">Live-Monitor</div>
+      <div class="module-desc">Aktive Touren und Echtzeit-Fortschritt der Fahrer im Blick.</div>
     </div>
 
-    <!-- INHALTSBEREICH (Modul Vollbild) -->
-    <div class="fullscreen-content-section" id="moduleContentArea">
-      <div id="pane-live" class="tab-pane">
-        <div class="card-header">
-          <span>Aktive Live-Touren in Echtzeit</span>
-          <span class="status-chip done">● Verbunden</span>
-        </div>
-        <div id="liveToursContainer"><p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p></div>
-      </div>
-
-      <div id="pane-team" class="tab-pane">
-        <div class="grid-2">
-          <div>
-            <div class="card-header" style="margin-bottom:12px;">Neuen Fahrer anlegen</div>
-            <form id="addWorkerForm" onsubmit="addEmployee(event)">
-              <label>Name</label><input type="text" id="empName" placeholder="Max Mustermann" required>
-              <label>Benutzername</label><input type="text" id="empUsername" placeholder="max" required>
-              <label>Passwort</label><input type="password" id="empPassword" placeholder="••••••••" required>
-              <button type="submit" id="addEmpBtn" class="btn-main">Fahrer erstellen</button>
-            </form>
-          </div>
-          <div>
-            <div class="card-header" style="margin-bottom:12px;">Fahrerliste</div>
-            <div class="table-container">
-              <table>
-                <thead><tr><th>Name</th><th>User</th><th>Status</th><th style="text-align:right;">Aktion</th></tr></thead>
-                <tbody id="employeeTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="pane-planer" class="tab-pane">
-        <div class="card-header" style="margin-bottom:12px;">Tour erstellen & Zuweisen</div>
-        <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
-          <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
-          <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
-            <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
-            <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">Datei auswählen</button>
-          </div>
-          <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
-          <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
-          <div id="scanStatusMsg" style="font-size:11px; color:var(--success); font-weight:600; margin-top:6px; display:none;">✓ Eingelesen</div>
-        </div>
-
-        <div class="grid-2">
-          <div>
-            <label>Tour-Titel</label><input type="text" id="tourTitle" placeholder="z. B. Tour Nord">
-            <label>Fahrer</label><select id="tourAssignee"></select>
-            <label>Adressen (zeilenweise)</label><textarea id="tourAddresses" style="height:90px;" placeholder="Hauptstraße 1..."></textarea>
-          </div>
-          <div>
-            <label>Hinweise</label><textarea id="tourNotes" style="height:90px;" placeholder="Optionale Anweisungen..."></textarea>
-            <button class="btn-main" onclick="createAndSendTour()" style="margin-top:20px;">Tour übermitteln</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="pane-proofs" class="tab-pane">
-        <div class="card-header">
-          <span>Erfasste Fotobeweise & Protokolle</span>
-          <span id="proofsCountBadge" style="color:var(--accent);">0 Nachweise</span>
-        </div>
-
-        <div class="filter-grid">
-          <input type="text" id="proofSearchInput" placeholder="Suche..." oninput="filterAndRenderProofs()">
-          <input type="date" id="proofDateFilter" onchange="filterAndRenderProofs()">
-          <select id="proofDriverFilter" onchange="filterAndRenderProofs()"><option value="">Alle Fahrer</option></select>
-        </div>
-
-        <div id="batchActionBar" class="batch-toolbar">
-          <span id="selectedCountText" style="font-weight:600; color:var(--accent);">0 ausgewählt</span>
-          <button class="utility-pill" onclick="exportSelectedProofsPDF()" style="background:var(--success); color:#fff; border:none;">PDF Export</button>
-        </div>
-
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:40px; text-align:center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllProofs(this)"></th>
-                <th style="width:50px;">Foto</th>
-                <th>Adresse</th>
-                <th>Fahrer</th>
-                <th>Tour</th>
-                <th>Zeitstempel</th>
-                <th>Status</th>
-                <th style="text-align:right;">Aktion</th>
-              </tr>
-            </thead>
-            <tbody id="proofsTableBody"><tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Lade Daten...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="pane-company" class="tab-pane">
-        <div class="card-header" style="margin-bottom:12px;">Unternehmensdaten für PDF-Header</div>
-        <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
-          <div class="grid-2">
-            <div>
-              <label>Firmenname</label><input type="text" id="compName" required>
-              <label>Untertitel / Slogan</label><input type="text" id="compSubtitle">
-              <label>Inhaber</label><input type="text" id="compOwner">
-              <label>Straße & Hausnummer</label><input type="text" id="compStreet" required>
-              <label>PLZ & Ort</label><input type="text" id="compCity" required>
-            </div>
-            <div>
-              <label>E-Mail</label><input type="email" id="compEmail">
-              <label>Telefon</label><input type="text" id="compPhone">
-              <label>Steuernummer / USt-IdNr.</label><input type="text" id="compTax">
-              <label>Firmenlogo</label>
-              <div style="border: 2px dashed var(--border); border-radius:10px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
-                <div style="font-size:11px; font-weight:600;">Logo auswählen</div>
-                <img id="compLogoPreview" style="max-width:120px; max-height:40px; object-fit:contain; margin-top:4px; display:none;" alt="Logo">
-              </div>
-              <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
-              <button type="button" class="btn-danger-compact" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:6px;">Logo entfernen</button>
-            </div>
-          </div>
-          <button type="submit" class="btn-main" style="margin-top:16px;">Firmendaten speichern</button>
-        </form>
-      </div>
+    <div class="module-card" onclick="openModule('pane-team')">
+      <div class="module-svg-container"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <div class="module-title">Fahrer-Verwaltung</div>
+      <div class="module-desc">Zugänge verwalten, neue Fahrer anlegen und Konten steuern.</div>
     </div>
 
+    <div class="module-card" onclick="openModule('pane-planer')">
+      <div class="module-svg-container"><svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg></div>
+      <div class="module-title">Tour-Planer & OCR</div>
+      <div class="module-desc">Touren per Foto einlesen, Adressen erfassen und direkt zuweisen.</div>
+    </div>
+
+    <div class="module-card" onclick="openModule('pane-proofs')">
+      <div class="module-svg-container"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="module-title">Nachweise & Audit</div>
+      <div class="module-desc">Fotobeweise prüfen, Lieferprotokolle einsehen und als PDF exportieren.</div>
+    </div>
+
+    <div class="module-card" onclick="openModule('pane-company')">
+      <div class="module-svg-container"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+      <div class="module-title">Firmendaten</div>
+      <div class="module-desc">Unternehmensprofil, Adresse und Logo für offizielle PDF-Dokumente.</div>
+    </div>
   </div>
 
-  <!-- 3. BOTTOM SECTION (Live Ticker + Footer Links) -->
+  <!-- VOLLBILD-INHALTSBEREICH (nach Klick) -->
+  <div class="fullscreen-content-section" id="moduleContentArea">
+    <div id="pane-live" class="tab-pane">
+      <div class="card-header">
+        <span>Aktive Live-Touren in Echtzeit</span>
+        <span class="status-chip done">● Verbunden</span>
+      </div>
+      <div id="liveToursContainer"><p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p></div>
+    </div>
+
+    <div id="pane-team" class="tab-pane">
+      <div class="grid-2">
+        <div>
+          <div class="card-header" style="margin-bottom:12px;">Neuen Fahrer anlegen</div>
+          <form id="addWorkerForm" onsubmit="addEmployee(event)">
+            <label>Name</label><input type="text" id="empName" placeholder="Max Mustermann" required>
+            <label>Benutzername</label><input type="text" id="empUsername" placeholder="max" required>
+            <label>Passwort</label><input type="password" id="empPassword" placeholder="••••••••" required>
+            <button type="submit" id="addEmpBtn" class="btn-main">Fahrer erstellen</button>
+          </form>
+        </div>
+        <div>
+          <div class="card-header" style="margin-bottom:12px;">Fahrerliste</div>
+          <div class="table-container">
+            <table>
+              <thead><tr><th>Name</th><th>User</th><th>Status</th><th style="text-align:right;">Aktion</th></tr></thead>
+              <tbody id="employeeTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pane-planer" class="tab-pane">
+      <div class="card-header" style="margin-bottom:12px;">Tour erstellen & Zuweisen</div>
+      <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
+        <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
+        <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+          <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
+          <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">Datei auswählen</button>
+        </div>
+        <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
+        <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
+        <div id="scanStatusMsg" style="font-size:11px; color:var(--success); font-weight:600; margin-top:6px; display:none;">✓ Eingelesen</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label>Tour-Titel</label><input type="text" id="tourTitle" placeholder="z. B. Tour Nord">
+          <label>Fahrer</label><select id="tourAssignee"></select>
+          <label>Adressen (zeilenweise)</label><textarea id="tourAddresses" style="height:90px;" placeholder="Hauptstraße 1..."></textarea>
+        </div>
+        <div>
+          <label>Hinweise</label><textarea id="tourNotes" style="height:90px;" placeholder="Optionale Anweisungen..."></textarea>
+          <button class="btn-main" onclick="createAndSendTour()" style="margin-top:20px;">Tour übermitteln</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pane-proofs" class="tab-pane">
+      <div class="card-header">
+        <span>Erfasste Fotobeweise & Protokolle</span>
+        <span id="proofsCountBadge" style="color:var(--accent);">0 Nachweise</span>
+      </div>
+
+      <div class="filter-grid">
+        <input type="text" id="proofSearchInput" placeholder="Suche..." oninput="filterAndRenderProofs()">
+        <input type="date" id="proofDateFilter" onchange="filterAndRenderProofs()">
+        <select id="proofDriverFilter" onchange="filterAndRenderProofs()"><option value="">Alle Fahrer</option></select>
+      </div>
+
+      <div id="batchActionBar" class="batch-toolbar">
+        <span id="selectedCountText" style="font-weight:600; color:var(--accent);">0 ausgewählt</span>
+        <button class="utility-pill" onclick="exportSelectedProofsPDF()" style="background:var(--success); color:#fff; border:none;">PDF Export</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px; text-align:center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllProofs(this)"></th>
+              <th style="width:50px;">Foto</th>
+              <th>Adresse</th>
+              <th>Fahrer</th>
+              <th>Tour</th>
+              <th>Zeitstempel</th>
+              <th>Status</th>
+              <th style="text-align:right;">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="proofsTableBody"><tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Lade Daten...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="pane-company" class="tab-pane">
+      <div class="card-header" style="margin-bottom:12px;">Unternehmensdaten für PDF-Header</div>
+      <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
+        <div class="grid-2">
+          <div>
+            <label>Firmenname</label><input type="text" id="compName" required>
+            <label>Untertitel / Slogan</label><input type="text" id="compSubtitle">
+            <label>Inhaber</label><input type="text" id="compOwner">
+            <label>Straße & Hausnummer</label><input type="text" id="compStreet" required>
+            <label>PLZ & Ort</label><input type="text" id="compCity" required>
+          </div>
+          <div>
+            <label>E-Mail</label><input type="email" id="compEmail">
+            <label>Telefon</label><input type="text" id="compPhone">
+            <label>Steuernummer / USt-IdNr.</label><input type="text" id="compTax">
+            <label>Firmenlogo</label>
+            <div style="border: 2px dashed var(--border); border-radius:10px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
+              <div style="font-size:11px; font-weight:600;">Logo auswählen</div>
+              <img id="compLogoPreview" style="max-width:120px; max-height:40px; object-fit:contain; margin-top:4px; display:none;" alt="Logo">
+            </div>
+            <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
+            <button type="button" class="btn-danger-compact" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:6px;">Logo entfernen</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-main" style="margin-top:16px;">Firmendaten speichern</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- BOTTOM SECTION -->
   <div class="bottom-section">
     <div class="live-ticker">
       <div class="ticker-pulse"></div>
@@ -583,7 +579,7 @@ function openModule(paneId) {
   document.getElementById('mainDashboardGrid').style.display = 'none';
   document.getElementById('moduleContentArea').style.display = 'block';
   document.getElementById('backToGridBtn').style.display = 'flex';
-  document.getElementById('kpiOverviewRow').style.display = 'none'; /* Versteckt KPIs im Vollbild für mehr Platz */
+  document.getElementById('kpiOverviewRow').style.display = 'none';
 
   document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
   document.getElementById(paneId).classList.add('active');
@@ -806,7 +802,6 @@ async function loadToursFromSupabase() {
   const { data: tours } = await supabaseClient.from('tours').select('*, stops(*), profiles:assigned_to(full_name, email, is_active)');
   const activeTours = (tours || []).filter(t => t.profiles?.is_active === true && t.status !== 'beendet');
   
-  // Update KPIs
   document.getElementById('kpiTotalTours').innerText = activeTours.length;
   let totalStops = 0, doneStops = 0;
   activeTours.forEach(t => {
