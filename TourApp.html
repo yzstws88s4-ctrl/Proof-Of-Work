@@ -28,23 +28,23 @@
 :root {
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --bg: #f8fafc;
-  --card: #ffffff;
+  --surface: #ffffff;
   --text: #0f172a;
   --text-muted: #64748b;
   --border: #e2e8f0;
   --input-bg: #f1f5f9;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   --switch-active: #10b981;
 }
 
 html[data-theme="dark"] {
   --bg: #0b0f19;
-  --card: #161e2e;
+  --surface: #131b2e;
   --text: #f8fafc;
   --text-muted: #94a3b8;
-  --border: #263548;
-  --input-bg: #0f172a;
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --border: #1e293b;
+  --input-bg: #090d16;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   --switch-active: #3b82f6;
 }
 
@@ -67,17 +67,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   padding: 0 4px;
 }
 
-.title { font-size: 20px; font-weight: 800; margin: 0; letter-spacing: -0.03em; }
+.title { font-size: 22px; font-weight: 800; margin: 0; letter-spacing: -0.03em; }
 .driver-badge { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-top: 2px; display: block; }
 
 .header-actions { display: flex; gap: 8px; }
 
 .theme-toggle-btn, .logout-btn {
-  background: var(--card);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   height: 38px;
@@ -95,12 +95,13 @@ body {
 .theme-toggle-btn { width: 38px; padding: 0; }
 .theme-toggle-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-.app-card {
-  background: var(--card);
+/* MODERNER FLACHER BLOCKELEMENT-STIL (KEIN KASTENLOOK) */
+.app-section {
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 16px;
-  margin-bottom: 12px;
+  padding: 18px;
+  margin-bottom: 14px;
   box-shadow: var(--shadow);
 }
 
@@ -290,7 +291,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 .stop-item:last-child { border-bottom: none; }
 .stop-item.done { opacity: 0.35; }
 .stop-item.done .stop-name { text-decoration: line-through; }
-.stop-item.active { background: var(--card); font-weight: 700; color: var(--text); border-left: 4px solid var(--switch-active); }
+.stop-item.active { background: var(--surface); font-weight: 700; color: var(--text); border-left: 4px solid var(--switch-active); }
 
 .proof-gallery-container { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .proof-item-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
@@ -310,7 +311,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .modal-box {
-  background: var(--card);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 20px;
@@ -362,7 +363,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 
   <!-- SETUP VIEW (STARTSEITE) -->
-  <div class="app-card" id="setup-view">
+  <div class="app-section" id="setup-view">
     <div style="font-weight: 700; margin-bottom: 12px; font-size: 14px;">Tour starten</div>
     <div class="btn-grid">
       <button class="btn-secondary" onclick="document.getElementById('ocrCameraInput').click()">
@@ -415,7 +416,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 
   <!-- TOUR AKTIV VIEW -->
-  <div class="app-card" id="tour-view">
+  <div class="app-section" id="tour-view">
     <div class="current-destination">
       <div class="dest-label" id="stopCounter">Stopp 1 von 16</div>
       <div class="dest-text" id="currentStopText">Lade Stopps...</div>
@@ -578,7 +579,6 @@ window.onload = async () => {
 
 async function restoreActiveTourSession() {
   try {
-    // WENN DER USER DIE TOUR GERADE ERST BEENDET HAT -> NICHT LADEN!
     if (localStorage.getItem('veribase_force_home') === 'true') {
       localStorage.removeItem('veribase_force_home');
       return;
@@ -610,7 +610,6 @@ async function restoreActiveTourSession() {
 
         const firstOpenIdx = tourStops.findIndex(s => !s.done);
         
-        // WENN ALLE STOPPS ERLEDIGT SIND -> AUF STARTSEITE BLEIBEN
         if (firstOpenIdx === -1) {
           localStorage.removeItem(`active_tour_index_${activeTour.id}`);
           currentSupabaseTourId = null;
@@ -1115,7 +1114,6 @@ async function finishAndSaveTour() {
     let tourId = currentSupabaseTourId;
 
     if (tourId) {
-      // Status in Supabase auf 'beendet' setzen
       await supabaseClient
         .from('tours')
         .update({ 
@@ -1128,7 +1126,6 @@ async function finishAndSaveTour() {
       localStorage.removeItem(`active_tour_index_${tourId}`);
     }
 
-    // SICHERSTELLUNG: Beim Neuladen NICHT wieder automatisch reinspringen!
     localStorage.setItem('veribase_force_home', 'true');
 
     alert("Tour erfolgreich gespeichert!");
@@ -1145,7 +1142,6 @@ function cancelAndReturn() {
   if (currentSupabaseTourId) {
     localStorage.removeItem(`active_tour_index_${currentSupabaseTourId}`);
   }
-  // Auch hier das Flag setzen, damit man beim Abbrechen ebenfalls auf der Startseite landet
   localStorage.setItem('veribase_force_home', 'true');
 
   tourStops = [];
