@@ -37,15 +37,15 @@
 
 /* Gedämpfter, blendfreier "Soft Mode" */
 [data-theme="light"] {
-  --bg: #c8ccd6;
-  --surface: #d5d8e0;
-  --surface-solid: #c3c7d2;
-  --surface-hover: #e2e5ed;
-  --border: rgba(0, 0, 0, 0.12);
-  --text-main: #1a202c;
-  --text-sub: #4a5568;
-  --text-muted: #718096;
-  --input-bg: #bebc1;
+  --bg: #e2e8f0;
+  --surface: #f1f5f9;
+  --surface-solid: #ffffff;
+  --surface-hover: #e8ecf4;
+  --border: #cbd5e1;
+  --text-main: #0f172a;
+  --text-sub: #64748b;
+  --text-muted: #94a3b8;
+  --input-bg: #ffffff;
   --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
 }
 
@@ -72,7 +72,7 @@ body {
 /* Top Bar */
 .top-utility-bar {
   display: flex; justify-content: space-between; align-items: center;
-  width: 100%; margin-bottom: 10px;
+  width: 100%; margin-bottom: 5px;
 }
 
 .brand-title {
@@ -89,7 +89,7 @@ body {
 }
 .utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-/* 5-Spalten Grid */
+/* 5-Spalten Grid (Desktop optimiert) */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -109,14 +109,14 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 30px 20px;
+  padding: 25px 20px;
   text-align: center;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  min-height: 260px;
+  min-height: 220px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -138,10 +138,10 @@ body {
 }
 
 .module-svg-container {
-  width: 60px; height: 60px;
+  width: 50px; height: 50px;
   display: flex; align-items: center; justify-content: center;
   color: var(--accent);
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   transition: transform 0.3s ease;
 }
 .module-card:hover .module-svg-container {
@@ -153,30 +153,31 @@ body {
 }
 
 .module-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-main);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .module-desc {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-sub);
   line-height: 1.4;
   font-weight: 500;
 }
 
-/* Inhaltsbereich */
+/* Inhaltsbereich (Vollbild nach Modul-Klick) */
 .content-section {
-  margin-top: 10px;
+  margin-top: 5px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 24px;
   padding: 35px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
+  min-height: 450px;
 }
 
 .card-header {
@@ -253,7 +254,7 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- 5 Module -->
+  <!-- 5 Module (Desktop Grid) -->
   <div class="dashboard-grid">
     
     <div class="module-card active" id="card-live" onclick="selectModule('pane-live', 'card-live')">
@@ -308,7 +309,7 @@ tr:last-child td { border-bottom: none; }
 
   </div>
 
-  <!-- Inhaltsbereich -->
+  <!-- Inhaltsbereich (Vollbild je gewähltem Modul) -->
   <main class="content-section">
     
     <div id="pane-live" class="tab-pane active">
@@ -350,7 +351,7 @@ tr:last-child td { border-bottom: none; }
     <div id="pane-planer" class="tab-pane">
       <div class="card-header" style="margin-bottom:15px;">Tour erstellen & Zuweisen</div>
       <div style="background:var(--input-bg); border: 2px dashed var(--border); border-radius:14px; padding:20px; text-align:center; margin-bottom:20px;">
-        <div style="font-size:13px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
+        <div style="font-size:13px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)[cite: 10]</div>
         <div style="display:flex; gap:12px; justify-content:center; margin-top:12px;">
           <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
           <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">Datei auswählen</button>
