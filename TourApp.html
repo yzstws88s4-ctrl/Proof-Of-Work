@@ -1234,7 +1234,7 @@ async function handleOcrImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  showModal("KI-Scan", "Analysiere Screenshot und extrahiere alle 29 Stopps...");
+  showModal("KI-Scan", "Analysiere Screenshot und extrahiere alle Stopps...");
 
   try {
     const worker = await Tesseract.createWorker('deu');
@@ -1251,11 +1251,9 @@ async function handleOcrImage(event) {
     const rawLines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     const extractedAddresses = [];
 
-    // PLZ Erkennung (5 Ziffern, typischerweise 51766, 51647, 51789 etc.)
     const plzRegex = /\b(5\d{4})\b/;
 
     rawLines.forEach(line => {
-      // Ignoriere Kopfzeilen und Tabellen-Header
       const lower = line.toLowerCase();
       if (lower.includes('tour') || lower.includes('ort') || lower.includes('adresse') || 
           lower.includes('name') || lower.includes('ziehen') || lower.includes('morgengold') ||
@@ -1266,15 +1264,15 @@ async function handleOcrImage(event) {
 
       const match = line.match(plzRegex);
       if (match) {
-        // Ab der PLZ schneiden, damit vordere Nummern (1, 2, 20...) entfernt werden
         let addressLine = line.substring(line.indexOf(match[1])).trim();
 
-        // Den Namen am Ende trennen:
-        // In der Morgengold-Tabelle ist der Name immer mit "Nachname, Vorname" formatiert.
-        // Wir suchen nach dem Komma im Namen oder dem Nachnamen.
+        // BEHEBT DAS KOMMA-PROBLEM BEI ADRESSEN WIE "Dorffeld, 12":
+        // Wandelt ein Komma vor einer Zahl in ein Leerzeichen um ("Dorffeld, 12" -> "Dorffeld 12")
+        addressLine = addressLine.replace(/,\s*(\d+)/g, ' $1');
+
+        // Den echten Namen am Ende trennen (anhand des Namens-Kommas, z.B. "Wissmann, Ralph")
         const commaIndex = addressLine.indexOf(',');
         if (commaIndex > -1) {
-          // Schneide vor dem Nachnamen ab (der Nachname steht direkt vor dem Komma)
           const beforeComma = addressLine.substring(0, commaIndex).trim();
           const lastSpace = beforeComma.lastIndexOf(' ');
           if (lastSpace > -1) {
@@ -1283,10 +1281,9 @@ async function handleOcrImage(event) {
             addressLine = beforeComma;
           }
         } else {
-          // Fallback: Trennung nach der Hausnummer (Zahl oder Zahl+Buchstabe)
+          // Fallback ohne Namens-Komma: Nach der letzten Hausnummer (Zahl) abschneiden
           const houseNumMatch = addressLine.match(/\b\d+[a-zA-Z]?\b/g);
           if (houseNumMatch && houseNumMatch.length > 0) {
-            // Die letzte Zahl, die nach dem Ortsnamen steht, ist die Hausnummer
             const parts = addressLine.split(/\s+/);
             if (parts.length >= 3) {
               let houseNumIdx = -1;
@@ -1316,7 +1313,7 @@ async function handleOcrImage(event) {
       const existing = document.getElementById('addressInput').value;
       const newText = uniqueAddresses.join('\n');
       document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-      showModal("Erfolg", `${uniqueAddresses.length} Adressen sauber im Format PLZ Ort Adresse extrahiert!`);
+      showModal("Erfolg", `${uniqueAddresses.length} Adressen (inkl. Dorffeld 12) erfolgreich extrahiert!`);
     } else {
       alert("Keine passenden Adressen im Bild gefunden.");
     }
