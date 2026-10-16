@@ -23,6 +23,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Tesseract.js für kostenlose lokale Texterkennung direkt im Browser -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 :root {
@@ -381,7 +383,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       <div class="btn-grid">
         <button onclick="document.getElementById('ocrCameraInput').click()">
           <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          Kamera (OCR)
+          Kamera (Smart-Scan)
         </button>
         <button onclick="document.getElementById('galleryInput').click()">
           <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
@@ -1233,48 +1235,85 @@ async function handleOcrImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  showModal("KI-Scan", "Analysiere Tour mit Vision-KI...");
+  showModal("Smart-Scan", "Analysiere Screenshot und extrahiere Adressen...");
 
   try {
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const base64Image = e.target.result;
+    const worker = await Tesseract.createWorker('deu');
+    const ret = await worker.recognize(file);
+    await worker.terminate();
 
-      // Aufruf unserer Supabase Edge Function
-      const { data, error } = await supabaseClient.functions.invoke('parse-tour-image', {
-        body: { imageBase64: base64Image }
+    const fullText = ret.data.text;
+    if (!fullText) {
+      closeModal();
+      alert("Es konnte kein Text auf dem Bild erkannt werden.");
+      return;
+    }
+
+    const rawLines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const extractedAddresses = [];
+    const plzRegex = /\b(5\d{4})\b/;
+
+    rawLines.forEach(line => {
+      const lower = line.toLowerCase();
+      if (lower.includes('tourplanung') || lower.includes('morgengold') || lower.includes('logistik') || 
+          lower.includes('freitag') || lower.includes('samstag') || lower.includes('sonntag') || 
+          lower.includes('uhr') || lower.length < 6) {
+        return;
+      }
+
+      const match = line.match(plzRegex);
+      if (match) {
+        let addressLine = line.substring(line.indexOf(match[1])).trim();
+        addressLine = addressLine.replace(/,\s*(\d+)/g, ' $1');
+
+        const matches = [...addressLine.matchAll(/\b(\d+[a-zA-Z]?)\b/g)];
+        if (matches.length > 0) {
+          let lastHouseMatch = null;
+          for (let i = matches.length - 1; i >= 0; i--) {
+            if (matches[i][1] !== match[1]) {
+              lastHouseMatch = matches[i];
+              break;
+            }
+          }
+          if (lastHouseMatch) {
+            const cutIndex = lastHouseMatch.index + lastHouseMatch[0].length;
+            addressLine = addressLine.substring(0, cutIndex).trim();
+          }
+        } else {
+          const commaIndex = addressLine.indexOf(',');
+          if (commaIndex > -1) {
+            addressLine = addressLine.substring(0, commaIndex).trim();
+          }
+        }
+
+        if (addressLine.length > 8 && /\d/.test(addressLine)) {
+          extractedAddresses.push(addressLine);
+        }
+      }
+    });
+
+    closeModal();
+
+    if (extractedAddresses.length > 0) {
+      const uniqueAddresses = [];
+      extractedAddresses.forEach(addr => {
+        if (!uniqueAddresses.includes(addr)) {
+          uniqueAddresses.push(addr);
+        }
       });
-
-      closeModal();
-
-      if (error) {
-        throw new Error(error.message || "Fehler beim Aufruf der KI-Funktion");
-      }
-
-      if (data && data.addresses && data.addresses.length > 0) {
-        const addresses = data.addresses;
-        
-        const existing = document.getElementById('addressInput').value;
-        const newText = addresses.join('\n');
-        document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-        
-        showModal("Erfolg", `${addresses.length} Adressen absolut fehlerfrei per KI extrahiert!`);
-      } else {
-        alert("Die KI konnte keine Adressen auf dem Bild finden.");
-      }
-    };
-    
-    reader.onerror = () => {
-      closeModal();
-      alert("Fehler beim Lesen der Bilddatei.");
-    };
-
-    reader.readAsDataURL(file);
+      
+      const existing = document.getElementById('addressInput').value;
+      const newText = uniqueAddresses.join('\n');
+      document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
+      showModal("Erfolg", `${uniqueAddresses.length} Adressen erfolgreich extrahiert!`);
+    } else {
+      alert("Keine passenden Adressen im Bild gefunden.");
+    }
 
   } catch (err) {
     closeModal();
-    console.error("KI-Scan Fehler:", err);
-    alert("Fehler beim KI-Scan: " + err.message);
+    console.error("Smart-Scan Fehler:", err);
+    alert("Fehler bei der Texterkennung.");
   } finally {
     event.target.value = '';
   }
