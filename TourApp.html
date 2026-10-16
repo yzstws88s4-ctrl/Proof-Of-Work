@@ -528,7 +528,16 @@ input:checked + .slider:before { transform: translateX(18px); }
   <div class="modal-box" style="text-align: center;">
     <div style="font-size:15px; font-weight:700;" id="modalTitle">Hinweis</div>
     <div id="modalBody" style="margin: 8px 0; font-size: 12px;"></div>
-    <button class="btn-success" onclick="closeModal()" style="margin-bottom:0; padding: 11px;">OK</button>
+    <div id="modalProgressContainer" style="display: none; margin: 12px 0 4px 0;">
+      <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-sub); margin-bottom: 4px;">
+        <span id="modalProgressText">Analysiere Tour...</span>
+        <span id="modalProgressPercent">0%</span>
+      </div>
+      <div style="width: 100%; height: 6px; background: var(--border); border-radius: 6px; overflow: hidden;">
+        <div id="modalProgressBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.2s ease;"></div>
+      </div>
+    </div>
+    <button class="btn-success" id="modalOkBtn" onclick="closeModal()" style="margin-bottom:0; padding: 11px; margin-top: 8px;">OK</button>
   </div>
 </div>
 
@@ -674,7 +683,7 @@ async function loadSupabaseTour() {
   if (tour.stops) {
     loadedChefStops = tour.stops.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
     document.getElementById('addressInput').value = loadedChefStops.map(s => s.address).join('\n');
-    showModal("Erfolg", "Tour geladen! Klicke auf 'Tour starten'.");
+    showModal("Erfolg", "Tour erfolgreich geladen!");
   }
 }
 
@@ -1235,10 +1244,10 @@ async function handleOcrImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  showModal("Smart-Scan", "Bereite Bild vor & analysiere Tour...");
+  showModal("Smart-Scan", "Analysiere Tour...", true);
+  updateProgress(10, "Bild wird vorbereitet...");
 
   try {
-    // 1. Bild per Canvas vergrößern (Upscaling), damit Tesseract kleine Tabellentexte scharf erkennt
     const imageUrl = URL.createObjectURL(file);
     const img = new Image();
     
@@ -1247,6 +1256,8 @@ async function handleOcrImage(event) {
       img.onerror = reject;
       img.src = imageUrl;
     });
+
+    updateProgress(30, "Auflösung wird optimiert...");
 
     const canvas = document.getElementById('proofCanvas');
     const ctx = canvas.getContext('2d');
@@ -1257,10 +1268,13 @@ async function handleOcrImage(event) {
     
     const scaledDataUrl = canvas.toDataURL('image/jpeg', 0.95);
 
-    // 2. Tesseract mit dem vergrößerten Bild starten
+    updateProgress(50, "Texterkennung läuft...");
+
     const worker = await Tesseract.createWorker('deu');
     const ret = await worker.recognize(scaledDataUrl);
     await worker.terminate();
+
+    updateProgress(85, "Adressen werden extrahiert...");
 
     const fullText = ret.data.text;
     if (!fullText) {
@@ -1295,16 +1309,18 @@ async function handleOcrImage(event) {
       }
     }
 
-    closeModal();
-
-    if (extractedAddresses.length > 0) {
-      const existing = document.getElementById('addressInput').value;
-      const newText = extractedAddresses.join('\n');
-      document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-      showModal("Erfolg", `${extractedAddresses.length} Stopps (inkl. aller langen Straßennamen) fehlerfrei erkannt!`);
-    } else {
-      alert("Es konnten keine Adressen im Bild erkannt werden.");
-    }
+    updateProgress(100, "Fertig!");
+    setTimeout(() => {
+      closeModal();
+      if (extractedAddresses.length > 0) {
+        const existing = document.getElementById('addressInput').value;
+        const newText = extractedAddresses.join('\n');
+        document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
+        showModal("Erfolg", `${extractedAddresses.length} Stopps erfolgreich geladen!`);
+      } else {
+        alert("Es konnten keine Adressen im Bild erkannt werden.");
+      }
+    }, 300);
 
   } catch (err) {
     closeModal();
@@ -1315,9 +1331,33 @@ async function handleOcrImage(event) {
   }
 }
 
-function showModal(title, bodyText) {
+function updateProgress(percent, text) {
+  const bar = document.getElementById('modalProgressBar');
+  const txt = document.getElementById('modalProgressText');
+  const pct = document.getElementById('modalProgressPercent');
+  if (bar && txt && pct) {
+    bar.style.width = percent + '%';
+    txt.innerText = text;
+    pct.innerText = percent + '%';
+  }
+}
+
+function showModal(title, bodyText, showProgress = false) {
   document.getElementById('modalTitle').innerText = title;
   document.getElementById('modalBody').innerText = bodyText;
+  
+  const progContainer = document.getElementById('modalProgressContainer');
+  const okBtn = document.getElementById('modalOkBtn');
+
+  if (showProgress) {
+    progContainer.style.display = 'block';
+    okBtn.style.display = 'none';
+    updateProgress(0, "Starte Scan...");
+  } else {
+    progContainer.style.display = 'none';
+    okBtn.style.display = 'block';
+  }
+
   document.getElementById('customModal').style.display = 'flex';
 }
 
