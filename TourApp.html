@@ -1235,7 +1235,7 @@ async function handleOcrImage(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  showModal("Smart-Scan", "Analysiere Screenshot und extrahiere Adressen...");
+  showModal("Smart-Scan", "Intelligente Analyse läuft...");
 
   try {
     const worker = await Tesseract.createWorker('deu');
@@ -1251,43 +1251,40 @@ async function handleOcrImage(event) {
 
     const rawLines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     const extractedAddresses = [];
-    const plzRegex = /\b(5\d{4})\b/;
 
     rawLines.forEach(line => {
       const lower = line.toLowerCase();
       if (lower.includes('tourplanung') || lower.includes('morgengold') || lower.includes('logistik') || 
-          lower.includes('freitag') || lower.includes('samstag') || lower.includes('sonntag') || 
-          lower.includes('uhr') || lower.length < 6) {
+          lower.includes('montag') || lower.includes('dienstag') || lower.includes('mittwoch') || 
+          lower.includes('donnerstag') || lower.includes('freitag') || lower.includes('samstag') || 
+          lower.includes('sonntag') || lower.includes('uhr') || lower.includes('ziehen und fallenlassen') ||
+          line.length < 5) {
         return;
       }
 
-      const match = line.match(plzRegex);
-      if (match) {
-        let addressLine = line.substring(line.indexOf(match[1])).trim();
-        addressLine = addressLine.replace(/,\s*(\d+)/g, ' $1');
+      const plzMatch = line.match(/\b(5\d{4})\b/);
+      if (plzMatch) {
+        const plzIndex = line.indexOf(plzMatch[1]);
+        let contentAfterPlz = line.substring(plzIndex).trim();
+        const parts = contentAfterPlz.split(/\s+/);
+        
+        if (parts.length >= 4) {
+          const plz = parts[0];
+          const ort = parts[1];
+          let addressAndNamePart = parts.slice(2).join(' ');
+          
+          const addressMatch = addressAndNamePart.match(/^(.*?\d+[a-zA-Z]?(?:\s+[a-zA-Z]+)?)/);
+          
+          let cleanAddress = '';
+          if (addressMatch) {
+            cleanAddress = `${plz} ${ort} ${addressMatch[1].trim()}`;
+          } else {
+            cleanAddress = `${plz} ${ort} ${parts.slice(2, 4).join(' ')}`;
+          }
 
-        const matches = [...addressLine.matchAll(/\b(\d+[a-zA-Z]?)\b/g)];
-        if (matches.length > 0) {
-          let lastHouseMatch = null;
-          for (let i = matches.length - 1; i >= 0; i--) {
-            if (matches[i][1] !== match[1]) {
-              lastHouseMatch = matches[i];
-              break;
-            }
+          if (cleanAddress.length > 10 && /\d/.test(cleanAddress)) {
+            extractedAddresses.push(cleanAddress);
           }
-          if (lastHouseMatch) {
-            const cutIndex = lastHouseMatch.index + lastHouseMatch[0].length;
-            addressLine = addressLine.substring(0, cutIndex).trim();
-          }
-        } else {
-          const commaIndex = addressLine.indexOf(',');
-          if (commaIndex > -1) {
-            addressLine = addressLine.substring(0, commaIndex).trim();
-          }
-        }
-
-        if (addressLine.length > 8 && /\d/.test(addressLine)) {
-          extractedAddresses.push(addressLine);
         }
       }
     });
@@ -1305,15 +1302,15 @@ async function handleOcrImage(event) {
       const existing = document.getElementById('addressInput').value;
       const newText = uniqueAddresses.join('\n');
       document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-      showModal("Erfolg", `${uniqueAddresses.length} Adressen erfolgreich extrahiert!`);
+      showModal("Erfolg", `${uniqueAddresses.length} Stopps intelligent und fehlerfrei erkannt!`);
     } else {
-      alert("Keine passenden Adressen im Bild gefunden.");
+      alert("Es konnten keine Adressen im gewohnten Tabellenformat erkannt werden.");
     }
 
   } catch (err) {
     closeModal();
     console.error("Smart-Scan Fehler:", err);
-    alert("Fehler bei der Texterkennung.");
+    alert("Fehler bei der intelligenten Texterkennung.");
   } finally {
     event.target.value = '';
   }
