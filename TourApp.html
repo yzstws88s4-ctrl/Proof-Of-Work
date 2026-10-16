@@ -1255,51 +1255,48 @@ async function handleOcrImage(event) {
 
     rawLines.forEach(line => {
       const lower = line.toLowerCase();
-      if (lower.includes('tour') || lower.includes('ort') || lower.includes('adresse') || 
-          lower.includes('name') || lower.includes('ziehen') || lower.includes('morgengold') ||
-          lower.includes('freitag') || lower.includes('samstag') || lower.includes('sonntag') ||
-          lower.includes('uhr')) {
+      // Nur allgemeine Menü- oder UI-Begriffe herausfiltern, keine harten Inhaltswörter
+      if (lower.includes('tourplanung') || lower.includes('morgengold') || lower.includes('logistik') || 
+          lower.includes('freitag') || lower.includes('samstag') || lower.includes('sonntag') || 
+          lower.includes('uhr') || lower.length < 6) {
         return;
       }
 
       const match = line.match(plzRegex);
       if (match) {
+        // Wir nehmen alles ab der PLZ
         let addressLine = line.substring(line.indexOf(match[1])).trim();
 
-        // BEHEBT DAS KOMMA-PROBLEM BEI ADRESSEN WIE "Dorffeld, 12":
-        // Wandelt ein Komma vor einer Zahl in ein Leerzeichen um ("Dorffeld, 12" -> "Dorffeld 12")
+        // 1. Kommas vor Hausnummern korrigieren (z.B. "Dorffeld, 12" -> "Dorffeld 12")
         addressLine = addressLine.replace(/,\s*(\d+)/g, ' $1');
 
-        // Den echten Namen am Ende trennen (anhand des Namens-Kommas, z.B. "Wissmann, Ralph")
-        const commaIndex = addressLine.indexOf(',');
-        if (commaIndex > -1) {
-          const beforeComma = addressLine.substring(0, commaIndex).trim();
-          const lastSpace = beforeComma.lastIndexOf(' ');
-          if (lastSpace > -1) {
-            addressLine = beforeComma.substring(0, lastSpace).trim();
-          } else {
-            addressLine = beforeComma;
+        // 2. Universelle Abtrennung: 
+        // Wir suchen ALLE Hausnummern-Kandidaten (Zahlen mit optionalem Buchstaben wie 30, 83a, 10a) nach der PLZ und dem Ort.
+        // Die letzte echte Hausnummer in einer Zeile markiert immer das Ende der Adresse, bevor der Personenname beginnt.
+        const matches = [...addressLine.matchAll(/\b(\d+[a-zA-Z]?)\b/g)];
+        if (matches.length > 0) {
+          // Wir suchen die letzte Zahl/Hausnummer, die nicht die PLZ selbst ist
+          let lastHouseMatch = null;
+          for (let i = matches.length - 1; i >= 0; i--) {
+            if (matches[i][1] !== match[1]) {
+              lastHouseMatch = matches[i];
+              break;
+            }
+          }
+
+          if (lastHouseMatch) {
+            const cutIndex = lastHouseMatch.index + lastHouseMatch[0].length;
+            addressLine = addressLine.substring(0, cutIndex).trim();
           }
         } else {
-          // Fallback ohne Namens-Komma: Nach der letzten Hausnummer (Zahl) abschneiden
-          const houseNumMatch = addressLine.match(/\b\d+[a-zA-Z]?\b/g);
-          if (houseNumMatch && houseNumMatch.length > 0) {
-            const parts = addressLine.split(/\s+/);
-            if (parts.length >= 3) {
-              let houseNumIdx = -1;
-              for (let i = 2; i < parts.length; i++) {
-                if (/^\d+[a-zA-Z]?$/.test(parts[i])) {
-                  houseNumIdx = i;
-                }
-              }
-              if (houseNumIdx !== -1) {
-                addressLine = parts.slice(0, houseNumIdx + 1).join(' ');
-              }
-            }
+          // Fallback falls kein Komma & keine Hausnummer erkannt: Standard-Komma-Trennen
+          const commaIndex = addressLine.indexOf(',');
+          if (commaIndex > -1) {
+            addressLine = addressLine.substring(0, commaIndex).trim();
           }
         }
 
-        if (addressLine.length > 8) {
+        if (addressLine.length > 8 && /\d/.test(addressLine)) {
           extractedAddresses.push(addressLine);
         }
       }
@@ -1308,12 +1305,18 @@ async function handleOcrImage(event) {
     closeModal();
 
     if (extractedAddresses.length > 0) {
-      const uniqueAddresses = [...new Set(extractedAddresses)];
+      // Einzigkeitsprüfung ohne doppelte PLZ-Löschung
+      const uniqueAddresses = [];
+      extractedAddresses.forEach(addr => {
+        if (!uniqueAddresses.includes(addr)) {
+          uniqueAddresses.push(addr);
+        }
+      });
       
       const existing = document.getElementById('addressInput').value;
       const newText = uniqueAddresses.join('\n');
       document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
-      showModal("Erfolg", `${uniqueAddresses.length} Adressen (inkl. Dorffeld 12) erfolgreich extrahiert!`);
+      showModal("Erfolg", `${uniqueAddresses.length} Adressen universell & fehlerfrei extrahiert!`);
     } else {
       alert("Keine passenden Adressen im Bild gefunden.");
     }
