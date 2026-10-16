@@ -1245,7 +1245,7 @@ async function handleOcrImage(event) {
   if (!file) return;
 
   showModal("Smart-Scan", "Analysiere Tour...", true);
-  updateProgress(10, "Bild wird vorbereitet...");
+  updateProgress(5, "Bild wird vorbereitet...");
 
   try {
     const imageUrl = URL.createObjectURL(file);
@@ -1257,7 +1257,7 @@ async function handleOcrImage(event) {
       img.src = imageUrl;
     });
 
-    updateProgress(30, "Auflösung wird optimiert...");
+    updateProgress(15, "Auflösung wird optimiert...");
 
     const canvas = document.getElementById('proofCanvas');
     const ctx = canvas.getContext('2d');
@@ -1268,13 +1268,24 @@ async function handleOcrImage(event) {
     
     const scaledDataUrl = canvas.toDataURL('image/jpeg', 0.95);
 
-    updateProgress(50, "Texterkennung läuft...");
+    updateProgress(25, "Starte Texterkennung...");
 
+    // Echter, mitlaufender Fortschritt über Tesseract logger
     const worker = await Tesseract.createWorker('deu');
-    const ret = await worker.recognize(scaledDataUrl);
+    
+    const ret = await worker.recognize(scaledDataUrl, {}, {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          // Mappt Tesseract's 0-1 Progress auf einen Bereich von 25% bis 85%
+          const prog = Math.floor(25 + (m.progress * 60));
+          updateProgress(prog, "Erkenne Text...");
+        }
+      }
+    });
+    
     await worker.terminate();
 
-    updateProgress(85, "Adressen werden extrahiert...");
+    updateProgress(90, "Adressen werden extrahiert...");
 
     const fullText = ret.data.text;
     if (!fullText) {
@@ -1298,10 +1309,14 @@ async function handleOcrImage(event) {
         const ort = tokens[1];
         let streetAndMore = tokens.slice(2).join(' ');
         
-        const addressMatch = streetAndMore.match(/^(.*?\d+[a-zA-Z]?)/);
+        // Erweiterter Regex für Hausnummern mit optionalen Leerzeichen und Zusätzen (z.B. "5 a")
+        const addressMatch = streetAndMore.match(/^(.*?\d+\s*[a-zA-Z]?)/);
         
         if (addressMatch) {
-          const fullAddress = `${plz} ${ort} ${addressMatch[1].trim()}`;
+          // Bereinigt evtl. Leerzeichen vor dem Buchstaben (z.B. "5 a" -> "5a")
+          let cleanStreetNum = addressMatch[1].trim().replace(/\s+([a-zA-Z])$/, '$1');
+          const fullAddress = `${plz} ${ort} ${cleanStreetNum}`;
+          
           if (!extractedAddresses.includes(fullAddress)) {
             extractedAddresses.push(fullAddress);
           }
