@@ -902,7 +902,11 @@ async function createAndSendTour() {
 }
 
 async function loadToursFromSupabase() {
-  const { data: tours } = await supabaseClient.from('tours').select('*, stops(*), profiles:assigned_to(full_name, email, is_active)');
+  // Lädt Touren absteigend nach Erstellungsdatum (neueste zuerst)
+  const { data: tours } = await supabaseClient
+    .from('tours')
+    .select('*, stops(*), profiles:assigned_to(full_name, email, is_active)')
+    .order('created_at', { ascending: false });
   
   // Filtere NUR aktive Touren von aktiven Fahrern für den Monitor
   const liveActiveTours = (tours || []).filter(t => t.profiles?.is_active === true && t.status === 'aktiv');
@@ -938,7 +942,8 @@ function renderLiveMonitor(activeTours) {
     return;
   }
 
-  // Gruppierung nach Fahrern (Pro Fahrer nur 1 Karte, nimmt die aktuellste)
+  // Gruppierung pro Fahrer: Da activeTours nach created_at absteigend sortiert ist,
+  // nimmt !driverMap.has(...) garantiert die aktuellste Tour des Fahrers.
   const driverMap = new Map();
   activeTours.forEach(t => {
     const driverId = t.assigned_to;
@@ -949,7 +954,7 @@ function renderLiveMonitor(activeTours) {
 
   container.innerHTML = '';
 
-  driverMap.forEach((tour, driverId) => {
+  driverMap.forEach((tour) => {
     const stops = (tour.stops || []).sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
     const total = stops.length;
     const doneStops = stops.filter(s => s.status === 'erledigt');
