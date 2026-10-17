@@ -1270,22 +1270,20 @@ async function handleOcrImage(event) {
 
     updateProgress(25, "Starte Texterkennung...");
 
-    // Echter, mitlaufender Fortschritt über Tesseract logger
-    const worker = await Tesseract.createWorker('deu');
-    
-    const ret = await worker.recognize(scaledDataUrl, {}, {
+    // Korrekte Tesseract.js v5 Logger-Einbindung über createWorker-Optionen
+    const worker = await Tesseract.createWorker('deu', 1, {
       logger: m => {
-        if (m.status === 'recognizing text') {
-          // Mappt Tesseract's 0-1 Progress auf einen Bereich von 25% bis 85%
-          const prog = Math.floor(25 + (m.progress * 60));
-          updateProgress(prog, "Erkenne Text...");
+        if (m && m.progress !== undefined) {
+          const prog = Math.floor(25 + (m.progress * 65));
+          updateProgress(prog, m.status ? `${m.status}` : "Erkenne Text...");
         }
       }
     });
-    
+
+    const ret = await worker.recognize(scaledDataUrl);
     await worker.terminate();
 
-    updateProgress(90, "Adressen werden extrahiert...");
+    updateProgress(92, "Adressen werden extrahiert...");
 
     const fullText = ret.data.text;
     if (!fullText) {
@@ -1313,7 +1311,6 @@ async function handleOcrImage(event) {
         const addressMatch = streetAndMore.match(/^(.*?\d+\s*[a-zA-Z]?)/);
         
         if (addressMatch) {
-          // Bereinigt evtl. Leerzeichen vor dem Buchstaben (z.B. "5 a" -> "5a")
           let cleanStreetNum = addressMatch[1].trim().replace(/\s+([a-zA-Z])$/, '$1');
           const fullAddress = `${plz} ${ort} ${cleanStreetNum}`;
           
