@@ -262,6 +262,7 @@ tr:last-child td { border-bottom: none; }
 .status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
 .status-chip.done { background: var(--success-bg); color: var(--success); }
 .status-chip.open { background: var(--warning-bg); color: var(--warning); }
+.status-chip.danger { background: var(--danger-bg); color: var(--danger); }
 
 .form-card-box {
   background: var(--input-bg);
@@ -979,9 +980,10 @@ async function loadToursFromSupabase() {
   
   const todayStr = new Date().toISOString().split('T')[0];
 
+  // Zeige im Live-Monitor aktive ODER heute abgebrochene Touren an
   const liveActiveTours = (tours || []).filter(t => 
     t.profiles?.is_active === true && 
-    t.status === 'aktiv' &&
+    (t.status === 'aktiv' || t.status === 'abgebrochen') &&
     t.created_at && t.created_at.startsWith(todayStr)
   );
   
@@ -1010,7 +1012,7 @@ function renderLiveMonitor(activeTours) {
       <div style="text-align:center; padding: 40px 20px; background:var(--input-bg); border-radius:16px; border:1px solid var(--border);">
         <div style="font-size:24px; margin-bottom:8px;">🚚</div>
         <div style="font-size:14px; font-weight:700; color:var(--text-main);">Aktuell keine Touren live</div>
-        <div style="font-size:12px; color:var(--text-sub); margin-top:4px;">Sobald ein Fahrer eine Tour startet, erscheint sein Echtzeit-Fortschritt hier.</div>
+        <div style="font-size:12px; color:var(--text-sub); margin-top:4px;">Sobald ein Fahrer eine Tour startet oder abbricht, erscheint er hier.</div>
       </div>
     `;
     return;
@@ -1036,6 +1038,13 @@ function renderLiveMonitor(activeTours) {
     const driverName = tour.profiles?.full_name || tour.profiles?.email?.split('@')[0] || 'Fahrer';
     const initials = driverName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
+    const isAborted = tour.status === 'abgebrochen';
+    const statusChipHtml = isAborted 
+      ? `<span class="status-chip danger">❌ Abgebrochen</span>` 
+      : `<span class="status-chip done">🟢 Unterwegs</span>`;
+
+    const cancelReasonText = isAborted ? (tour.notes || 'Kein Grund angegeben') : '';
+
     const lastDone = doneStops.length > 0 ? doneStops[doneStops.length - 1] : null;
     const lastDoneText = lastDone 
       ? `${lastDone.address} ${lastDone.completed_at ? '(' + new Date(lastDone.completed_at).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) + ' Uhr)' : ''}`
@@ -1045,43 +1054,47 @@ function renderLiveMonitor(activeTours) {
     const nextOpenText = nextOpen ? `#${nextOpen.sequence} ${nextOpen.address}` : 'Alle Stopps geschafft 🎉';
 
     const cardHtml = `
-      <div class="live-driver-card">
+      <div class="live-driver-card" style="${isAborted ? 'border-color: var(--danger);' : ''}">
         <div class="live-card-header" onclick="toggleAccordion('acc-${tour.id}')">
           <div class="driver-info-main">
-            <div class="driver-avatar">${initials}</div>
+            <div class="driver-avatar" style="${isAborted ? 'color: var(--danger); border-color: var(--danger); background: var(--danger-bg);' : ''}">${initials}</div>
             <div>
               <strong style="font-size:15px; color:var(--text-main);">${driverName}</strong>
               <div style="font-size:11px; color:var(--text-sub); margin-top:1px;">${tour.title}</div>
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
-            <span class="status-chip done">🟢 Unterwegs</span>
+            ${statusChipHtml}
             <span style="font-size:12px; color:var(--text-sub); cursor:pointer;">▼</span>
           </div>
         </div>
 
-        <div class="progress-track-bg">
-          <div class="progress-track-fill" style="width: ${pct}%;"></div>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sub); font-weight:700;">
-          <span>Stopps: ${doneCount} von ${total} erledigt</span>
-          <span style="color:var(--accent);">${pct}%</span>
-        </div>
-
-        <div class="live-stop-nodes">
-          <div class="stop-node-box">
-            <div class="stop-node-label">Zuletzt erledigt</div>
-            <div class="stop-node-value" title="${lastDoneText}">${lastDoneText}</div>
+        ${isAborted ? `
+          <div style="margin-top: 12px; background: var(--danger-bg); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: var(--danger);">
+            <strong>⚠️ Abbruchgrund vom Fahrer:</strong> ${cancelReasonText}
           </div>
-          <div class="stop-node-box">
-            <div class="stop-node-label">Nächster Stopp</div>
-            <div class="stop-node-value" title="${nextOpenText}">${nextOpenText}</div>
+        ` : `
+          <div class="progress-track-bg">
+            <div class="progress-track-fill" style="width: ${pct}%;"></div>
           </div>
-        </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sub); font-weight:700;">
+            <span>Stopps: ${doneCount} von${total} erledigt</span>
+            <span style="color:var(--accent);">${pct}%</span>
+          </div>
+          <div class="live-stop-nodes">
+            <div class="stop-node-box">
+              <div class="stop-node-label">Zuletzt erledigt</div>
+              <div class="stop-node-value" title="${lastDoneText}">${lastDoneText}</div>
+            </div>
+            <div class="stop-node-box">
+              <div class="stop-node-label">Nächster Stopp</div>
+              <div class="stop-node-value" title="${nextOpenText}">${nextOpenText}</div>
+            </div>
+          </div>
+        `}
 
         <div class="accordion-details" id="acc-${tour.id}">
-          <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-sub); margin-bottom:8px;">Live Stopp-Protokoll</div>
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-sub); margin-bottom:8px;">Stopp-Protokoll</div>
           <div class="table-container">
             <table>
               <thead>
