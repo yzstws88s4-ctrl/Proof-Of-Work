@@ -1146,8 +1146,20 @@ async function finishAndSaveTour() {
   }
 }
 
-function cancelAndReturn() {
+async function cancelAndReturn() {
   if (currentSupabaseTourId) {
+    try {
+      await supabaseClient
+        .from('tours')
+        .update({ 
+          status: 'abgebrochen', 
+          ended_at: new Date().toISOString() 
+        })
+        .eq('id', currentSupabaseTourId);
+    } catch (e) {
+      console.error("Fehler beim Abbrechen der Tour:", e);
+    }
+
     localStorage.removeItem('veribase_active_tour_id');
     localStorage.removeItem(`veribase_stop_index_${currentSupabaseTourId}`);
   }
