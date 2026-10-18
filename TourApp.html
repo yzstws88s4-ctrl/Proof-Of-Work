@@ -23,7 +23,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- Tesseract.js für kostenlose lokale Texterkennung direkt im Browser -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
@@ -32,6 +31,7 @@
   --bg: #e2e8f0;
   --surface: #f1f5f9;
   --surface-solid: #ffffff;
+  --surface-hover: #e8ecf4;
   --text: #0f172a;
   --text-sub: #64748b;
   --text-muted: #94a3b8;
@@ -42,12 +42,19 @@
   --accent-glow: rgba(99, 102, 241, 0.25);
   --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
   --switch-active: #6366f1;
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
 }
 
 html[data-theme="dark"] {
   --bg: #030712;
   --surface: rgba(17, 24, 39, 0.75);
   --surface-solid: #0f172a;
+  --surface-hover: rgba(30, 41, 59, 0.95);
   --text: #f9fafb;
   --text-sub: #9ca3af;
   --text-muted: #4b5563;
@@ -87,7 +94,6 @@ body {
   justify-content: space-between;
 }
 
-/* Header */
 .header {
   display: flex;
   align-items: center;
@@ -186,8 +192,8 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 }
 
 .btn-danger {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  background: var(--danger-bg);
+  color: var(--danger);
   border-color: rgba(239, 68, 68, 0.3);
 }
 
@@ -560,7 +566,10 @@ let editingStopIndex = null;
 let activeDetailTourId = null;
 
 window.onload = async () => {
-  const savedTheme = localStorage.getItem('veribase_theme') || 'dark';
+  if (!localStorage.getItem('veribase_theme')) {
+    localStorage.setItem('veribase_theme', 'dark');
+  }
+  const savedTheme = localStorage.getItem('veribase_theme');
   document.documentElement.setAttribute('data-theme', savedTheme);
 
   const savedProofToggle = localStorage.getItem('veribase_photo_proof_enabled');
