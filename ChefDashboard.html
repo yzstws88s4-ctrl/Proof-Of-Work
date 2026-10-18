@@ -890,7 +890,6 @@ async function addEmployee(e) {
   if (!name || !username || !password) return;
   btn.disabled = true;
 
-  // Hängt automatisch @app.local an, falls der Chef nur den Namen getippt hat
   const emailForAuth = username.includes('@') ? username : `${username}@app.local`;
 
   const { data, error } = await supabaseClient.rpc('create_driver_by_chef', {
@@ -964,7 +963,15 @@ async function loadToursFromSupabase() {
     .select('*, stops(*), profiles:assigned_to(full_name, email, is_active)')
     .order('created_at', { ascending: false });
   
-  const liveActiveTours = (tours || []).filter(t => t.profiles?.is_active === true && t.status === 'aktiv');
+  // Heutiges Datum als YYYY-MM-DD ermitteln
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  // Nur aktive Touren anzeigen, die AKTIV sind UND HEUTE gestartet wurden (verhindert Altlasten von Vortagen)
+  const liveActiveTours = (tours || []).filter(t => 
+    t.profiles?.is_active === true && 
+    t.status === 'aktiv' &&
+    t.created_at && t.created_at.startsWith(todayStr)
+  );
   
   document.getElementById('kpiTotalTours').innerText = (tours || []).filter(t => t.status === 'geplant').length;
   
