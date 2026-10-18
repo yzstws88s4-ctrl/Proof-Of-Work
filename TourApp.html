@@ -1270,7 +1270,6 @@ async function handleOcrImage(event) {
 
     updateProgress(25, "Starte Texterkennung...");
 
-    // Korrekte Tesseract.js v5 Logger-Einbindung über createWorker-Optionen
     const worker = await Tesseract.createWorker('deu', 1, {
       logger: m => {
         if (m && m.progress !== undefined) {
@@ -1307,7 +1306,6 @@ async function handleOcrImage(event) {
         const ort = tokens[1];
         let streetAndMore = tokens.slice(2).join(' ');
         
-        // Erweiterter Regex für Hausnummern mit optionalen Leerzeichen und Zusätzen (z.B. "5 a")
         const addressMatch = streetAndMore.match(/^(.*?\d+\s*[a-zA-Z]?)/);
         
         if (addressMatch) {
