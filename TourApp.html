@@ -476,8 +476,8 @@ input:checked + .slider:before { transform: translateX(18px); }
       <button class="btn-success" style="padding: 12px; margin-bottom: 6px;" id="finishTourBtn" onclick="finishAndSaveTour()">
         Tour beenden & Speichern
       </button>
-      <button onclick="cancelAndReturn()" style="padding: 10px;">
-        Abbrechen
+      <button class="btn-danger" onclick="cancelAndReturn()" style="padding: 10px;">
+        Tour abbrechen (Notfall)
       </button>
     </div>
   </div>
@@ -1156,12 +1156,16 @@ async function finishAndSaveTour() {
 }
 
 async function cancelAndReturn() {
+  const reason = prompt("Bitte gib den Grund für den Abbruch ein (z.B. Reifenpanne, Fahrzeugdefekt):");
+  if (reason === null) return; // Abgebrochen im Prompt
+
   if (currentSupabaseTourId) {
     try {
       await supabaseClient
         .from('tours')
         .update({ 
           status: 'abgebrochen', 
+          notes: reason ? `[ABGEBROCHEN] Grund: ${reason}` : '[ABGEBROCHEN] Ohne Grund',
           ended_at: new Date().toISOString() 
         })
         .eq('id', currentSupabaseTourId);
