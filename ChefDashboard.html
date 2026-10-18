@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="dark">
+<html lang="de" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,31 +12,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
+<script>
+  if (!localStorage.getItem('veribase_chef_theme')) {
+    localStorage.setItem('veribase_chef_theme', 'light');
+  }
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_chef_theme'));
+</script>
+
 <style>
 :root {
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --bg: #030712;
-  --surface: rgba(17, 24, 39, 0.75);
-  --surface-solid: #0f172a;
-  --surface-hover: rgba(30, 41, 59, 0.95);
-  --border: rgba(255, 255, 255, 0.08);
-  --accent-line: rgba(99, 102, 241, 0.35);
-  --text-main: #f9fafb;
-  --text-sub: #9ca3af;
-  --text-muted: #4b5563;
-  --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.25);
-  --input-bg: rgba(3, 7, 18, 0.8);
-  --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.12);
-  --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.12);
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.12);
-  --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
-}
-
-[data-theme="light"] {
   --bg: #e2e8f0;
   --surface: #f1f5f9;
   --surface-solid: #ffffff;
@@ -46,8 +31,30 @@
   --text-main: #0f172a;
   --text-sub: #64748b;
   --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.25);
   --input-bg: #ffffff;
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
   --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --bg: #030712;
+  --surface: rgba(17, 24, 39, 0.75);
+  --surface-solid: #0f172a;
+  --surface-hover: rgba(30, 41, 59, 0.95);
+  --border: rgba(255, 255, 255, 0.08);
+  --accent-line: rgba(99, 102, 241, 0.35);
+  --text-main: #f9fafb;
+  --text-sub: #9ca3af;
+  --text-muted: #4b5563;
+  --input-bg: rgba(3, 7, 18, 0.8);
+  --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -65,6 +72,7 @@ body {
   display: flex; justify-content: center;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .app-container {
@@ -77,7 +85,6 @@ body {
   gap: 16px;
 }
 
-/* TOP SEKTION (Header + KPIs) */
 .top-section {
   display: flex;
   flex-direction: column;
@@ -104,7 +111,6 @@ body {
 }
 .utility-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-/* KPI Leiste */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -127,7 +133,6 @@ body {
 .kpi-value { font-size: 20px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
 .kpi-icon { color: var(--accent); opacity: 0.8; }
 
-/* MITTLERES GRID */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -199,7 +204,6 @@ body {
   max-width: 200px;
 }
 
-/* Vollbild-Inhaltsbereich (nach Klick) */
 .fullscreen-content-section {
   display: none;
   flex: 1;
@@ -259,7 +263,6 @@ tr:last-child td { border-bottom: none; }
 .status-chip.done { background: var(--success-bg); color: var(--success); }
 .status-chip.open { background: var(--warning-bg); color: var(--warning); }
 
-/* FAHRER VERWALTUNG STYLING */
 .form-card-box {
   background: var(--input-bg);
   border: 1px solid var(--accent-line);
@@ -279,7 +282,6 @@ tr:last-child td { border-bottom: none; }
   margin-right: 10px;
 }
 
-/* LIVE MONITOR SPEZIELLES STYLING */
 .live-driver-card {
   background: var(--input-bg);
   border: 1px solid var(--accent-line);
@@ -382,7 +384,6 @@ tr:last-child td { border-bottom: none; }
 
 .filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 
-/* BOTTOM SECTION */
 .bottom-section {
   display: flex;
   justify-content: space-between;
@@ -420,7 +421,6 @@ tr:last-child td { border-bottom: none; }
 
 <div class="app-container">
 
-  <!-- TOP SECTION -->
   <div class="top-section">
     <div class="top-utility-bar">
       <div style="display:flex; align-items:center; gap:16px;">
@@ -437,7 +437,6 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
-    <!-- KPI Leiste -->
     <div class="kpi-row" id="kpiOverviewRow">
       <div class="kpi-card">
         <div>
@@ -470,7 +469,6 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- HAUPT-GRID -->
   <div class="dashboard-grid" id="mainDashboardGrid">
     <div class="module-card" onclick="openModule('pane-live')">
       <div class="module-svg-container"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
@@ -503,7 +501,6 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- VOLLBILD-INHALTSBEREICH (nach Klick) -->
   <div class="fullscreen-content-section" id="moduleContentArea">
     <div id="pane-live" class="tab-pane">
       <div class="card-header">
@@ -513,7 +510,6 @@ tr:last-child td { border-bottom: none; }
       <div id="liveToursContainer"><p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p></div>
     </div>
 
-    <!-- FAHRER-VERWALTUNG MODUL (ÜBERARBEITET) -->
     <div id="pane-team" class="tab-pane">
       <div class="grid-2">
         <div class="form-card-box">
@@ -646,7 +642,6 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- BOTTOM SECTION -->
   <div class="bottom-section">
     <div class="live-ticker">
       <div class="ticker-pulse"></div>
@@ -662,7 +657,6 @@ tr:last-child td { border-bottom: none; }
 
 </div>
 
-<!-- MODAL FÜR GROSSANSICHT -->
 <div id="proofModal" class="modal-backdrop" style="display:none;">
   <div class="modal-window">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -694,11 +688,18 @@ let activeModalProof = null;
 let companyLogoBase64 = '';
 
 window.onload = async () => {
+  if (!localStorage.getItem('veribase_chef_theme')) {
+    localStorage.setItem('veribase_chef_theme', 'light');
+  }
+  const savedTheme = localStorage.getItem('veribase_chef_theme');
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session || !session.user) {
       loadCompanyProfile();
       renderMockData();
+      restoreActiveDashboardSession();
       return;
     }
     currentChef = session.user;
@@ -706,9 +707,11 @@ window.onload = async () => {
     await loadDriversFromSupabase();
     await loadToursFromSupabase();
     subscribeRealtime();
+    restoreActiveDashboardSession();
   } catch (err) {
     loadCompanyProfile();
     renderMockData();
+    restoreActiveDashboardSession();
   }
 };
 
@@ -720,6 +723,8 @@ function openModule(paneId) {
 
   document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
   document.getElementById(paneId).classList.add('active');
+
+  localStorage.setItem('veribase_chef_active_pane', paneId);
 }
 
 function closeModuleView() {
@@ -727,6 +732,15 @@ function closeModuleView() {
   document.getElementById('backToGridBtn').style.display = 'none';
   document.getElementById('kpiOverviewRow').style.display = 'grid';
   document.getElementById('mainDashboardGrid').style.display = 'grid';
+
+  localStorage.removeItem('veribase_chef_active_pane');
+}
+
+function restoreActiveDashboardSession() {
+  const activePane = localStorage.getItem('veribase_chef_active_pane');
+  if (activePane && document.getElementById(activePane)) {
+    openModule(activePane);
+  }
 }
 
 function renderMockData() {
@@ -861,7 +875,7 @@ function renderDriverList() {
               <strong>${name}</strong>
             </div>
           </td>
-          <td><code style="background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:6px; font-size:12px;">${cleanUsername}</code></td>
+          <td><code style="background:var(--surface); padding:3px 8px; border-radius:6px; font-size:12px;">${cleanUsername}</code></td>
           <td><span class="status-chip done">Aktiv</span></td>
           <td style="text-align: right;">
             <button class="btn-danger-compact" onclick="deleteDriver('${driver.id}', '${name}')">Löschen</button>
@@ -963,10 +977,8 @@ async function loadToursFromSupabase() {
     .select('*, stops(*), profiles:assigned_to(full_name, email, is_active)')
     .order('created_at', { ascending: false });
   
-  // Heutiges Datum als YYYY-MM-DD ermitteln
   const todayStr = new Date().toISOString().split('T')[0];
 
-  // Nur aktive Touren anzeigen, die AKTIV sind UND HEUTE gestartet wurden (verhindert Altlasten von Vortagen)
   const liveActiveTours = (tours || []).filter(t => 
     t.profiles?.is_active === true && 
     t.status === 'aktiv' &&
@@ -1291,6 +1303,7 @@ function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('veribase_chef_theme', next);
 }
 
 async function logout() {
