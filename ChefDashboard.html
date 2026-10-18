@@ -245,7 +245,9 @@ button.btn-main:hover { opacity: 0.92; }
 .btn-danger-compact {
   background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);
   padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s ease;
 }
+.btn-danger-compact:hover { background: var(--danger); color: #fff; }
 
 .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--input-bg); }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
@@ -256,6 +258,26 @@ tr:last-child td { border-bottom: none; }
 .status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
 .status-chip.done { background: var(--success-bg); color: var(--success); }
 .status-chip.open { background: var(--warning-bg); color: var(--warning); }
+
+/* FAHRER VERWALTUNG STYLING */
+.form-card-box {
+  background: var(--input-bg);
+  border: 1px solid var(--accent-line);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.driver-mini-avatar {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--accent-glow);
+  color: var(--accent);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 12px;
+  border: 1px solid var(--accent-line);
+  margin-right: 10px;
+}
 
 /* LIVE MONITOR SPEZIELLES STYLING */
 .live-driver-card {
@@ -491,23 +513,42 @@ tr:last-child td { border-bottom: none; }
       <div id="liveToursContainer"><p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p></div>
     </div>
 
+    <!-- FAHRER-VERWALTUNG MODUL (ÜBERARBEITET) -->
     <div id="pane-team" class="tab-pane">
       <div class="grid-2">
-        <div>
-          <div class="card-header" style="margin-bottom:12px;">Neuen Fahrer anlegen</div>
+        <div class="form-card-box">
+          <div class="card-header" style="margin-bottom:16px;">Neuen Fahrer anlegen</div>
           <form id="addWorkerForm" onsubmit="addEmployee(event)">
-            <label>Name</label><input type="text" id="empName" placeholder="Max Mustermann" required>
-            <label>Benutzername</label><input type="text" id="empUsername" placeholder="max" required>
-            <label>Passwort</label><input type="password" id="empPassword" placeholder="••••••••" required>
-            <button type="submit" id="addEmpBtn" class="btn-main">Fahrer erstellen</button>
+            <label>Vollständiger Name</label>
+            <input type="text" id="empName" placeholder="z. B. Max Mustermann" required>
+            
+            <label>Benutzername für App-Login</label>
+            <input type="text" id="empUsername" placeholder="z. B. fahrer1" required autocomplete="off">
+            
+            <label>Passwort</label>
+            <input type="password" id="empPassword" placeholder="••••••••" required>
+            
+            <button type="submit" id="addEmpBtn" class="btn-main" style="margin-top:10px;">
+              <span>+ Fahrer erstellen</span>
+            </button>
           </form>
         </div>
+
         <div>
-          <div class="card-header" style="margin-bottom:12px;">Fahrerliste</div>
+          <div class="card-header" style="margin-bottom:16px;">Aktives Fahrer-Team</div>
           <div class="table-container">
             <table>
-              <thead><tr><th>Name</th><th>User</th><th>Status</th><th style="text-align:right;">Aktion</th></tr></thead>
-              <tbody id="employeeTableBody"></tbody>
+              <thead>
+                <tr>
+                  <th>Fahrer</th>
+                  <th>Login-User</th>
+                  <th>Status</th>
+                  <th style="text-align:right;">Aktion</th>
+                </tr>
+              </thead>
+              <tbody id="employeeTableBody">
+                <tr><td colspan="4" style="color:var(--text-muted); text-align: center;">Lade Fahrerliste...</td></tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -800,7 +841,7 @@ function renderDriverList() {
   if (driverFilter) driverFilter.innerHTML = '<option value="">Alle Fahrer</option>';
 
   if (driversList.length === 0) {
-    if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted); text-align: center;">Keine Fahrer.</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted); text-align: center;">Keine Fahrer hinterlegt.</td></tr>';
     if (select) select.innerHTML = '<option value="">Keine Fahrer verfügbar</option>';
     return;
   }
@@ -809,9 +850,23 @@ function renderDriverList() {
     const rawEmail = driver.email || '';
     const cleanUsername = rawEmail.split('@')[0];
     const name = driver.full_name || cleanUsername;
+    const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
     if (tbody) {
-      tbody.innerHTML += `<tr><td><strong>${name}</strong></td><td>${cleanUsername}</td><td><span style="color:var(--success); font-weight:600;">Aktiv</span></td><td style="text-align: right;"><button class="btn-danger-compact" onclick="deleteDriver('${driver.id}', '${name}')">Löschen</button></td></tr>`;
+      tbody.innerHTML += `
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center;">
+              <div class="driver-mini-avatar">${initials}</div>
+              <strong>${name}</strong>
+            </div>
+          </td>
+          <td><code style="background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:6px; font-size:12px;">${cleanUsername}</code></td>
+          <td><span class="status-chip done">Aktiv</span></td>
+          <td style="text-align: right;">
+            <button class="btn-danger-compact" onclick="deleteDriver('${driver.id}', '${name}')">Löschen</button>
+          </td>
+        </tr>`;
     }
     if (select) select.innerHTML += `<option value="${driver.id}">${name} (${cleanUsername})</option>`;
     if (driverFilter) driverFilter.innerHTML += `<option value="${name.toLowerCase()}">${name}</option>`;
@@ -819,7 +874,7 @@ function renderDriverList() {
 }
 
 async function deleteDriver(id, name) {
-  if (!confirm(`Fahrer "${name}" deaktivieren?`)) return;
+  if (!confirm(`Fahrer "${name}" wirklich deaktivieren?`)) return;
   await supabaseClient.from('profiles').update({ is_active: false }).eq('id', id);
   await loadDriversFromSupabase();
   await loadToursFromSupabase();
@@ -835,7 +890,9 @@ async function addEmployee(e) {
   if (!name || !username || !password) return;
   btn.disabled = true;
 
+  // Hängt automatisch @app.local an, falls der Chef nur den Namen getippt hat
   const emailForAuth = username.includes('@') ? username : `${username}@app.local`;
+
   const { data, error } = await supabaseClient.rpc('create_driver_by_chef', {
     driver_email: emailForAuth, driver_password: password, driver_name: name
   });
@@ -846,7 +903,7 @@ async function addEmployee(e) {
     return;
   }
 
-  alert(`Fahrer "${name}" erfolgreich angelegt!`);
+  alert(`Fahrer "${name}" mit Login "${username.split('@')[0]}" erfolgreich angelegt!`);
   document.getElementById('addWorkerForm').reset();
   btn.disabled = false;
   await loadDriversFromSupabase();
@@ -902,13 +959,11 @@ async function createAndSendTour() {
 }
 
 async function loadToursFromSupabase() {
-  // Lädt Touren absteigend nach Erstellungsdatum (neueste zuerst)
   const { data: tours } = await supabaseClient
     .from('tours')
     .select('*, stops(*), profiles:assigned_to(full_name, email, is_active)')
     .order('created_at', { ascending: false });
   
-  // Filtere NUR aktive Touren von aktiven Fahrern für den Monitor
   const liveActiveTours = (tours || []).filter(t => t.profiles?.is_active === true && t.status === 'aktiv');
   
   document.getElementById('kpiTotalTours').innerText = (tours || []).filter(t => t.status === 'geplant').length;
@@ -942,8 +997,6 @@ function renderLiveMonitor(activeTours) {
     return;
   }
 
-  // Gruppierung pro Fahrer: Da activeTours nach created_at absteigend sortiert ist,
-  // nimmt !driverMap.has(...) garantiert die aktuellste Tour des Fahrers.
   const driverMap = new Map();
   activeTours.forEach(t => {
     const driverId = t.assigned_to;
@@ -964,13 +1017,11 @@ function renderLiveMonitor(activeTours) {
     const driverName = tour.profiles?.full_name || tour.profiles?.email?.split('@')[0] || 'Fahrer';
     const initials = driverName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
-    // Letzter geschaffter Stopp
     const lastDone = doneStops.length > 0 ? doneStops[doneStops.length - 1] : null;
     const lastDoneText = lastDone 
       ? `${lastDone.address} ${lastDone.completed_at ? '(' + new Date(lastDone.completed_at).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) + ' Uhr)' : ''}`
       : 'Noch kein Stopp abgeschlossen';
 
-    // Nächster offener Stopp
     const nextOpen = stops.find(s => s.status !== 'erledigt');
     const nextOpenText = nextOpen ? `#${nextOpen.sequence} ${nextOpen.address}` : 'Alle Stopps geschafft 🎉';
 
