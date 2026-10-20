@@ -182,12 +182,12 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 }
 
 .btn-complete-action {
-  min-height: 52px;
-  font-size: 14px;
-  font-weight: 700;
-  background: var(--surface-solid);
-  color: var(--text);
-  border: 1.5px solid var(--accent);
+  min-height: 48px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--surface);
+  color: var(--text-sub);
+  border: 1px solid var(--accent-line);
   box-shadow: var(--shadow);
 }
 
@@ -200,15 +200,15 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .btn-navigate {
-  min-height: 60px;
-  font-size: 16px;
+  min-height: 64px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   background: var(--accent);
   color: #ffffff;
   border: none;
-  box-shadow: 0 4px 16px var(--accent-glow);
+  box-shadow: 0 6px 20px var(--accent-glow);
 }
 
 textarea, input[type="text"] {
@@ -476,7 +476,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       <button class="btn-success" style="padding: 12px; margin-bottom: 6px;" id="finishTourBtn" onclick="finishAndSaveTour()">
         Tour beenden & Speichern
       </button>
-      <button class="btn-danger" onclick="cancelAndReturn()" style="padding: 10px;">
+      <button class="btn-danger" onclick="openCancelModal()" style="padding: 10px;">
         Tour abbrechen (Notfall)
       </button>
     </div>
@@ -493,6 +493,21 @@ input:checked + .slider:before { transform: translateX(18px); }
       <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 220px; object-fit: contain;">
     </div>
     <button class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()" style="padding: 13px;">Bestätigen & Weiter</button>
+  </div>
+</div>
+
+<!-- NEUES ABBRUCH-MODAL (DESIGN-INTEgriert) -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal-box">
+    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--danger);">Tour abbrechen</div>
+    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Bitte gib den Grund für den Abbruch ein (z.B. Reifenpanne, Fahrzeugdefekt):</div>
+    
+    <input type="text" id="cancelReasonInput" placeholder="Grund hier eingeben..." style="margin-bottom: 16px;">
+
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-danger" style="margin-bottom:0; padding: 12px;" onclick="confirmCancelTour()">Abbruch bestätigen</button>
+      <button style="margin-bottom:0; padding: 12px;" onclick="closeCancelModal()">Zurück</button>
+    </div>
   </div>
 </div>
 
@@ -1146,7 +1161,7 @@ async function finishAndSaveTour() {
     }
 
     alert("Tour erfolgreich gespeichert!");
-    cancelAndReturn();
+    resetTourView();
   } catch (err) {
     alert("Fehler beim Speichern: " + err.message);
   } finally {
@@ -1155,9 +1170,19 @@ async function finishAndSaveTour() {
   }
 }
 
-async function cancelAndReturn() {
-  const reason = prompt("Bitte gib den Grund für den Abbruch ein (z.B. Reifenpanne, Fahrzeugdefekt):");
-  if (reason === null) return; // Abgebrochen im Prompt
+function openCancelModal() {
+  document.getElementById('cancelReasonInput').value = '';
+  document.getElementById('cancelModal').style.display = 'flex';
+  setTimeout(() => { document.getElementById('cancelReasonInput').focus(); }, 150);
+}
+
+function closeCancelModal() {
+  document.getElementById('cancelModal').style.display = 'none';
+}
+
+async function confirmCancelTour() {
+  const reason = document.getElementById('cancelReasonInput').value.trim();
+  closeCancelModal();
 
   if (currentSupabaseTourId) {
     try {
@@ -1177,6 +1202,10 @@ async function cancelAndReturn() {
     localStorage.removeItem(`veribase_stop_index_${currentSupabaseTourId}`);
   }
 
+  resetTourView();
+}
+
+function resetTourView() {
   tourStops = [];
   currentSupabaseTourId = null;
   loadedChefStops = [];
