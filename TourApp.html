@@ -197,7 +197,7 @@ button:disabled { opacity: 0.3; cursor: not-allowed; }
   border-color: rgba(239, 68, 68, 0.3);
 }
 
-.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
 
 .btn-navigate {
   min-height: 64px;
@@ -389,16 +389,11 @@ input:checked + .slider:before { transform: translateX(18px); }
       <div class="btn-grid">
         <button onclick="document.getElementById('ocrCameraInput').click()">
           <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          Kamera (Smart-Scan)
-        </button>
-        <button onclick="document.getElementById('galleryInput').click()">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          Aus Galerie
+          Tour-Foto einlesen (Smart-Scan)
         </button>
       </div>
 
       <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
-      <input type="file" id="galleryInput" accept="image/*" style="display: none;" onchange="handleOcrImage(event)">
 
       <textarea id="addressInput" placeholder="Adressen zeilenweise einfügen..."></textarea>
 
@@ -408,7 +403,7 @@ input:checked + .slider:before { transform: translateX(18px); }
           <span style="font-size: 10px; color: var(--text-sub);">Foto vor Abschluss erforderlich</span>
         </div>
         <label class="switch">
-          <input type="checkbox" id="photoProofToggle" checked>
+          <input type="checkbox" id="photoProofToggle" checked disabled>
           <span class="slider"></span>
         </label>
       </div>
@@ -450,7 +445,7 @@ input:checked + .slider:before { transform: translateX(18px); }
       </a>
 
       <button class="btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
-        STOPP ERLEDIGT ✓
+        STOPP ERLEDIGT ✓ (Live-Foto aufnehmen)
       </button>
 
       <button id="prevStopBtn" onclick="previousStop()" style="padding: 10px; font-size: 12px;">
@@ -487,23 +482,20 @@ input:checked + .slider:before { transform: translateX(18px); }
 
 <div class="modal-overlay" id="proofPreviewModal">
   <div class="modal-box">
-    <div style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Fotobeweis erfasst</div>
-    <input type="text" id="modalProofNoteInput" placeholder="Notiz zum Stopp..." oninput="updateLiveStampNote()">
+    <div style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Fälschungssicherer Fotobeweis</div>
+    <input type="text" id="modalProofNoteInput" placeholder="Notiz zum Stopp (optional)..." oninput="updateLiveStampNote()">
     <div style="border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--accent-line); background: #000;">
       <img id="modalProofImagePreview" src="" style="width: 100%; display: block; max-height: 220px; object-fit: contain;">
     </div>
-    <button class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()" style="padding: 13px;">Bestätigen & Weiter</button>
+    <button class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()" style="padding: 13px;">Bestätigen & Übermitteln</button>
   </div>
 </div>
 
-<!-- NEUES ABBRUCH-MODAL (DESIGN-INTEgriert) -->
 <div class="modal-overlay" id="cancelModal">
   <div class="modal-box">
     <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--danger);">Tour abbrechen</div>
-    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Bitte gib den Grund für den Abbruch ein (z.B. Reifenpanne, Fahrzeugdefekt):</div>
-    
+    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Bitte gib den Grund für den Abbruch ein:</div>
     <input type="text" id="cancelReasonInput" placeholder="Grund hier eingeben..." style="margin-bottom: 16px;">
-
     <div style="display: flex; gap: 8px;">
       <button class="btn-danger" style="margin-bottom:0; padding: 12px;" onclick="confirmCancelTour()">Abbruch bestätigen</button>
       <button style="margin-bottom:0; padding: 12px;" onclick="closeCancelModal()">Zurück</button>
@@ -515,18 +507,14 @@ input:checked + .slider:before { transform: translateX(18px); }
   <div class="modal-box" style="max-height: 85vh; overflow-y: auto;">
     <div style="font-size: 15px; font-weight: 700; margin-bottom: 2px;" id="noteModalTitle">Stopp bearbeiten</div>
     <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;" id="noteModalSub">Details</div>
-    
     <textarea id="noteModalInput" placeholder="z.B. Abgabe beim Nachbarn..."></textarea>
-    
     <button onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 8px; padding: 11px;">
       <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Foto aufnehmen / ersetzen
+      Live-Foto aufnehmen / ersetzen
     </button>
-
     <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 8px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-line);">
       <img id="modalStopPhotoImg" src="" style="width: 100%; max-height: 150px; object-fit: cover; display: block;">
     </div>
-
     <div style="display: flex; gap: 8px;">
       <button class="btn-success" style="margin-bottom:0; padding: 11px;" onclick="saveStopNoteFromModal()">Speichern</button>
       <button style="margin-bottom:0; padding: 11px;" onclick="closeNoteModal()">Abbrechen</button>
@@ -573,7 +561,9 @@ let tourStops = [];
 let currentStopIndex = 0;
 let currentSupabaseTourId = null;
 let loadedChefStops = [];
-let currentGPSCoords = "GPS wird ermittelt...";
+let currentGPSCoords = "Ermittle präzises GPS...";
+let currentLatitude = null;
+let currentLongitude = null;
 
 let tempCapturedFile = null;
 let tempCanvasBlob = null;
@@ -586,15 +576,6 @@ window.onload = async () => {
   }
   const savedTheme = localStorage.getItem('veribase_theme');
   document.documentElement.setAttribute('data-theme', savedTheme);
-
-  const savedProofToggle = localStorage.getItem('veribase_photo_proof_enabled');
-  if (savedProofToggle !== null) {
-    document.getElementById('photoProofToggle').checked = (savedProofToggle === 'true');
-  }
-
-  document.getElementById('photoProofToggle').addEventListener('change', (e) => {
-    localStorage.setItem('veribase_photo_proof_enabled', e.target.checked);
-  });
 
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) {
@@ -677,16 +658,37 @@ function initGPS() {
   if ("geolocation" in navigator) {
     navigator.geolocation.watchPosition(
       (pos) => {
-        currentGPSCoords = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+        currentLatitude = pos.coords.latitude;
+        currentLongitude = pos.coords.longitude;
+        currentGPSCoords = `${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}`;
         document.getElementById('gpsStatusText').innerText = `GPS aktiv (${currentGPSCoords})`;
       },
-      () => {
-        currentGPSCoords = "GPS nicht verfügbar";
-        document.getElementById('gpsStatusText').innerText = "GPS offline";
+      (err) => {
+        currentGPSCoords = "GPS Signal schwach";
+        document.getElementById('gpsStatusText').innerText = "GPS Offline / Fehler";
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
     );
   }
+}
+
+function forceFreshGPSFix() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve();
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        currentLatitude = pos.coords.latitude;
+        currentLongitude = pos.coords.longitude;
+        currentGPSCoords = `${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}`;
+        resolve();
+      },
+      () => { resolve(); },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+    );
+  });
 }
 
 async function loadSupabaseTour() {
@@ -877,19 +879,7 @@ function closeNoteModal() {
 
 function triggerCompleteStop() {
   if (currentStopIndex >= tourStops.length) return;
-  const isProofRequired = document.getElementById('photoProofToggle').checked;
-  const current = tourStops[currentStopIndex];
-
-  if (isProofRequired) {
-    const hasPhoto = current.photo_url || current.blob;
-    if (hasPhoto) {
-      completeCurrentStop(current.photo_url, current.blob, current.notes || '');
-    } else {
-      document.getElementById('proofCameraInput').click();
-    }
-  } else {
-    completeCurrentStop(current.photo_url || null, current.blob || null, current.notes || '');
-  }
+  document.getElementById('proofCameraInput').click();
 }
 
 async function handleProofCapture(event) {
@@ -914,6 +904,7 @@ async function handleModalReplaceCapture(event) {
   if (!file || editingStopIndex === null) return;
   
   const stop = tourStops[editingStopIndex];
+  await forceFreshGPSFix();
   
   const reader = new FileReader();
   reader.onload = async (e) => {
@@ -928,13 +919,15 @@ async function handleModalReplaceCapture(event) {
 
       const userNote = document.getElementById('noteModalInput').value.trim();
       const now = new Date().toLocaleString('de-DE');
+      const driverDisplayName = currentProfile?.full_name || currentUser.email.split('@')[0];
 
-      const fontSize = Math.max(18, Math.floor(canvas.width / 26));
-      const padding = fontSize;
+      const fontSize = Math.max(22, Math.floor(canvas.width / 24));
+      const padding = Math.floor(fontSize * 0.8);
       const lines = [
-        `VERIBASE - STOPP #${editingStopIndex + 1}`,
-        `Adresse: ${stop.address}`,
-        `${now} - GPS: ${currentGPSCoords}`,
+        `VERIBASE - AUDIT-FOTOBEW. #${editingStopIndex + 1}`,
+        `Fahrer: ${driverDisplayName}`,
+        `Ort: ${stop.address}`,
+        `Zeit: ${now} | GPS: ${currentGPSCoords}`,
         userNote ? `Notiz: ${userNote}` : null
       ].filter(Boolean);
 
@@ -943,15 +936,15 @@ async function handleModalReplaceCapture(event) {
       lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
 
       const boxW = maxW + (padding * 2);
-      const boxH = (lines.length * fontSize * 1.3) + padding;
+      const boxH = (lines.length * fontSize * 1.35) + padding;
       const yPos = canvas.height - boxH - padding;
 
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
       ctx.fillRect(padding, yPos, boxW, boxH);
 
       lines.forEach((line, i) => {
-        ctx.fillStyle = i === 0 ? '#ffffff' : '#94a3b8';
-        ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
+        ctx.fillStyle = i === 0 ? '#ffffff' : '#cbd5e1';
+        ctx.fillText(line, padding * 1.5, yPos + padding + (i * fontSize * 1.35));
       });
 
       canvas.toBlob(async (blob) => {
@@ -985,7 +978,7 @@ async function handleModalReplaceCapture(event) {
 
         updateGalleryGrid();
         renderTourUI();
-      }, 'image/jpeg', 0.88);
+      }, 'image/jpeg', 0.90);
     };
     img.src = e.target.result;
   };
@@ -993,7 +986,8 @@ async function handleModalReplaceCapture(event) {
   event.target.value = '';
 }
 
-function refreshStampPreview() {
+async function refreshStampPreview() {
+  await forceFreshGPSFix();
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -1009,13 +1003,15 @@ function refreshStampPreview() {
         const currentStop = tourStops[currentStopIndex];
         const userNote = document.getElementById('modalProofNoteInput').value.trim();
         const now = new Date().toLocaleString('de-DE');
+        const driverDisplayName = currentProfile?.full_name || currentUser.email.split('@')[0];
 
-        const fontSize = Math.max(18, Math.floor(canvas.width / 26));
-        const padding = fontSize;
+        const fontSize = Math.max(22, Math.floor(canvas.width / 24));
+        const padding = Math.floor(fontSize * 0.8);
         const lines = [
-          `VERIBASE - STOPP #${currentStopIndex + 1}`,
-          `Adresse: ${currentStop.address}`,
-          `${now} - GPS: ${currentGPSCoords}`,
+          `VERIBASE - AUDIT-FOTOBEW. #${currentStopIndex + 1}`,
+          `Fahrer: ${driverDisplayName}`,
+          `Ort: ${currentStop.address}`,
+          `Zeit: ${now} | GPS: ${currentGPSCoords}`,
           userNote ? `Notiz: ${userNote}` : null
         ].filter(Boolean);
 
@@ -1024,22 +1020,22 @@ function refreshStampPreview() {
         lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
 
         const boxW = maxW + (padding * 2);
-        const boxH = (lines.length * fontSize * 1.3) + padding;
+        const boxH = (lines.length * fontSize * 1.35) + padding;
         const yPos = canvas.height - boxH - padding;
 
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
         ctx.fillRect(padding, yPos, boxW, boxH);
 
         lines.forEach((line, i) => {
-          ctx.fillStyle = i === 0 ? '#ffffff' : '#94a3b8';
-          ctx.fillText(line, padding * 2, yPos + padding + (i * fontSize * 1.3));
+          ctx.fillStyle = i === 0 ? '#ffffff' : '#cbd5e1';
+          ctx.fillText(line, padding * 1.5, yPos + padding + (i * fontSize * 1.35));
         });
 
         canvas.toBlob((blob) => {
           tempCanvasBlob = blob;
           document.getElementById('modalProofImagePreview').src = URL.createObjectURL(blob);
           resolve();
-        }, 'image/jpeg', 0.88);
+        }, 'image/jpeg', 0.90);
       };
       img.src = e.target.result;
     };
@@ -1426,6 +1422,7 @@ function showModal(title, bodyText, showProgress = false) {
 }
 
 function closeModal() {
+  document.getElementById('customManager') // Fallback
   document.getElementById('customModal').style.display = 'none';
 }
 </script>
