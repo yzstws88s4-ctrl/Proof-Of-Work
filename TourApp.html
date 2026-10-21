@@ -702,10 +702,10 @@ function forceFreshGPSFix() {
         currentLatitude = pos.coords.latitude;
         currentLongitude = pos.coords.longitude;
         currentGPSCoords = `${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}`;
-        resolve();
+        resolve(pos.coords);
       },
-      () => { resolve(); },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+      () => { resolve(null); },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 4000 }
     );
   });
 }
@@ -945,13 +945,13 @@ function closeNoteModal() {
   document.getElementById('noteEditModal').style.display = 'none';
 }
 
-// 100% Unsichtbarer Hintergrund-Check ohne lästigen Ladebalken
+// Zuverlässiger Hintergrund-Check mit direktem Kamera-Start bei Erfolg
 async function triggerCompleteStop() {
   if (currentStopIndex >= tourStops.length) return;
   const current = tourStops[currentStopIndex];
 
   if (isPhotoProofEnabled) {
-    // Frischen GPS-Fix im Hintergrund holen
+    // 1. GPS Fix holen
     await forceFreshGPSFix();
 
     if (currentLatitude === null || currentLongitude === null) {
@@ -959,7 +959,7 @@ async function triggerCompleteStop() {
       return;
     }
 
-    // Entfernung zur Zieladresse im Hintergrund prüfen
+    // 2. Entfernung ermitteln
     const targetCoords = await getCoordinatesForAddress(current.address);
 
     if (targetCoords) {
@@ -972,10 +972,10 @@ async function triggerCompleteStop() {
       }
     }
 
-    // Wenn alles passt: Kein Ladebalken, direkt Kamera öffnen!
+    // 3. Wenn Vor Ort: Direkt Live-Kamera auslösen ohne Verzögerung
     document.getElementById('proofCameraInput').click();
   } else {
-    // Ohne Foto: Direkt im Hintergrund abschließen
+    // Ohne Foto: Direkt abhaken
     completeCurrentStopWithoutPhoto();
   }
 }
