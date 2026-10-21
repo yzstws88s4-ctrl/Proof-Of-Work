@@ -642,7 +642,6 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
-    <!-- PANE PROOFS & AUDIT (ERWEITERT UM ABBRÜCHE, LÖSCHEN & PROFI-FILTER) -->
     <div id="pane-proofs" class="tab-pane">
       <div class="card-header">
         <span>Erfasste Fotobeweise, Protokolle & Abbrüche</span>
@@ -695,32 +694,65 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- ERWEITERTES FIRMENDATEN-MODUL MIT LIVE-VORSCHAU & BANKDATEN -->
     <div id="pane-company" class="tab-pane">
-      <div class="card-header" style="margin-bottom:12px;">Unternehmensdaten für PDF-Header</div>
-      <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
-        <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
-          <div>
-            <label>Firmenname</label><input type="text" id="compName" required>
-            <label>Untertitel / Slogan</label><input type="text" id="compSubtitle">
-            <label>Inhaber</label><input type="text" id="compOwner">
-            <label>Straße & Hausnummer</label><input type="text" id="compStreet" required>
-            <label>PLZ & Ort</label><input type="text" id="compCity" required>
-          </div>
-          <div>
-            <label>E-Mail</label><input type="email" id="compEmail">
-            <label>Telefon</label><input type="text" id="compPhone">
-            <label>Steuernummer / USt-IdNr.</label><input type="text" id="compTax">
+      <div class="card-header" style="margin-bottom:12px;">Unternehmensdaten & Rechnungs-Header für PDFs</div>
+      
+      <div class="grid-2">
+        <div class="form-card-box">
+          <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
+            <label>Firmenname</label><input type="text" id="compName" placeholder="z. B. Veribase GbR" oninput="updatePdfPreview()" required>
+            <label>Untertitel / Slogan</label><input type="text" id="compSubtitle" placeholder="z. B. Mülltonnenservice & Logistik" oninput="updatePdfPreview()">
+            <label>Inhaber</label><input type="text" id="compOwner" placeholder="z. B. Björn ..." oninput="updatePdfPreview()">
+            <label>Straße & Hausnummer</label><input type="text" id="compStreet" placeholder="Hauptstraße 1" oninput="updatePdfPreview()" required>
+            <label>PLZ & Ort</label><input type="text" id="compCity" placeholder="51766 Engelskirchen" oninput="updatePdfPreview()" required>
+            <label>E-Mail</label><input type="email" id="compEmail" placeholder="kontakt@veribase.de" oninput="updatePdfPreview()">
+            <label>Telefon</label><input type="text" id="compPhone" placeholder="+49 ..." oninput="updatePdfPreview()">
+            <label>Steuernummer / USt-IdNr.</label><input type="text" id="compTax" placeholder="DE..." oninput="updatePdfPreview()">
+            <label>Webseite</label><input type="text" id="compWeb" placeholder="https://..." oninput="updatePdfPreview()">
+            <label>IBAN (optional für Fußzeile)</label><input type="text" id="compIban" placeholder="DE..." oninput="updatePdfPreview()">
+            <label>BIC</label><input type="text" id="compBic" placeholder="..." oninput="updatePdfPreview()">
+            
             <label>Firmenlogo</label>
             <div style="border: 2px dashed var(--accent-line); border-radius:10px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
-              <div style="font-size:11px; font-weight:600;">Logo auswählen</div>
-              <img id="compLogoPreview" style="max-width:120px; max-height:40px; object-fit:contain; margin-top:4px; display:none;" alt="Logo">
+              <div style="font-size:11px; font-weight:600;">Logo auswählen (PNG/JPG)</div>
             </div>
             <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
             <button type="button" class="btn-danger-compact" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:6px;">Logo entfernen</button>
+
+            <button type="submit" class="btn-main" style="margin-top:20px;">💾 Firmendaten & PDF-Header speichern</button>
+          </form>
+        </div>
+
+        <!-- LIVE PDF BRIEFKOPF VORSCHAU -->
+        <div>
+          <div class="card-header" style="margin-bottom:12px;">Live-Vorschau (PDF Briefkopf)</div>
+          <div style="background:#ffffff; color:#0f172a; border:1px solid var(--border); border-radius:16px; padding:24px; box-shadow:var(--shadow); min-height:400px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #6366f1; padding-bottom:16px; margin-bottom:16px;">
+                <div>
+                  <div id="prevLogoArea"><strong id="prevCompName" style="font-size:18px; color:#0f172a;">Veribase Operations</strong></div>
+                  <div id="prevCompSubtitle" style="font-size:11px; color:#64748b; margin-top:2px;">Mülltonnenservice & Logistik</div>
+                </div>
+                <div style="text-align:right; font-size:11px; color:#64748b; line-height:1.4;">
+                  <span id="prevCompStreet" style="font-weight:700;">Hauptstraße 1</span><br>
+                  <span id="prevCompCity" style="font-weight:700;">51766 Engelskirchen</span><br>
+                  <span id="prevCompEmail">kontakt@veribase.de</span>
+                </div>
+              </div>
+              <h3 style="font-size:14px; text-transform:uppercase; color:#0f172a; margin:16px 0 8px 0;">Leistungsnachweis / Audit-Protokoll</h3>
+              <p style="font-size:11px; color:#64748b;">Erstellt am: ${new Date().toLocaleDateString('de-DE')} | Status: Offizielles Dokument</p>
+              <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:20px; text-align:center; color:#94a3b8; font-size:12px; margin-top:20px;">
+                [ Tabellen-Inhalt & Fotobeweise im PDF ]
+              </div>
+            </div>
+            <div style="border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; font-size:10px; color:#64748b;">
+              <div>Inhaber: <span id="prevCompOwner">-</span> | Steuernr: <span id="prevCompTax">-</span></div>
+              <div>IBAN: <span id="prevCompIban">-</span></div>
+            </div>
           </div>
         </div>
-        <button type="submit" class="btn-main" style="margin-top:16px;">Firmendaten speichern</button>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -871,13 +903,42 @@ function loadCompanyProfile() {
       document.getElementById('compEmail').value = data.email || '';
       document.getElementById('compPhone').value = data.phone || '';
       document.getElementById('compTax').value = data.tax || '';
+      document.getElementById('compWeb').value = data.web || '';
+      document.getElementById('compIban').value = data.iban || '';
+      document.getElementById('compBic').value = data.bic || '';
       if (data.logo) {
         companyLogoBase64 = data.logo;
-        const prev = document.getElementById('compLogoPreview');
-        prev.src = data.logo; prev.style.display = 'block';
         document.getElementById('removeLogoBtn').style.display = 'block';
       }
+      updatePdfPreview();
     } catch (e) {}
+  }
+}
+
+function updatePdfPreview() {
+  const name = document.getElementById('compName').value || 'Veribase Operations';
+  const subtitle = document.getElementById('compSubtitle').value || '';
+  const owner = document.getElementById('compOwner').value || '-';
+  const street = document.getElementById('compStreet').value || 'Hauptstraße 1';
+  const city = document.getElementById('compCity').value || '51766 Engelskirchen';
+  const email = document.getElementById('compEmail').value || 'kontakt@veribase.de';
+  const tax = document.getElementById('compTax').value || '-';
+  const iban = document.getElementById('compIban').value || '-';
+
+  document.getElementById('prevCompName').innerText = name;
+  document.getElementById('prevCompSubtitle').innerText = subtitle;
+  document.getElementById('prevCompStreet').innerText = street;
+  document.getElementById('prevCompCity').innerText = city;
+  document.getElementById('prevCompEmail').innerText = email;
+  document.getElementById('prevCompOwner').innerText = owner;
+  document.getElementById('prevCompTax').innerText = tax;
+  document.getElementById('prevCompIban').innerText = iban;
+
+  const logoArea = document.getElementById('prevLogoArea');
+  if (companyLogoBase64) {
+    logoArea.innerHTML = `<img src="${companyLogoBase64}" style="max-height:45px; max-width:140px; object-fit:contain;">`;
+  } else {
+    logoArea.innerHTML = `<strong style="font-size:18px; color:#0f172a;">${name}</strong>`;
   }
 }
 
@@ -887,18 +948,17 @@ function handleLogoUpload(e) {
   const reader = new FileReader();
   reader.onload = (event) => {
     companyLogoBase64 = event.target.result;
-    const prev = document.getElementById('compLogoPreview');
-    prev.src = companyLogoBase64; prev.style.display = 'block';
     document.getElementById('removeLogoBtn').style.display = 'block';
+    updatePdfPreview();
   };
   reader.readAsDataURL(file);
 }
 
 function removeLogo() {
   companyLogoBase64 = '';
-  document.getElementById('compLogoPreview').style.display = 'none';
   document.getElementById('compLogoInput').value = '';
   document.getElementById('removeLogoBtn').style.display = 'none';
+  updatePdfPreview();
 }
 
 function saveCompanyProfile(e) {
@@ -912,16 +972,19 @@ function saveCompanyProfile(e) {
     email: document.getElementById('compEmail').value.trim(),
     phone: document.getElementById('compPhone').value.trim(),
     tax: document.getElementById('compTax').value.trim(),
+    web: document.getElementById('compWeb').value.trim(),
+    iban: document.getElementById('compIban').value.trim(),
+    bic: document.getElementById('compBic').value.trim(),
     logo: companyLogoBase64
   };
   localStorage.setItem('companyProfile', JSON.stringify(data));
-  alert('Firmendaten erfolgreich gespeichert!');
+  alert('Firmendaten & PDF-Header erfolgreich gespeichert!');
 }
 
 function getCompanyProfile() {
   const saved = localStorage.getItem('companyProfile');
   if (saved) return JSON.parse(saved);
-  return { name: 'Veribase Operations', subtitle: '', owner: '', street: '', city: '', email: '', phone: '', tax: '', logo: '' };
+  return { name: 'Veribase Operations', subtitle: '', owner: '', street: '', city: '', email: '', phone: '', tax: '', web: '', iban: '', bic: '', logo: '' };
 }
 
 async function loadDriversFromSupabase() {
@@ -1502,7 +1565,7 @@ function generatePDFHTML(proofs, title = 'Leistungsnachweis') {
 
   return `
     <div style="padding: 30px; font-family: sans-serif; color: #0f172a; background: #fff;">
-      <table style="width: 100%; margin-bottom: 20px;"><tr><td>${logo}</td><td style="text-align:right; font-size:12px; color:#475569;"><strong>${comp.name}</strong><br>${comp.street}, ${comp.city}</td></tr></table>
+      <table style="width: 100%; margin-bottom: 20px;"><tr><td>${logo}</td><td style="text-align:right; font-size:12px; color:#475569;"><strong>${comp.name}</strong><br>${comp.street}, ${comp.city}<br>${comp.email || ''}</td></tr></table>
       <hr style="border:0; border-top:2px solid #6366f1; margin-bottom: 20px;">
       <h2>${title}</h2>
       <p style="font-size:12px; color:#64748b;">Erstellt am: ${date} | Erledigt: ${done}/${total}</p>
@@ -1510,6 +1573,10 @@ function generatePDFHTML(proofs, title = 'Leistungsnachweis') {
         <thead><tr style="background:#f8fafc; font-size:12px; text-align:left;"><th>Foto</th><th>Details</th><th>Zeit</th><th style="text-align:right;">Status</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
+      <div style="margin-top:30px; border-top:1px solid #cbd5e1; padding-top:10px; font-size:10px; color:#64748b; display:flex; justify-content:space-between;">
+        <span>Inhaber: ${comp.owner || '-'} | Steuernr: ${comp.tax || '-'}</span>
+        <span>IBAN: ${comp.iban || '-'}</span>
+      </div>
     </div>
   `;
 }
