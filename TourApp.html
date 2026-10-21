@@ -397,7 +397,6 @@ input:checked + .slider:before { transform: translateX(18px); }
 
       <textarea id="addressInput" placeholder="Adressen zeilenweise einfügen..."></textarea>
 
-      <!-- Toggle wieder frei bedienbar, standardmäßig auf AUS -->
       <div class="toggle-box">
         <div>
           <strong style="font-size: 12px; display: block;">Fotobeweis-Pflicht</strong>
@@ -534,6 +533,15 @@ input:checked + .slider:before { transform: translateX(18px); }
   </div>
 </div>
 
+<!-- IN-APP ALERT MODAL FÜR GEODATEN / SICHERHEIT -->
+<div class="modal-overlay" id="geoAlertModal">
+  <div class="modal-box" style="text-align: left;">
+    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--danger);">Sicherheits-Sperre</div>
+    <div id="geoAlertBody" style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px; line-height: 1.5;"></div>
+    <button class="btn-success" onclick="closeGeoAlertModal()" style="margin-bottom:0; padding: 12px;">Schließen</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="customModal">
   <div class="modal-box" style="text-align: center;">
     <div style="font-size:15px; font-weight:700;" id="modalTitle">Hinweis</div>
@@ -579,7 +587,6 @@ window.onload = async () => {
   const savedTheme = localStorage.getItem('veribase_theme');
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  // Toggle Standard auf AUS (bzw. gemerkt im LocalStorage, standard false)
   const savedProofToggle = localStorage.getItem('veribase_photo_proof_enabled');
   isPhotoProofEnabled = savedProofToggle === 'true';
   document.getElementById('photoProofToggle').checked = isPhotoProofEnabled;
@@ -703,9 +710,8 @@ function forceFreshGPSFix() {
   });
 }
 
-// Hilfsfunktion zur Entfernungsberechnung in Metern (Haversine-Formel)
 function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371000; // Radius der Erde in Metern
+  const R = 6371000;
   const dLat = deg2rad(lat2 - lat1);
   const dLon = deg2rad(lon2 - lon1);
   const a = 
@@ -720,7 +726,6 @@ function deg2rad(deg) {
   return deg * (Math.PI/180);
 }
 
-// Einfacher Geocodierungs-Helper für PLZ + Straße (nutzt Nominatim OpenStreetMap, um Koordinaten der Zieladresse zu ermitteln)
 async function getCoordinatesForAddress(addressStr) {
   try {
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressStr)}`;
@@ -809,8 +814,6 @@ async function startManualTour() {
 
   document.getElementById('galleryGrid').innerHTML = '';
   document.getElementById('photoCount').innerText = '0';
-
-  // Galerie/Fotobereich ein- oder ausblenden je nach Toggle
   document.getElementById('gallerySectionContainer').style.display = isPhotoProofEnabled ? 'block' : 'none';
 
   document.getElementById('setup-view').style.display = 'none';
@@ -829,7 +832,6 @@ function renderTourUI() {
     prevBtn.disabled = (currentStopIndex <= 0);
   }
 
-  // Button-Text dynamisch anpassen
   const completeBtn = document.getElementById('manualCompleteBtn');
   if (isPhotoProofEnabled) {
     completeBtn.innerText = "STOPP ERLEDIGT ✓ (Mit Live-Foto)";
@@ -906,7 +908,6 @@ function openNoteModal(index) {
   const imgPrev = document.getElementById('modalStopPhotoImg');
   const replaceBtn = document.getElementById('modalPhotoReplaceBtn');
 
-  // Wenn Fotobeweis aus ist, verstecken wir die Foto-Option im Bearbeiten-Modal
   if (!isPhotoProofEnabled) {
     replaceBtn.style.display = 'none';
   } else {
@@ -944,43 +945,48 @@ function closeNoteModal() {
   document.getElementById('noteEditModal').style.display = 'none';
 }
 
-// Hauptlogik beim Klick auf Stopp erledigt mit Geofencing-Prüfung
+// 100% Unsichtbarer Hintergrund-Check ohne lästigen Ladebalken
 async function triggerCompleteStop() {
   if (currentStopIndex >= tourStops.length) return;
   const current = tourStops[currentStopIndex];
 
-  // Wenn Fotobeweis eingeschaltet ist -> Geofencing & Kamera-Zwang prüfen!
   if (isPhotoProofEnabled) {
-    showModal("GPS Prüfung", "Ermittle genauen Standort vor Ort...", true);
+    // Frischen GPS-Fix im Hintergrund holen
     await forceFreshGPSFix();
 
     if (currentLatitude === null || currentLongitude === null) {
-      closeModal();
-      alert("GPS-Signal nicht verfügbar. Bitte aktiviere GPS.");
+      showGeoAlert("GPS-Signal nicht verfügbar. Bitte aktiviere GPS auf deinem Gerät.");
       return;
     }
 
-    updateProgress(50, "Prüfe Entfernung zur Zieladresse...");
+    // Entfernung zur Zieladresse im Hintergrund prüfen
     const targetCoords = await getCoordinatesForAddress(current.address);
 
     if (targetCoords) {
       const distanceMeters = getDistanceFromLatLonInMeters(currentLatitude, currentLongitude, targetCoords.lat, targetCoords.lon);
-      closeModal();
 
-      // Toleranz: 150 Meter Radius um die Zieladresse
+      // Toleranz: 150 Meter Radius
       if (distanceMeters > 150) {
-        alert(`Sicherheits-Sperre: Du bist ca. ${Math.round(distanceMeters)} Meter von "${current.address}" entfernt.\n\nDu musst vor Ort sein, um diesen Stopp abzuhaken!`);
+        showGeoAlert(`Sicherheits-Sperre: Du bist ca. ${Math.round(distanceMeters)} Meter von "${current.address}" entfernt.<br><br>Du musst vor Ort sein, um diesen Stopp abzuhaken!`);
         return;
       }
-    } else {
-      closeModal(); // Falls Adresse nicht gefunden wurde, lassen wir es im Feld durch, aber warnen
     }
 
+    // Wenn alles passt: Kein Ladebalken, direkt Kamera öffnen!
     document.getElementById('proofCameraInput').click();
   } else {
-    // Wenn Fotobeweis AUS ist -> direkt ohne Foto abschließen!
+    // Ohne Foto: Direkt im Hintergrund abschließen
     completeCurrentStopWithoutPhoto();
   }
+}
+
+function showGeoAlert(htmlMessage) {
+  document.getElementById('geoAlertBody').innerHTML = htmlMessage;
+  document.getElementById('geoAlertModal').style.display = 'flex';
+}
+
+function closeGeoAlertModal() {
+  document.getElementById('geoAlertModal').style.display = 'none';
 }
 
 async function handleProofCapture(event) {
@@ -1022,7 +1028,6 @@ async function handleModalReplaceCapture(event) {
       const now = new Date().toLocaleString('de-DE');
       const driverDisplayName = currentProfile?.full_name || currentUser.email.split('@')[0];
 
-      // Vergrößerte, saubere Skalierung für einen lesbaren, nicht gequetschten Stempel
       const fontSize = Math.max(26, Math.floor(canvas.width / 22));
       const padding = Math.floor(fontSize * 0.9);
       const lines = [
@@ -1041,7 +1046,6 @@ async function handleModalReplaceCapture(event) {
       const boxH = (lines.length * fontSize * 1.45) + padding;
       const yPos = canvas.height - boxH - padding;
 
-      // Halbtransparenter Hintergrundbalken mit ausreichend Luft
       ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
       ctx.fillRect(padding, yPos, boxW, boxH);
 
@@ -1108,7 +1112,6 @@ async function refreshStampPreview() {
         const now = new Date().toLocaleString('de-DE');
         const driverDisplayName = currentProfile?.full_name || currentUser.email.split('@')[0];
 
-        // Optimierte Abstände und Schriftgrößen gegen das "Gequetschte"
         const fontSize = Math.max(26, Math.floor(canvas.width / 22));
         const padding = Math.floor(fontSize * 0.9);
         const lines = [
