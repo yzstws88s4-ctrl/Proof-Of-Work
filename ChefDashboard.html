@@ -398,11 +398,11 @@ tr:last-child td { border-bottom: none; }
 
 .batch-toolbar {
   display: none; background: rgba(99, 102, 241, 0.12); border: 1px solid var(--accent); border-radius: 10px;
-  padding: 12px 18px; margin-bottom: 16px; align-items: center; justify-content: space-between; font-size: 13px;
+  padding: 10px 16px; margin-bottom: 16px; align-items: center; justify-content: space-between; font-size: 13px;
 }
 .batch-toolbar.active { display: flex; }
 
-.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 14px; align-items: center; }
 
 .bottom-section {
   display: flex;
@@ -578,12 +578,10 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
-    <!-- NEU GESTALTER TOUR-PLANER (HIGH-END 2-SPALTIG MIT LIVE-ÜBERSICHT) -->
     <div id="pane-planer" class="tab-pane">
       <div class="card-header" style="margin-bottom:16px;">Tour erstellen & Zuweisen</div>
       
       <div class="grid-2" style="align-items: start; margin-bottom: 24px;">
-        <!-- LINKE SPALTE: DETAILS & OCR SCAN -->
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <div class="form-card-box" style="padding: 16px;">
             <div style="font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 10px;">Tourplan per Foto erfassen (OCR)</div>
@@ -610,7 +608,6 @@ tr:last-child td { border-bottom: none; }
           </div>
         </div>
 
-        <!-- RECHTE SPALTE: ADRESSEN & AKTIONS-BUTTON -->
         <div class="form-card-box" style="padding: 16px; display: flex; flex-direction: column; height: 100%;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <label style="margin-bottom: 0;">Adressen (zeilenweise)</label>
@@ -624,7 +621,6 @@ tr:last-child td { border-bottom: none; }
         </div>
       </div>
 
-      <!-- UNTERER BEREICH: GEPLANTE TOUREN WARTESCHLANGE -->
       <div class="card-header" style="margin-bottom: 12px; border-top: 1px solid var(--border); padding-top: 20px;">
         <span>Bereits zugewiesene & geplante Touren (Warteschlange)</span>
       </div>
@@ -646,21 +642,36 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- PANE PROOFS & AUDIT (ERWEITERT UM ABBRÜCHE, LÖSCHEN & PROFI-FILTER) -->
     <div id="pane-proofs" class="tab-pane">
       <div class="card-header">
-        <span>Erfasste Fotobeweise & Protokolle</span>
+        <span>Erfasste Fotobeweise, Protokolle & Abbrüche</span>
         <span id="proofsCountBadge" style="color:var(--accent);">0 Nachweise</span>
       </div>
 
       <div class="filter-grid">
-        <input type="text" id="proofSearchInput" placeholder="Suche..." oninput="filterAndRenderProofs()">
-        <input type="date" id="proofDateFilter" onchange="filterAndRenderProofs()">
-        <select id="proofDriverFilter" onchange="filterAndRenderProofs()"><option value="">Alle Fahrer</option></select>
+        <input type="text" id="proofSearchInput" placeholder="🔍 Adresse / Fahrer suchen..." oninput="filterAndRenderProofs()" style="margin-bottom:0;">
+        <input type="date" id="proofDateFilter" onchange="filterAndRenderProofs()" style="margin-bottom:0;">
+        <select id="proofStatusFilter" onchange="filterAndRenderProofs()" style="margin-bottom:0;">
+          <option value="">Alle Status</option>
+          <option value="erledigt">Erledigt</option>
+          <option value="offen">Offen</option>
+          <option value="abgebrochen">Abgebrochen ⚠️</option>
+        </select>
+        <select id="proofDriverFilter" onchange="filterAndRenderProofs()" style="margin-bottom:0;">
+          <option value="">Alle Fahrer</option>
+        </select>
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:11px; margin-bottom:0; font-weight:600; white-space:nowrap;">
+          <input type="checkbox" id="onlyPhotosToggle" onchange="filterAndRenderProofs()" style="width:auto; margin-bottom:0;"> Nur mit Foto
+        </label>
       </div>
 
       <div id="batchActionBar" class="batch-toolbar">
-        <span id="selectedCountText" style="font-weight:600; color:var(--accent);">0 ausgewählt</span>
-        <button class="utility-pill" onclick="exportSelectedProofsPDF()" style="background:var(--success); color:#fff; border:none;">PDF Export</button>
+        <span id="selectedCountText" style="font-weight:700; color:var(--accent);">0 ausgewählt</span>
+        <div style="display:flex; gap:10px;">
+          <button class="utility-pill" onclick="exportSelectedProofsPDF()" style="background:var(--success); color:#fff; border:none;">📄 PDF Export</button>
+          <button class="utility-pill" onclick="deleteSelectedProofs()" style="background:var(--danger-bg); color:var(--danger); border-color:rgba(239, 68, 68, 0.3);">🗑️ Ausgewählte löschen</button>
+        </div>
       </div>
 
       <div class="table-container">
@@ -669,15 +680,17 @@ tr:last-child td { border-bottom: none; }
             <tr>
               <th style="width:40px; text-align:center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllProofs(this)"></th>
               <th style="width:50px;">Foto</th>
-              <th>Adresse</th>
+              <th>Adresse & Notiz</th>
               <th>Fahrer</th>
               <th>Tour</th>
               <th>Zeitstempel</th>
               <th>Status</th>
-              <th style="text-align:right;">Aktion</th>
+              <th style="text-align:right;">Aktionen</th>
             </tr>
           </thead>
-          <tbody id="proofsTableBody"><tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Lade Daten...</td></tr></tbody>
+          <tbody id="proofsTableBody">
+            <tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Lade Daten...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -729,7 +742,7 @@ tr:last-child td { border-bottom: none; }
 <div id="proofModal" class="modal-backdrop" style="display:none;">
   <div class="modal-window">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-      <strong>Fotobeweis-Details</strong>
+      <strong>Nachweis & Protokoll Details</strong>
       <button onclick="closeProofModal()" style="background:none; border:none; color:var(--text-sub); cursor:pointer; font-size:18px;">✕</button>
     </div>
     <img id="modalImage" style="width:100%; max-height:240px; object-fit:contain; background:#000; border-radius:10px; margin-bottom:12px;" alt="Beweis">
@@ -738,9 +751,13 @@ tr:last-child td { border-bottom: none; }
       <div><strong>Fahrer:</strong> <span id="modalDriver"></span></div>
       <div><strong>Tour:</strong> <span id="modalTour"></span></div>
       <div><strong>Zeit:</strong> <span id="modalTime"></span></div>
-      <div><strong>Status:</strong> <span id="modalStatus" style="color:var(--success);"></span></div>
+      <div><strong>Status:</strong> <span id="modalStatus"></span></div>
+      <div id="modalNoteBox" style="display:none; color:var(--text-sub);"><strong>Notiz/Grund:</strong> <span id="modalNotes"></span></div>
     </div>
-    <button class="btn-main" onclick="downloadSingleProofPDF()">Einzel-PDF herunterladen</button>
+    <div style="display:flex; gap:10px;">
+      <button class="btn-main" onclick="downloadSingleProofPDF()">Einzel-PDF herunterladen</button>
+      <button class="btn-danger-compact" style="padding: 12px 16px; font-size: 13px;" onclick="deleteSingleProofModal()">Löschen</button>
+    </div>
   </div>
 </div>
 
@@ -1281,6 +1298,7 @@ function openSingleImageModal(url, address, driver) {
   document.getElementById('modalTour').innerText = 'Live Tour';
   document.getElementById('modalTime').innerText = 'Echtzeit';
   document.getElementById('modalStatus').innerText = 'Erledigt';
+  document.getElementById('modalNoteBox').style.display = 'none';
   
   const img = document.getElementById('modalImage');
   img.src = url;
@@ -1293,12 +1311,20 @@ function extractAndProcessProofs(tours) {
   allExtractedProofs = [];
   tours.forEach(tour => {
     const driverName = tour.profiles?.full_name || tour.profiles?.email?.split('@')[0] || 'Unbekannt';
-    if (tour.stops) {
+    const isTourAborted = tour.status === 'abgebrochen';
+
+    if (tour.stops && tour.stops.length > 0) {
       tour.stops.forEach(stop => {
+        const effectiveStatus = isTourAborted && stop.status !== 'erledigt' ? 'abgebrochen' : (stop.status || 'offen');
         allExtractedProofs.push({
-          id: stop.id, address: stop.address, status: stop.status || 'offen',
-          photo_url: stop.photo_url, tourTitle: tour.title, driverName,
-          created_at: stop.created_at || tour.created_at || new Date().toISOString()
+          id: stop.id, 
+          address: stop.address, 
+          status: effectiveStatus,
+          photo_url: stop.photo_url, 
+          tourTitle: tour.title, 
+          driverName,
+          notes: stop.notes || (isTourAborted ? tour.notes : ''),
+          created_at: stop.completed_at || stop.created_at || tour.created_at || new Date().toISOString()
         });
       });
     }
@@ -1313,13 +1339,17 @@ function extractAndProcessProofs(tours) {
 function filterAndRenderProofs() {
   const search = (document.getElementById('proofSearchInput')?.value || '').toLowerCase();
   const date = document.getElementById('proofDateFilter')?.value;
+  const status = document.getElementById('proofStatusFilter')?.value;
   const driver = (document.getElementById('proofDriverFilter')?.value || '').toLowerCase();
+  const onlyPhotos = document.getElementById('onlyPhotosToggle')?.checked;
 
   const filtered = allExtractedProofs.filter(item => {
-    const mSearch = item.address.toLowerCase().includes(search) || item.driverName.toLowerCase().includes(search);
+    const mSearch = item.address.toLowerCase().includes(search) || item.driverName.toLowerCase().includes(search) || item.tourTitle.toLowerCase().includes(search);
     const mDriver = !driver || item.driverName.toLowerCase() === driver;
+    const mStatus = !status || item.status.toLowerCase() === status.toLowerCase();
     const mDate = !date || item.created_at.startsWith(date);
-    return mSearch && mDriver && mDate;
+    const mPhoto = !onlyPhotos || (item.photo_url && item.photo_url.length > 0);
+    return mSearch && mDriver && mStatus && mDate && mPhoto;
   });
 
   renderProofTable(filtered);
@@ -1332,23 +1362,33 @@ function renderProofTable(items) {
   if (!tbody) return;
 
   if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="color: var(--text-muted); text-align: center;">Keine Nachweise gefunden.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="color: var(--text-muted); text-align: center;">Keine Nachweise oder Protokolle gefunden.</td></tr>';
     updateBatchActionBar();
     return;
   }
 
   tbody.innerHTML = items.map((s, idx) => {
     const checked = selectedProofIds.has(s.id) ? 'checked' : '';
+    let statusClass = 'open';
+    if (s.status === 'erledigt') statusClass = 'done';
+    if (s.status === 'abgebrochen') statusClass = 'danger';
+
     return `
       <tr>
         <td style="text-align: center;"><input type="checkbox" data-id="${s.id}" ${checked} onchange="toggleSelectProof('${s.id}')"></td>
         <td>${s.photo_url ? `<img src="${s.photo_url}" style="width:36px; height:36px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="openProofModal(${idx})">` : `<span style="font-size:11px; color:var(--text-muted);">Kein</span>`}</td>
-        <td><strong>${s.address}</strong></td>
+        <td>
+          <strong>${s.address}</strong>
+          ${s.notes ? `<div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Notiz: ${s.notes}</div>` : ''}
+        </td>
         <td>${s.driverName}</td>
         <td>${s.tourTitle}</td>
         <td>${new Date(s.created_at).toLocaleString('de-DE')}</td>
-        <td><span class="status-chip ${s.status === 'erledigt' ? 'done' : 'open'}">${s.status}</span></td>
-        <td style="text-align: right;"><button class="utility-pill" onclick="openProofModal(${idx})" style="padding:4px 10px; font-size:11px;">Details</button></td>
+        <td><span class="status-chip ${statusClass}">${s.status}</span></td>
+        <td style="text-align: right; white-space:nowrap;">
+          <button class="utility-pill" onclick="openProofModal(${idx})" style="padding:4px 10px; font-size:11px; display:inline-flex;">Details</button>
+          <button class="btn-danger-compact" onclick="deleteSingleProof('${s.id}')" style="padding:4px 8px; font-size:11px; margin-left:4px; display:inline-flex;">🗑️</button>
+        </td>
       </tr>
     `;
   }).join('');
@@ -1379,6 +1419,29 @@ function updateBatchActionBar() {
   } else bar.classList.remove('active');
 }
 
+async function deleteSingleProof(id) {
+  if (!confirm('Diesen Nachweis/Stopp wirklich löschen?')) return;
+  await supabaseClient.from('stops').delete().eq('id', id);
+  selectedProofIds.delete(id);
+  await loadToursFromSupabase();
+}
+
+async function deleteSingleProofModal() {
+  if (!activeModalProof) return;
+  await deleteSingleProof(activeModalProof.id);
+  closeProofModal();
+}
+
+async function deleteSelectedProofs() {
+  if (selectedProofIds.size === 0) return;
+  if (!confirm(`${selectedProofIds.size} ausgewählte Nachweise wirklich unwiderruflich löschen?`)) return;
+
+  const idsArray = Array.from(selectedProofIds);
+  await supabaseClient.from('stops').delete().in('id', idsArray);
+  selectedProofIds.clear();
+  await loadToursFromSupabase();
+}
+
 function openProofModal(idx) {
   const items = window.currentFilteredProofs || allExtractedProofs;
   const proof = items[idx];
@@ -1389,7 +1452,18 @@ function openProofModal(idx) {
   document.getElementById('modalDriver').innerText = proof.driverName;
   document.getElementById('modalTour').innerText = proof.tourTitle;
   document.getElementById('modalTime').innerText = new Date(proof.created_at).toLocaleString('de-DE');
-  document.getElementById('modalStatus').innerText = proof.status;
+  
+  const statusEl = document.getElementById('modalStatus');
+  statusEl.innerText = proof.status.toUpperCase();
+  statusEl.style.color = proof.status === 'erledigt' ? 'var(--success)' : (proof.status === 'abgebrochen' ? 'var(--danger)' : 'var(--warning)');
+
+  const noteBox = document.getElementById('modalNoteBox');
+  if (proof.notes) {
+    document.getElementById('modalNotes').innerText = proof.notes;
+    noteBox.style.display = 'block';
+  } else {
+    noteBox.style.display = 'none';
+  }
 
   const img = document.getElementById('modalImage');
   if (proof.photo_url) { img.src = proof.photo_url; img.style.display = 'block'; }
@@ -1414,9 +1488,15 @@ function generatePDFHTML(proofs, title = 'Leistungsnachweis') {
   const rows = proofs.map(p => `
     <tr style="border-bottom: 1px solid #e2e8f0;">
       <td style="padding: 10px; width: 100px;">${p.photo_url ? `<img src="${p.photo_url}" style="width:90px; height:65px; object-fit:cover; border-radius:4px;">` : 'Kein Foto'}</td>
-      <td style="padding: 10px;"><strong>${p.address}</strong><br><span style="font-size:12px; color:#64748b;">Tour: ${p.tourTitle} | Fahrer: ${p.driverName}</span></td>
+      <td style="padding: 10px;">
+        <strong>${p.address}</strong><br>
+        <span style="font-size:12px; color:#64748b;">Tour: ${p.tourTitle} | Fahrer: ${p.driverName}</span>
+        ${p.notes ? `<br><span style="font-size:11px; color:#ef4444;">Hinweis: ${p.notes}</span>` : ''}
+      </td>
       <td style="padding: 10px; font-size:12px;">${new Date(p.created_at).toLocaleString('de-DE')}</td>
-      <td style="padding: 10px; text-align:right;"><span style="padding:4px 8px; border-radius:4px; font-size:11px; background:${p.status==='erledigt'?'#d1fae5':'#fef3c7'}; color:${p.status==='erledigt'?'#065f46':'#92400e'}">${p.status}</span></td>
+      <td style="padding: 10px; text-align:right;">
+        <span style="padding:4px 8px; border-radius:4px; font-size:11px; background:${p.status==='erledigt'?'#d1fae5':(p.status==='abgebrochen'?'#fee2e2':'#fef3c7')}; color:${p.status==='erledigt'?'#065f46':(p.status==='abgebrochen'?'#991b1b':'#92400e')}">${p.status}</span>
+      </td>
     </tr>
   `).join('');
 
