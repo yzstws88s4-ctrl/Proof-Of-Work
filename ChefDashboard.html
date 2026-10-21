@@ -226,7 +226,7 @@ body {
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
 
-.grid-2 { display: grid; grid-template-columns: 360px 1fr; gap: 24px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media (max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } }
 
 label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -253,7 +253,6 @@ button.btn-main:hover { opacity: 0.92; }
 }
 .btn-danger-compact:hover { background: var(--danger); color: #fff; }
 
-/* FIX FÜR TABELLEN-SCROLLING BEI VIELEN FAHRERN */
 .table-container { 
   overflow-x: auto; 
   overflow-y: auto; 
@@ -531,7 +530,6 @@ tr:last-child td { border-bottom: none; }
       <div id="liveToursContainer"><p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p></div>
     </div>
 
-    <!-- FAHRER-VERWALTUNG (OPTIMIERT FÜR SKALIERUNG) -->
     <div id="pane-team" class="tab-pane">
       <div class="grid-2">
         <div class="form-card-box">
@@ -580,29 +578,71 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- NEU GESTALTER TOUR-PLANER (HIGH-END 2-SPALTIG MIT LIVE-ÜBERSICHT) -->
     <div id="pane-planer" class="tab-pane">
-      <div class="card-header" style="margin-bottom:12px;">Tour erstellen & Zuweisen</div>
-      <div style="background:var(--input-bg); border: 2px dashed var(--accent-line); border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
-        <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Tourplan per Foto erfassen (OCR)</div>
-        <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
-          <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">Kamera</button>
-          <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">Datei auswählen</button>
+      <div class="card-header" style="margin-bottom:16px;">Tour erstellen & Zuweisen</div>
+      
+      <div class="grid-2" style="align-items: start; margin-bottom: 24px;">
+        <!-- LINKE SPALTE: DETAILS & OCR SCAN -->
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="form-card-box" style="padding: 16px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 10px;">Tourplan per Foto erfassen (OCR)</div>
+            <div style="border: 2px dashed var(--accent-line); border-radius:12px; padding:14px; text-align:center; background:var(--surface);">
+              <div style="display:flex; gap:10px; justify-content:center;">
+                <button class="utility-pill" onclick="document.getElementById('bossCameraInput').click()">📷 Kamera</button>
+                <button class="utility-pill" onclick="document.getElementById('bossFileInput').click()">📁 Datei auswählen</button>
+              </div>
+              <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
+              <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
+              <div id="scanStatusMsg" style="font-size:11px; color:var(--success); font-weight:600; margin-top:8px; display:none;">✓ Eingelesen</div>
+            </div>
+          </div>
+
+          <div class="form-card-box" style="padding: 16px;">
+            <label>Tour-Titel</label>
+            <input type="text" id="tourTitle" placeholder="z. B. Tour Nord">
+            
+            <label>Fahrer zuweisen</label>
+            <select id="tourAssignee"></select>
+
+            <label>Hinweise für den Fahrer</label>
+            <textarea id="tourNotes" style="height:70px;" placeholder="Optionale Anweisungen..."></textarea>
+          </div>
         </div>
-        <input type="file" id="bossCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="processBossTourScan(event)">
-        <input type="file" id="bossFileInput" accept="image/*" style="display:none;" onchange="processBossTourScan(event)">
-        <div id="scanStatusMsg" style="font-size:11px; color:var(--success); font-weight:600; margin-top:6px; display:none;">✓ Eingelesen</div>
+
+        <!-- RECHTE SPALTE: ADRESSEN & AKTIONS-BUTTON -->
+        <div class="form-card-box" style="padding: 16px; display: flex; flex-direction: column; height: 100%;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="margin-bottom: 0;">Adressen (zeilenweise)</label>
+            <span id="addressCountBadge" style="font-size: 11px; font-weight: 700; color: var(--accent);">0 Stopps</span>
+          </div>
+          <textarea id="tourAddresses" style="height: 245px; font-family: monospace; font-size: 12px;" placeholder="Hauptstraße 1, 51766 Engelskirchen&#10;Dörner Weg 20, 51766 Engelskirchen" oninput="updateAddressCounter()"></textarea>
+
+          <button class="btn-main" onclick="createAndSendTour()" style="margin-top: 12px; padding: 14px;">
+            🚀 Tour jetzt an Fahrer übermitteln
+          </button>
+        </div>
       </div>
 
-      <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
-        <div>
-          <label>Tour-Titel</label><input type="text" id="tourTitle" placeholder="z. B. Tour Nord">
-          <label>Fahrer</label><select id="tourAssignee"></select>
-          <label>Adressen (zeilenweise)</label><textarea id="tourAddresses" style="height:90px;" placeholder="Hauptstraße 1..."></textarea>
-        </div>
-        <div>
-          <label>Hinweise</label><textarea id="tourNotes" style="height:90px;" placeholder="Optionale Anweisungen..."></textarea>
-          <button class="btn-main" onclick="createAndSendTour()" style="margin-top:20px;">Tour übermitteln</button>
-        </div>
+      <!-- UNTERER BEREICH: GEPLANTE TOUREN WARTESCHLANGE -->
+      <div class="card-header" style="margin-bottom: 12px; border-top: 1px solid var(--border); padding-top: 20px;">
+        <span>Bereits zugewiesene & geplante Touren (Warteschlange)</span>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Tour-Titel</th>
+              <th>Zugewiesen an</th>
+              <th>Stopps</th>
+              <th>Erstellt am</th>
+              <th style="text-align:right;">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="plannedToursTableBody">
+            <tr><td colspan="5" style="color:var(--text-muted); text-align: center;">Lade geplante Touren...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -975,6 +1015,12 @@ async function addEmployee(e) {
   await loadDriversFromSupabase();
 }
 
+function updateAddressCounter() {
+  const text = document.getElementById('tourAddresses').value;
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+  document.getElementById('addressCountBadge').innerText = `${lines.length} Stopps`;
+}
+
 async function processBossTourScan(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -987,6 +1033,7 @@ async function processBossTourScan(e) {
     const lines = result.data.text.split(/\r?\n|;/).map(l => l.replace(/^\s*\d+[\.\)\-]?\s*/, '').trim()).filter(l => l.length > 3);
     if (lines.length > 0) {
       document.getElementById('tourAddresses').value = lines.join('\n');
+      updateAddressCounter();
       statusMsg.innerText = `✓ ${lines.length} Adressen eingelesen`;
     } else {
       statusMsg.innerText = '⚠ Keine Adressen erkannt.';
@@ -1021,6 +1068,14 @@ async function createAndSendTour() {
   document.getElementById('tourAddresses').value = '';
   document.getElementById('tourNotes').value = '';
   document.getElementById('tourTitle').value = '';
+  updateAddressCounter();
+  await loadToursFromSupabase();
+}
+
+async function deletePlannedTour(tourId, title) {
+  if (!confirm(`Geplante Tour "${title}" wirklich löschen?`)) return;
+  await supabaseClient.from('stops').delete().eq('tour_id', tourId);
+  await supabaseClient.from('tours').delete().eq('id', tourId);
   await loadToursFromSupabase();
 }
 
@@ -1037,8 +1092,11 @@ async function loadToursFromSupabase() {
     (t.status === 'aktiv' || t.status === 'abgebrochen') &&
     t.created_at && t.created_at.startsWith(todayStr)
   );
+
+  const plannedTours = (tours || []).filter(t => t.status === 'geplant');
   
-  document.getElementById('kpiTotalTours').innerText = (tours || []).filter(t => t.status === 'geplant').length;
+  document.getElementById('kpiTotalTours').innerText = plannedTours.length;
+  renderPlannedToursTable(plannedTours);
   
   let totalStops = 0, doneStops = 0;
   (tours || []).forEach(t => {
@@ -1052,6 +1110,34 @@ async function loadToursFromSupabase() {
 
   renderLiveMonitor(liveActiveTours);
   extractAndProcessProofs(tours || []);
+}
+
+function renderPlannedToursTable(plannedTours) {
+  const tbody = document.getElementById('plannedToursTableBody');
+  if (!tbody) return;
+
+  if (plannedTours.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted); text-align: center;">Keine geplanten Touren in der Warteschlange.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = plannedTours.map(t => {
+    const driverName = t.profiles?.full_name || t.profiles?.email?.split('@')[0] || 'Unbekannt';
+    const stopCount = t.stops ? t.stops.length : 0;
+    const dateStr = new Date(t.created_at).toLocaleString('de-DE');
+
+    return `
+      <tr>
+        <td><strong>${t.title}</strong></td>
+        <td>${driverName}</td>
+        <td><span class="status-chip open">${stopCount} Stopps</span></td>
+        <td style="font-size:12px; color:var(--text-sub);">${dateStr}</td>
+        <td style="text-align: right;">
+          <button class="btn-danger-compact" onclick="deletePlannedTour('${t.id}', '${t.title}')">Löschen</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function renderLiveMonitor(activeTours) {
