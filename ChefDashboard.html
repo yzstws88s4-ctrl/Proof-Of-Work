@@ -435,9 +435,41 @@ tr:last-child td { border-bottom: none; }
   display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
 }
 .modal-window { background: var(--surface-solid); border: 1px solid var(--accent-line); border-radius: 20px; width: 100%; max-width: 500px; overflow: hidden; padding: 24px; box-shadow: var(--shadow); }
+
+/* IN-APP TOAST BANNER */
+.app-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--accent);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.app-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
 </style>
 </head>
 <body>
+
+<div id="toastBanner" class="app-toast">
+  <span id="toastIcon">✓</span>
+  <span id="toastMessage">Aktion erfolgreich</span>
+</div>
 
 <div class="app-container">
 
@@ -694,40 +726,64 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
-    <!-- ERWEITERTES FIRMENDATEN-MODUL MIT LIVE-VORSCHAU & BANKDATEN -->
+    <!-- FIRMENDATEN (ECHTZEIT-VORSCHAU & FORMULAR-LOGO-VORSCHAU) -->
     <div id="pane-company" class="tab-pane">
       <div class="card-header" style="margin-bottom:12px;">Unternehmensdaten & Rechnungs-Header für PDFs</div>
       
       <div class="grid-2">
         <div class="form-card-box">
           <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
-            <label>Firmenname</label><input type="text" id="compName" placeholder="z. B. Veribase GbR" oninput="updatePdfPreview()" required>
-            <label>Untertitel / Slogan</label><input type="text" id="compSubtitle" placeholder="z. B. Mülltonnenservice & Logistik" oninput="updatePdfPreview()">
-            <label>Inhaber</label><input type="text" id="compOwner" placeholder="z. B. Björn ..." oninput="updatePdfPreview()">
-            <label>Straße & Hausnummer</label><input type="text" id="compStreet" placeholder="Hauptstraße 1" oninput="updatePdfPreview()" required>
-            <label>PLZ & Ort</label><input type="text" id="compCity" placeholder="51766 Engelskirchen" oninput="updatePdfPreview()" required>
-            <label>E-Mail</label><input type="email" id="compEmail" placeholder="kontakt@veribase.de" oninput="updatePdfPreview()">
-            <label>Telefon</label><input type="text" id="compPhone" placeholder="+49 ..." oninput="updatePdfPreview()">
-            <label>Steuernummer / USt-IdNr.</label><input type="text" id="compTax" placeholder="DE..." oninput="updatePdfPreview()">
-            <label>Webseite</label><input type="text" id="compWeb" placeholder="https://..." oninput="updatePdfPreview()">
-            <label>IBAN (optional für Fußzeile)</label><input type="text" id="compIban" placeholder="DE..." oninput="updatePdfPreview()">
-            <label>BIC</label><input type="text" id="compBic" placeholder="..." oninput="updatePdfPreview()">
+            <label>Firmenname</label>
+            <input type="text" id="compName" placeholder="z. B. Veribase GbR" oninput="updatePdfPreview()" required>
+            
+            <label>Untertitel / Slogan</label>
+            <input type="text" id="compSubtitle" placeholder="z. B. Mülltonnenservice & Logistik" oninput="updatePdfPreview()">
+            
+            <label>Inhaber</label>
+            <input type="text" id="compOwner" placeholder="z. B. Björn ..." oninput="updatePdfPreview()">
+            
+            <label>Straße & Hausnummer</label>
+            <input type="text" id="compStreet" placeholder="Hauptstraße 1" oninput="updatePdfPreview()" required>
+            
+            <label>PLZ & Ort</label>
+            <input type="text" id="compCity" placeholder="51766 Engelskirchen" oninput="updatePdfPreview()" required>
+            
+            <label>E-Mail</label>
+            <input type="email" id="compEmail" placeholder="kontakt@veribase.de" oninput="updatePdfPreview()">
+            
+            <label>Telefon</label>
+            <input type="text" id="compPhone" placeholder="+49 ..." oninput="updatePdfPreview()">
+            
+            <label>Steuernummer / USt-IdNr.</label>
+            <input type="text" id="compTax" placeholder="DE..." oninput="updatePdfPreview()">
+            
+            <label>Webseite</label>
+            <input type="text" id="compWeb" placeholder="https://..." oninput="updatePdfPreview()">
+            
+            <label>IBAN (optional für Fußzeile)</label>
+            <input type="text" id="compIban" placeholder="DE..." oninput="updatePdfPreview()">
+            
+            <label>BIC</label>
+            <input type="text" id="compBic" placeholder="..." oninput="updatePdfPreview()">
             
             <label>Firmenlogo</label>
-            <div style="border: 2px dashed var(--accent-line); border-radius:10px; padding:12px; text-align:center; cursor:pointer;" onclick="document.getElementById('compLogoInput').click()">
-              <div style="font-size:11px; font-weight:600;">Logo auswählen (PNG/JPG)</div>
+            <div style="border: 2px dashed var(--accent-line); border-radius:12px; padding:16px; text-align:center; cursor:pointer; background:var(--surface);" onclick="document.getElementById('compLogoInput').click()">
+              <div id="formLogoContainer">
+                <div style="font-size:12px; font-weight:600; color:var(--text-sub);">Logo auswählen (PNG / JPG)</div>
+              </div>
             </div>
             <input type="file" id="compLogoInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleLogoUpload(event)">
-            <button type="button" class="btn-danger-compact" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:6px;">Logo entfernen</button>
+            
+            <button type="button" class="btn-danger-compact" id="removeLogoBtn" onclick="removeLogo()" style="display:none; width:100%; margin-top:8px;">🗑️ Logo entfernen</button>
 
-            <button type="submit" class="btn-main" style="margin-top:20px;">💾 Firmendaten & PDF-Header speichern</button>
+            <button type="submit" class="btn-main" style="margin-top:20px; padding:14px;">💾 Firmendaten & PDF-Header speichern</button>
           </form>
         </div>
 
-        <!-- LIVE PDF BRIEFKOPF VORSCHAU -->
+        <!-- ECHTZEIT PDF-BRIEFKOPF VORSCHAU -->
         <div>
           <div class="card-header" style="margin-bottom:12px;">Live-Vorschau (PDF Briefkopf)</div>
-          <div style="background:#ffffff; color:#0f172a; border:1px solid var(--border); border-radius:16px; padding:24px; box-shadow:var(--shadow); min-height:400px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="background:#ffffff; color:#0f172a; border:1px solid var(--border); border-radius:16px; padding:24px; box-shadow:var(--shadow); min-height:450px; display:flex; flex-direction:column; justify-content:space-between;">
             <div>
               <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #6366f1; padding-bottom:16px; margin-bottom:16px;">
                 <div>
@@ -740,12 +796,14 @@ tr:last-child td { border-bottom: none; }
                   <span id="prevCompEmail">kontakt@veribase.de</span>
                 </div>
               </div>
-              <h3 style="font-size:14px; text-transform:uppercase; color:#0f172a; margin:16px 0 8px 0;">Leistungsnachweis / Audit-Protokoll</h3>
-              <p style="font-size:11px; color:#64748b;">Erstellt am: ${new Date().toLocaleDateString('de-DE')} | Status: Offizielles Dokument</p>
-              <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:20px; text-align:center; color:#94a3b8; font-size:12px; margin-top:20px;">
-                [ Tabellen-Inhalt & Fotobeweise im PDF ]
+              <h3 style="font-size:14px; text-transform:uppercase; color:#0f172a; margin:16px 0 6px 0;">Leistungsnachweis / Audit-Protokoll</h3>
+              <p style="font-size:11px; color:#64748b; margin-top:0;">Erstellt am: <span id="prevDateDisplay">21.10.2026</span> | Status: Offizielles Dokument</p>
+              
+              <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:30px 20px; text-align:center; color:#94a3b8; font-size:12px; margin-top:20px;">
+                [ Tabellen-Inhalt & Fotobeweise im generierten PDF ]
               </div>
             </div>
+
             <div style="border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; font-size:10px; color:#64748b;">
               <div>Inhaber: <span id="prevCompOwner">-</span> | Steuernr: <span id="prevCompTax">-</span></div>
               <div>IBAN: <span id="prevCompIban">-</span></div>
@@ -763,9 +821,9 @@ tr:last-child td { border-bottom: none; }
     </div>
 
     <div class="footer-links">
-      <a href="#" onclick="alert('Veribase Command Center v2.5')">Version 2.5</a>
-      <a href="#" onclick="alert('Impressum: Veribase GbR')">Impressum</a>
-      <a href="#" onclick="alert('Datenschutz: Supabase Verschlüsselung aktiv.')">Datenschutz</a>
+      <a href="#" onclick="showToast('Veribase Command Center v2.5', 'ℹ️')">Version 2.5</a>
+      <a href="#" onclick="showToast('Impressum: Veribase GbR', 'ℹ️')">Impressum</a>
+      <a href="#" onclick="showToast('Datenschutz: Supabase Verschlüsselung aktiv.', '🔒')">Datenschutz</a>
     </div>
   </div>
 
@@ -805,12 +863,22 @@ let selectedProofIds = new Set();
 let activeModalProof = null;
 let companyLogoBase64 = '';
 
+function showToast(message, icon = '✓') {
+  const toast = document.getElementById('toastBanner');
+  document.getElementById('toastMessage').innerText = message;
+  document.getElementById('toastIcon').innerText = icon;
+  toast.classList.add('show');
+  setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
 window.onload = async () => {
   if (!localStorage.getItem('veribase_chef_theme')) {
     localStorage.setItem('veribase_chef_theme', 'light');
   }
   const savedTheme = localStorage.getItem('veribase_chef_theme');
   document.documentElement.setAttribute('data-theme', savedTheme);
+
+  document.getElementById('prevDateDisplay').innerText = new Date().toLocaleDateString('de-DE');
 
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -917,7 +985,7 @@ function loadCompanyProfile() {
 
 function updatePdfPreview() {
   const name = document.getElementById('compName').value || 'Veribase Operations';
-  const subtitle = document.getElementById('compSubtitle').value || '';
+  const subtitle = document.getElementById('compSubtitle').value || 'Mülltonnenservice & Logistik';
   const owner = document.getElementById('compOwner').value || '-';
   const street = document.getElementById('compStreet').value || 'Hauptstraße 1';
   const city = document.getElementById('compCity').value || '51766 Engelskirchen';
@@ -935,10 +1003,17 @@ function updatePdfPreview() {
   document.getElementById('prevCompIban').innerText = iban;
 
   const logoArea = document.getElementById('prevLogoArea');
+  const formLogoContainer = document.getElementById('formLogoContainer');
+
   if (companyLogoBase64) {
     logoArea.innerHTML = `<img src="${companyLogoBase64}" style="max-height:45px; max-width:140px; object-fit:contain;">`;
+    formLogoContainer.innerHTML = `
+      <img src="${companyLogoBase64}" style="max-height:50px; max-width:100%; object-fit:contain; margin-bottom:4px;"><br>
+      <span style="font-size:11px; color:var(--accent); font-weight:700;">Logo ändern</span>
+    `;
   } else {
     logoArea.innerHTML = `<strong style="font-size:18px; color:#0f172a;">${name}</strong>`;
+    formLogoContainer.innerHTML = `<div style="font-size:12px; font-weight:600; color:var(--text-sub);">Logo auswählen (PNG / JPG)</div>`;
   }
 }
 
@@ -950,6 +1025,7 @@ function handleLogoUpload(e) {
     companyLogoBase64 = event.target.result;
     document.getElementById('removeLogoBtn').style.display = 'block';
     updatePdfPreview();
+    showToast('Logo hochgeladen');
   };
   reader.readAsDataURL(file);
 }
@@ -959,6 +1035,7 @@ function removeLogo() {
   document.getElementById('compLogoInput').value = '';
   document.getElementById('removeLogoBtn').style.display = 'none';
   updatePdfPreview();
+  showToast('Logo entfernt', '🗑️');
 }
 
 function saveCompanyProfile(e) {
@@ -978,7 +1055,7 @@ function saveCompanyProfile(e) {
     logo: companyLogoBase64
   };
   localStorage.setItem('companyProfile', JSON.stringify(data));
-  alert('Firmendaten & PDF-Header erfolgreich gespeichert!');
+  showToast('Firmendaten & PDF-Header erfolgreich gespeichert!');
 }
 
 function getCompanyProfile() {
@@ -1063,6 +1140,7 @@ function filterDriverTable() {
 async function deleteDriver(id, name) {
   if (!confirm(`Fahrer "${name}" wirklich deaktivieren?`)) return;
   await supabaseClient.from('profiles').update({ is_active: false }).eq('id', id);
+  showToast(`Fahrer ${name} deaktiviert`, '🗑️');
   await loadDriversFromSupabase();
   await loadToursFromSupabase();
 }
@@ -1084,12 +1162,12 @@ async function addEmployee(e) {
   });
 
   if (error || (data && !data.success)) {
-    alert('Fehler: ' + (error?.message || data?.error || 'Unbekannt'));
+    showToast('Fehler: ' + (error?.message || data?.error || 'Unbekannt'), '⚠️');
     btn.disabled = false;
     return;
   }
 
-  alert(`Fahrer "${name}" mit Login "${username.split('@')[0]}" erfolgreich angelegt!`);
+  showToast(`Fahrer "${name}" erstellt!`);
   document.getElementById('addWorkerForm').reset();
   btn.disabled = false;
   await loadDriversFromSupabase();
@@ -1132,19 +1210,19 @@ async function createAndSendTour() {
   const addressText = document.getElementById('tourAddresses').value.trim();
   const notes = document.getElementById('tourNotes').value.trim();
 
-  if (!driverId || !addressText) return alert('Fahrer und Adressen angeben!');
+  if (!driverId || !addressText) return showToast('Bitte Fahrer und Adressen angeben!', '⚠️');
   const addresses = addressText.split('\n').map(a => a.trim()).filter(a => a.length > 2);
 
   const { data: tourData, error } = await supabaseClient.from('tours').insert([{
     title, assigned_to: driverId, created_by: currentChef?.id || 'demo', notes, status: 'geplant'
   }]).select('*').single();
 
-  if (error) return alert('Fehler: ' + error.message);
+  if (error) return showToast('Fehler: ' + error.message, '⚠️');
 
   const stops = addresses.map((addr, idx) => ({ tour_id: tourData.id, address: addr, sequence: idx + 1, status: 'offen' }));
   await supabaseClient.from('stops').insert(stops);
 
-  alert('Tour erfolgreich übermittelt!');
+  showToast('Tour erfolgreich an Fahrer übermittelt!');
   document.getElementById('tourAddresses').value = '';
   document.getElementById('tourNotes').value = '';
   document.getElementById('tourTitle').value = '';
@@ -1156,6 +1234,7 @@ async function deletePlannedTour(tourId, title) {
   if (!confirm(`Geplante Tour "${title}" wirklich löschen?`)) return;
   await supabaseClient.from('stops').delete().eq('tour_id', tourId);
   await supabaseClient.from('tours').delete().eq('id', tourId);
+  showToast(`Tour "${title}" gelöscht`, '🗑️');
   await loadToursFromSupabase();
 }
 
@@ -1486,6 +1565,7 @@ async function deleteSingleProof(id) {
   if (!confirm('Diesen Nachweis/Stopp wirklich löschen?')) return;
   await supabaseClient.from('stops').delete().eq('id', id);
   selectedProofIds.delete(id);
+  showToast('Nachweis gelöscht', '🗑️');
   await loadToursFromSupabase();
 }
 
@@ -1502,6 +1582,7 @@ async function deleteSelectedProofs() {
   const idsArray = Array.from(selectedProofIds);
   await supabaseClient.from('stops').delete().in('id', idsArray);
   selectedProofIds.clear();
+  showToast('Ausgewählte Nachweise gelöscht', '🗑️');
   await loadToursFromSupabase();
 }
 
@@ -1583,7 +1664,7 @@ function generatePDFHTML(proofs, title = 'Leistungsnachweis') {
 
 function exportSelectedProofsPDF() {
   const proofs = allExtractedProofs.filter(p => selectedProofIds.has(p.id));
-  if (proofs.length === 0) return alert('Bitte Nachweise auswählen!');
+  if (proofs.length === 0) return showToast('Bitte Nachweise auswählen!', '⚠️');
   const el = document.createElement('div');
   el.innerHTML = generatePDFHTML(proofs);
   html2pdf().set({ margin: 10, filename: 'Leistungsnachweis.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
