@@ -726,7 +726,7 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
-    <!-- FIRMENDATEN (ECHTZEIT-VORSCHAU & FORMULAR-LOGO-VORSCHAU) -->
+    <!-- FIRMENDATEN (ECHTZEIT-VORSCHAU & SAUBERES HOCHWERTIGES PDF-LAYOUT) -->
     <div id="pane-company" class="tab-pane">
       <div class="card-header" style="margin-bottom:12px;">Unternehmensdaten & Rechnungs-Header für PDFs</div>
       
@@ -734,16 +734,16 @@ tr:last-child td { border-bottom: none; }
         <div class="form-card-box">
           <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
             <label>Firmenname</label>
-            <input type="text" id="compName" placeholder="z. B. Veribase GbR" oninput="updatePdfPreview()" required>
+            <input type="text" id="compName" placeholder="z. B. Veribase" oninput="updatePdfPreview()" required>
             
             <label>Untertitel / Slogan</label>
-            <input type="text" id="compSubtitle" placeholder="z. B. Mülltonnenservice & Logistik" oninput="updatePdfPreview()">
+            <input type="text" id="compSubtitle" placeholder="z. B. Touren und Nachweise" oninput="updatePdfPreview()">
             
             <label>Inhaber</label>
-            <input type="text" id="compOwner" placeholder="z. B. Björn ..." oninput="updatePdfPreview()">
+            <input type="text" id="compOwner" placeholder="z. B. Björn Koch" oninput="updatePdfPreview()">
             
             <label>Straße & Hausnummer</label>
-            <input type="text" id="compStreet" placeholder="Hauptstraße 1" oninput="updatePdfPreview()" required>
+            <input type="text" id="compStreet" placeholder="Thüringer Straße 37" oninput="updatePdfPreview()" required>
             
             <label>PLZ & Ort</label>
             <input type="text" id="compCity" placeholder="51766 Engelskirchen" oninput="updatePdfPreview()" required>
@@ -752,16 +752,16 @@ tr:last-child td { border-bottom: none; }
             <input type="email" id="compEmail" placeholder="kontakt@veribase.de" oninput="updatePdfPreview()">
             
             <label>Telefon</label>
-            <input type="text" id="compPhone" placeholder="+49 ..." oninput="updatePdfPreview()">
+            <input type="text" id="compPhone" placeholder="015208703955" oninput="updatePdfPreview()">
             
             <label>Steuernummer / USt-IdNr.</label>
-            <input type="text" id="compTax" placeholder="DE..." oninput="updatePdfPreview()">
+            <input type="text" id="compTax" placeholder="DE 246424623" oninput="updatePdfPreview()">
             
             <label>Webseite</label>
-            <input type="text" id="compWeb" placeholder="https://..." oninput="updatePdfPreview()">
+            <input type="text" id="compWeb" placeholder="https://veribase.de" oninput="updatePdfPreview()">
             
             <label>IBAN (optional für Fußzeile)</label>
-            <input type="text" id="compIban" placeholder="DE..." oninput="updatePdfPreview()">
+            <input type="text" id="compIban" placeholder="DE21 4444..." oninput="updatePdfPreview()">
             
             <label>BIC</label>
             <input type="text" id="compBic" placeholder="..." oninput="updatePdfPreview()">
@@ -780,33 +780,56 @@ tr:last-child td { border-bottom: none; }
           </form>
         </div>
 
-        <!-- ECHTZEIT PDF-BRIEFKOPF VORSCHAU -->
+        <!-- HOCHWERTIGE REALISTISCHE PDF-BRIEFKOPF VORSCHAU -->
         <div>
           <div class="card-header" style="margin-bottom:12px;">Live-Vorschau (PDF Briefkopf)</div>
-          <div style="background:#ffffff; color:#0f172a; border:1px solid var(--border); border-radius:16px; padding:24px; box-shadow:var(--shadow); min-height:450px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:12px; padding:32px 28px; box-shadow:var(--shadow); min-height:480px; display:flex; flex-direction:column; justify-content:space-between; font-family:sans-serif;">
             <div>
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #6366f1; padding-bottom:16px; margin-bottom:16px;">
-                <div>
-                  <div id="prevLogoArea"><strong id="prevCompName" style="font-size:18px; color:#0f172a;">Veribase Operations</strong></div>
-                  <div id="prevCompSubtitle" style="font-size:11px; color:#64748b; margin-top:2px;">Mülltonnenservice & Logistik</div>
+              <!-- HEADER ZEILE MIT LOGO + NAME LINKS & ADRESSE RECHTS -->
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #6366f1; padding-bottom:18px; margin-bottom:20px;">
+                <div style="display:flex; align-items:center; gap:14px;">
+                  <div id="prevLogoArea" style="display:flex; align-items:center;"></div>
+                  <div>
+                    <strong id="prevCompName" style="font-size:20px; color:#0f172a; display:block; font-weight:800; line-height:1.2;">Veribase</strong>
+                    <span id="prevCompSubtitle" style="font-size:11px; color:#64748b; font-weight:600;">Touren und Nachweise</span>
+                  </div>
                 </div>
-                <div style="text-align:right; font-size:11px; color:#64748b; line-height:1.4;">
-                  <span id="prevCompStreet" style="font-weight:700;">Hauptstraße 1</span><br>
+                <div style="text-align:right; font-size:11px; color:#475569; line-height:1.5;">
+                  <span id="prevCompStreet" style="font-weight:700;">Thüringer Straße 37</span><br>
                   <span id="prevCompCity" style="font-weight:700;">51766 Engelskirchen</span><br>
-                  <span id="prevCompEmail">kontakt@veribase.de</span>
+                  <span id="prevCompEmail">kontakt@veribase.de</span><br>
+                  <span id="prevCompPhone" style="color:#64748b;">-</span>
                 </div>
               </div>
-              <h3 style="font-size:14px; text-transform:uppercase; color:#0f172a; margin:16px 0 6px 0;">Leistungsnachweis / Audit-Protokoll</h3>
-              <p style="font-size:11px; color:#64748b; margin-top:0;">Erstellt am: <span id="prevDateDisplay">21.10.2026</span> | Status: Offizielles Dokument</p>
-              
-              <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:30px 20px; text-align:center; color:#94a3b8; font-size:12px; margin-top:20px;">
+
+              <!-- DOKUMENT TITEL -->
+              <div style="margin:20px 0 10px 0;">
+                <h3 style="font-size:15px; text-transform:uppercase; color:#0f172a; margin:0; letter-spacing:0.05em; font-weight:800;">LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL</h3>
+                <p style="font-size:11px; color:#64748b; margin:4px 0 0 0;">Erstellt am: <span id="prevDateDisplay">21.10.2026</span> | Status: Offizielles Dokument</p>
+              </div>
+
+              <!-- BEISPIEL INHALT -->
+              <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:30px 20px; text-align:center; color:#94a3b8; font-size:12px; margin-top:24px;">
                 [ Tabellen-Inhalt & Fotobeweise im generierten PDF ]
               </div>
             </div>
 
-            <div style="border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; font-size:10px; color:#64748b;">
-              <div>Inhaber: <span id="prevCompOwner">-</span> | Steuernr: <span id="prevCompTax">-</span></div>
-              <div>IBAN: <span id="prevCompIban">-</span></div>
+            <!-- GEORDNETE DREISPALTIGE FUSSZEILE -->
+            <div style="border-top:1px solid #e2e8f0; padding-top:14px; margin-top:24px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; font-size:10px; color:#64748b; line-height:1.5;">
+              <div>
+                <strong style="color:#0f172a;">Unternehmen</strong><br>
+                Inhaber: <span id="prevCompOwner">-</span><br>
+                Web: <span id="prevCompWeb">-</span>
+              </div>
+              <div>
+                <strong style="color:#0f172a;">Steuerdaten</strong><br>
+                Steuernr: <span id="prevCompTax">-</span>
+              </div>
+              <div>
+                <strong style="color:#0f172a;">Bankverbindung</strong><br>
+                IBAN: <span id="prevCompIban">-</span><br>
+                BIC: <span id="prevCompBic">-</span>
+              </div>
             </div>
           </div>
         </div>
@@ -984,35 +1007,41 @@ function loadCompanyProfile() {
 }
 
 function updatePdfPreview() {
-  const name = document.getElementById('compName').value || 'Veribase Operations';
-  const subtitle = document.getElementById('compSubtitle').value || 'Mülltonnenservice & Logistik';
+  const name = document.getElementById('compName').value || 'Veribase';
+  const subtitle = document.getElementById('compSubtitle').value || 'Touren und Nachweise';
   const owner = document.getElementById('compOwner').value || '-';
-  const street = document.getElementById('compStreet').value || 'Hauptstraße 1';
+  const street = document.getElementById('compStreet').value || 'Thüringer Straße 37';
   const city = document.getElementById('compCity').value || '51766 Engelskirchen';
   const email = document.getElementById('compEmail').value || 'kontakt@veribase.de';
+  const phone = document.getElementById('compPhone').value || '-';
   const tax = document.getElementById('compTax').value || '-';
+  const web = document.getElementById('compWeb').value || '-';
   const iban = document.getElementById('compIban').value || '-';
+  const bic = document.getElementById('compBic').value || '-';
 
   document.getElementById('prevCompName').innerText = name;
   document.getElementById('prevCompSubtitle').innerText = subtitle;
   document.getElementById('prevCompStreet').innerText = street;
   document.getElementById('prevCompCity').innerText = city;
   document.getElementById('prevCompEmail').innerText = email;
+  document.getElementById('prevCompPhone').innerText = phone;
   document.getElementById('prevCompOwner').innerText = owner;
   document.getElementById('prevCompTax').innerText = tax;
+  document.getElementById('prevCompWeb').innerText = web;
   document.getElementById('prevCompIban').innerText = iban;
+  document.getElementById('prevCompBic').innerText = bic;
 
   const logoArea = document.getElementById('prevLogoArea');
   const formLogoContainer = document.getElementById('formLogoContainer');
 
   if (companyLogoBase64) {
-    logoArea.innerHTML = `<img src="${companyLogoBase64}" style="max-height:45px; max-width:140px; object-fit:contain;">`;
+    logoArea.innerHTML = `<img src="${companyLogoBase64}" style="max-height:48px; max-width:120px; object-fit:contain;">`;
     formLogoContainer.innerHTML = `
       <img src="${companyLogoBase64}" style="max-height:50px; max-width:100%; object-fit:contain; margin-bottom:4px;"><br>
       <span style="font-size:11px; color:var(--accent); font-weight:700;">Logo ändern</span>
     `;
   } else {
-    logoArea.innerHTML = `<strong style="font-size:18px; color:#0f172a;">${name}</strong>`;
+    logoArea.innerHTML = '';
     formLogoContainer.innerHTML = `<div style="font-size:12px; font-weight:600; color:var(--text-sub);">Logo auswählen (PNG / JPG)</div>`;
   }
 }
@@ -1061,7 +1090,7 @@ function saveCompanyProfile(e) {
 function getCompanyProfile() {
   const saved = localStorage.getItem('companyProfile');
   if (saved) return JSON.parse(saved);
-  return { name: 'Veribase Operations', subtitle: '', owner: '', street: '', city: '', email: '', phone: '', tax: '', web: '', iban: '', bic: '', logo: '' };
+  return { name: 'Veribase', subtitle: 'Touren und Nachweise', owner: '', street: 'Thüringer Straße 37', city: '51766 Engelskirchen', email: 'kontakt@veribase.de', phone: '', tax: '', web: '', iban: '', bic: '', logo: '' };
 }
 
 async function loadDriversFromSupabase() {
@@ -1621,13 +1650,13 @@ function closeProofModal() {
   activeModalProof = null;
 }
 
-function generatePDFHTML(proofs, title = 'Leistungsnachweis') {
+function generatePDFHTML(proofs, title = 'LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL') {
   const comp = getCompanyProfile();
   const date = new Date().toLocaleDateString('de-DE');
   const total = proofs.length;
   const done = proofs.filter(p => p.status === 'erledigt').length;
 
-  const logo = comp.logo ? `<img src="${comp.logo}" style="max-height: 50px;">` : `<strong style="font-size:18px;">${comp.name}</strong>`;
+  const logoHtml = comp.logo ? `<img src="${comp.logo}" style="max-height:48px; max-width:120px; object-fit:contain; margin-right:12px;">` : '';
 
   const rows = proofs.map(p => `
     <tr style="border-bottom: 1px solid #e2e8f0;">
@@ -1646,17 +1675,45 @@ function generatePDFHTML(proofs, title = 'Leistungsnachweis') {
 
   return `
     <div style="padding: 30px; font-family: sans-serif; color: #0f172a; background: #fff;">
-      <table style="width: 100%; margin-bottom: 20px;"><tr><td>${logo}</td><td style="text-align:right; font-size:12px; color:#475569;"><strong>${comp.name}</strong><br>${comp.street}, ${comp.city}<br>${comp.email || ''}</td></tr></table>
-      <hr style="border:0; border-top:2px solid #6366f1; margin-bottom: 20px;">
-      <h2>${title}</h2>
-      <p style="font-size:12px; color:#64748b;">Erstellt am: ${date} | Erledigt: ${done}/${total}</p>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #6366f1; padding-bottom:16px; margin-bottom:20px;">
+        <div style="display:flex; align-items:center;">
+          ${logoHtml}
+          <div>
+            <strong style="font-size:20px; font-weight:800; color:#0f172a; display:block; line-height:1.2;">${comp.name}</strong>
+            <span style="font-size:11px; color:#64748b; font-weight:600;">${comp.subtitle || ''}</span>
+          </div>
+        </div>
+        <div style="text-align:right; font-size:11px; color:#475569; line-height:1.5;">
+          <strong>${comp.street}</strong><br>
+          <strong>${comp.city}</strong><br>
+          ${comp.email || ''}<br>
+          ${comp.phone || ''}
+        </div>
+      </div>
+
+      <h2 style="font-size:16px; text-transform:uppercase; margin:0 0 4px 0;">${title}</h2>
+      <p style="font-size:11px; color:#64748b; margin-top:0;">Erstellt am: ${date} | Status: Offizielles Dokument (${done}/${total} erledigt)</p>
+
       <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
         <thead><tr style="background:#f8fafc; font-size:12px; text-align:left;"><th>Foto</th><th>Details</th><th>Zeit</th><th style="text-align:right;">Status</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-      <div style="margin-top:30px; border-top:1px solid #cbd5e1; padding-top:10px; font-size:10px; color:#64748b; display:flex; justify-content:space-between;">
-        <span>Inhaber: ${comp.owner || '-'} | Steuernr: ${comp.tax || '-'}</span>
-        <span>IBAN: ${comp.iban || '-'}</span>
+
+      <div style="margin-top:40px; border-top:1px solid #e2e8f0; padding-top:14px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; font-size:10px; color:#64748b; line-height:1.5;">
+        <div>
+          <strong style="color:#0f172a;">Unternehmen</strong><br>
+          Inhaber: ${comp.owner || '-'}<br>
+          Web: ${comp.web || '-'}
+        </div>
+        <div>
+          <strong style="color:#0f172a;">Steuerdaten</strong><br>
+          Steuernr: ${comp.tax || '-'}
+        </div>
+        <div>
+          <strong style="color:#0f172a;">Bankverbindung</strong><br>
+          IBAN: ${comp.iban || '-'}<br>
+          BIC: ${comp.bic || '-'}
+        </div>
       </div>
     </div>
   `;
@@ -1673,7 +1730,7 @@ function exportSelectedProofsPDF() {
 function downloadSingleProofPDF() {
   if (!activeModalProof) return;
   const el = document.createElement('div');
-  el.innerHTML = generatePDFHTML([activeModalProof], 'Einzelnachweis');
+  el.innerHTML = generatePDFHTML([activeModalProof], 'EINZELNACHWEIS / AUDIT-PROTOKOLL');
   html2pdf().set({ margin: 10, filename: 'Nachweis.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
 }
 
