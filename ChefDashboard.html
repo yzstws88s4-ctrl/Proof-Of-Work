@@ -226,8 +226,8 @@ body {
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
 
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+.grid-2 { display: grid; grid-template-columns: 360px 1fr; gap: 24px; }
+@media (max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } }
 
 label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 
@@ -248,15 +248,34 @@ button.btn-main:hover { opacity: 0.92; }
 
 .btn-danger-compact {
   background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+  padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
   transition: all 0.2s ease;
 }
 .btn-danger-compact:hover { background: var(--danger); color: #fff; }
 
-.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--input-bg); }
+/* FIX FÜR TABELLEN-SCROLLING BEI VIELEN FAHRERN */
+.table-container { 
+  overflow-x: auto; 
+  overflow-y: auto; 
+  max-height: calc(100vh - 280px); 
+  border: 1px solid var(--border); 
+  border-radius: 12px; 
+  background: var(--input-bg); 
+}
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-th, td { padding: 14px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-th { background: var(--surface-solid); color: var(--text-sub); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+th, td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th { 
+  background: var(--surface-solid); 
+  color: var(--text-sub); 
+  font-size: 10px; 
+  text-transform: uppercase; 
+  font-weight: 700; 
+  letter-spacing: 0.05em; 
+  position: sticky; 
+  top: 0; 
+  z-index: 10; 
+  box-shadow: 0 1px 0 var(--border); 
+}
 tr:last-child td { border-bottom: none; }
 
 .status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
@@ -270,6 +289,7 @@ tr:last-child td { border-bottom: none; }
   border-radius: 16px;
   padding: 20px;
   box-shadow: var(--shadow);
+  height: fit-content;
 }
 
 .driver-mini-avatar {
@@ -511,6 +531,7 @@ tr:last-child td { border-bottom: none; }
       <div id="liveToursContainer"><p style="color:var(--text-muted); font-size:13px;">Lade Live-Daten...</p></div>
     </div>
 
+    <!-- FAHRER-VERWALTUNG (OPTIMIERT FÜR SKALIERUNG) -->
     <div id="pane-team" class="tab-pane">
       <div class="grid-2">
         <div class="form-card-box">
@@ -532,7 +553,14 @@ tr:last-child td { border-bottom: none; }
         </div>
 
         <div>
-          <div class="card-header" style="margin-bottom:16px;">Aktives Fahrer-Team</div>
+          <div class="card-header" style="margin-bottom:12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span>Aktives Fahrer-Team</span>
+              <span id="driverCountBadge" class="status-chip done" style="font-size: 11px;">0 Fahrer</span>
+            </div>
+            <input type="text" id="driverSearchInput" placeholder="🔍 Fahrer suchen..." oninput="filterDriverTable()" style="width: 220px; margin-bottom: 0; padding: 8px 12px; font-size: 12px;">
+          </div>
+          
           <div class="table-container">
             <table>
               <thead>
@@ -565,7 +593,7 @@ tr:last-child td { border-bottom: none; }
         <div id="scanStatusMsg" style="font-size:11px; color:var(--success); font-weight:600; margin-top:6px; display:none;">✓ Eingelesen</div>
       </div>
 
-      <div class="grid-2">
+      <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
         <div>
           <label>Tour-Titel</label><input type="text" id="tourTitle" placeholder="z. B. Tour Nord">
           <label>Fahrer</label><select id="tourAssignee"></select>
@@ -617,7 +645,7 @@ tr:last-child td { border-bottom: none; }
     <div id="pane-company" class="tab-pane">
       <div class="card-header" style="margin-bottom:12px;">Unternehmensdaten für PDF-Header</div>
       <form id="companyProfileForm" onsubmit="saveCompanyProfile(event)">
-        <div class="grid-2">
+        <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
           <div>
             <label>Firmenname</label><input type="text" id="compName" required>
             <label>Untertitel / Slogan</label><input type="text" id="compSubtitle">
@@ -843,14 +871,16 @@ async function loadDriversFromSupabase() {
   const { data: profiles } = await supabaseClient.from('profiles').select('*').eq('role', 'driver').eq('is_active', true);
   driversList = profiles || [];
   document.getElementById('kpiActiveDrivers').innerText = driversList.length;
-  renderDriverList();
+  renderDriverList(driversList);
 }
 
-function renderDriverList() {
+function renderDriverList(listToRender) {
   const tbody = document.getElementById('employeeTableBody');
   const select = document.getElementById('tourAssignee');
   const driverFilter = document.getElementById('proofDriverFilter');
+  const countBadge = document.getElementById('driverCountBadge');
 
+  if (countBadge) countBadge.innerText = `${driversList.length} Fahrer`;
   if (tbody) tbody.innerHTML = '';
   if (select) select.innerHTML = '';
   if (driverFilter) driverFilter.innerHTML = '<option value="">Alle Fahrer</option>';
@@ -862,6 +892,20 @@ function renderDriverList() {
   }
 
   driversList.forEach(driver => {
+    const rawEmail = driver.email || '';
+    const cleanUsername = rawEmail.split('@')[0];
+    const name = driver.full_name || cleanUsername;
+
+    if (select) select.innerHTML += `<option value="${driver.id}">${name} (${cleanUsername})</option>`;
+    if (driverFilter) driverFilter.innerHTML += `<option value="${name.toLowerCase()}">${name}</option>`;
+  });
+
+  if (listToRender.length === 0) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted); text-align: center;">Keine passenden Fahrer gefunden.</td></tr>';
+    return;
+  }
+
+  listToRender.forEach(driver => {
     const rawEmail = driver.email || '';
     const cleanUsername = rawEmail.split('@')[0];
     const name = driver.full_name || cleanUsername;
@@ -883,9 +927,17 @@ function renderDriverList() {
           </td>
         </tr>`;
     }
-    if (select) select.innerHTML += `<option value="${driver.id}">${name} (${cleanUsername})</option>`;
-    if (driverFilter) driverFilter.innerHTML += `<option value="${name.toLowerCase()}">${name}</option>`;
   });
+}
+
+function filterDriverTable() {
+  const searchTerm = (document.getElementById('driverSearchInput')?.value || '').toLowerCase();
+  const filtered = driversList.filter(driver => {
+    const name = (driver.full_name || '').toLowerCase();
+    const username = (driver.email || '').toLowerCase();
+    return name.includes(searchTerm) || username.includes(searchTerm);
+  });
+  renderDriverList(filtered);
 }
 
 async function deleteDriver(id, name) {
@@ -980,7 +1032,6 @@ async function loadToursFromSupabase() {
   
   const todayStr = new Date().toISOString().split('T')[0];
 
-  // Zeige im Live-Monitor aktive ODER heute abgebrochene Touren an
   const liveActiveTours = (tours || []).filter(t => 
     t.profiles?.is_active === true && 
     (t.status === 'aktiv' || t.status === 'abgebrochen') &&
@@ -1078,7 +1129,7 @@ function renderLiveMonitor(activeTours) {
             <div class="progress-track-fill" style="width: ${pct}%;"></div>
           </div>
           <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sub); font-weight:700;">
-            <span>Stopps: ${doneCount} von${total} erledigt</span>
+            <span>Stopps: ${doneCount} von ${total} erledigt</span>
             <span style="color:var(--accent);">${pct}%</span>
           </div>
           <div class="live-stop-nodes">
