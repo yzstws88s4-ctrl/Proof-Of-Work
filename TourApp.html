@@ -538,15 +538,6 @@ input:checked + .slider:before { transform: translateX(18px); }
   </div>
 </div>
 
-<!-- IN-APP ALERT MODAL FÜR GEODATEN / SICHERHEIT -->
-<div class="modal-overlay" id="geoAlertModal">
-  <div class="modal-box" style="text-align: left;">
-    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--danger);">Sicherheits-Sperre</div>
-    <div id="geoAlertBody" style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px; line-height: 1.5;"></div>
-    <button class="btn-success" onclick="closeGeoAlertModal()" style="margin-bottom:0; padding: 12px;">Schließen</button>
-  </div>
-</div>
-
 <div class="modal-overlay" id="customModal">
   <div class="modal-box" style="text-align: center;">
     <div style="font-size:15px; font-weight:700;" id="modalTitle">Hinweis</div>
@@ -713,39 +704,6 @@ function forceFreshGPSFix() {
       { enableHighAccuracy: true, maximumAge: 0, timeout: 4000 }
     );
   });
-}
-
-function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371000;
-  const dLat = deg2rad(lat2 - lat1);
-  const dLon = deg2rad(lon2 - lon1);
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
-
-function deg2rad(deg) {
-  return deg * (Math.PI/180);
-}
-
-async function getCoordinatesForAddress(addressStr) {
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressStr)}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    if (data && data.length > 0) {
-      return {
-        lat: parseFloat(data[0].lat),
-        lon: parseFloat(data[0].lon)
-      };
-    }
-  } catch (e) {
-    console.error("Geocoding Fehler:", e);
-  }
-  return null;
 }
 
 async function loadSupabaseTour() {
@@ -950,46 +908,16 @@ function closeNoteModal() {
   document.getElementById('noteEditModal').style.display = 'none';
 }
 
-// Strikte Geofencing-Prüfung ZUERST, Kamera erst bei erfolgreichem Standort
-async function triggerCompleteStop() {
+// Direkter, reibungsloser Kamera-Aufruf bei jedem Stopp (mit Live-GPS Stempel)
+function triggerCompleteStop() {
   if (currentStopIndex >= tourStops.length) return;
-  const current = tourStops[currentStopIndex];
 
   if (isPhotoProofEnabled) {
-    // 1. Erst GPS und Koordinaten abrufen
-    await forceFreshGPSFix();
-
-    if (currentLatitude === null || currentLongitude === null) {
-      showGeoAlert("GPS-Signal nicht verfügbar. Bitte aktiviere GPS auf deinem Gerät.");
-      return;
-    }
-
-    const targetCoords = await getCoordinatesForAddress(current.address);
-
-    if (targetCoords) {
-      const distanceMeters = getDistanceFromLatLonInMeters(currentLatitude, currentLongitude, targetCoords.lat, targetCoords.lon);
-
-      // 2. Wenn zu weit weg -> Sofort abbrechen und Warnung zeigen (Kamera bleibt geschlossen!)
-      if (distanceMeters > 150) {
-        showGeoAlert(`Sicherheits-Sperre: Du bist ca. ${Math.round(distanceMeters)} Meter von "${current.address}" entfernt.<br><br>Du musst vor Ort sein, um diesen Stopp abzuhaken!`);
-        return;
-      }
-    }
-
-    // 3. Erst wenn man wirklich in der Nähe ist, öffnen wir die Kamera
+    // Öffnet sofort die Live-Kamera ohne Blockierung
     document.getElementById('proofCameraInput').click();
   } else {
     completeCurrentStopWithoutPhoto();
   }
-}
-
-function showGeoAlert(htmlMessage) {
-  document.getElementById('geoAlertBody').innerHTML = htmlMessage;
-  document.getElementById('geoAlertModal').style.display = 'flex';
-}
-
-function closeGeoAlertModal() {
-  document.getElementById('geoAlertModal').style.display = 'none';
 }
 
 async function handleProofCapture(event) {
