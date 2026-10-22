@@ -490,7 +490,6 @@ input:checked + .slider:before { transform: translateX(18px); }
     <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Fälschungssicherer Fotobeweis</div>
     <input type="text" id="modalProofNoteInput" placeholder="Notiz zum Stopp (optional)..." style="margin-bottom: 10px;" oninput="updateLiveStampNote()">
     
-    <!-- Bildvorschau vollflächig ohne Ränder -->
     <div style="border-radius: 12px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--accent-line); background: #000; display: flex; align-items: center; justify-content: center;">
       <img id="modalProofImagePreview" src="" style="width: 100%; max-height: 280px; object-fit: contain; display: block;">
     </div>
@@ -960,11 +959,10 @@ async function handleModalReplaceCapture(event) {
       const now = new Date().toLocaleString('de-DE');
       const driverDisplayName = currentProfile?.full_name || currentUser.email.split('@')[0];
 
-      // Optimierte Stempel-Visualisierung
       drawAuditStamp(ctx, canvas.width, canvas.height, {
         title: `VERIBASE - AUDIT-FOTOBEWEIS #${editingStopIndex + 1}`,
         driver: driverDisplayName,
-        address: stop.address,
+        targetAddress: stop.address,
         time: now,
         gps: currentGPSCoords,
         note: userNote
@@ -1009,18 +1007,19 @@ async function handleModalReplaceCapture(event) {
   event.target.value = '';
 }
 
-// PERFEKTE STEMPEL-ZEICHNUNG OHNE ABSCHNEIDEN
+// KLAR GETRENNTE DARSTELLUNG: SOLL-ZIELADRESSE UND ECHTZEIT-GPS KOORDINATEN
 function drawAuditStamp(ctx, width, height, data) {
   const baseSize = Math.max(22, Math.floor(width / 26));
   const paddingHorizontal = Math.floor(baseSize * 1.0);
   const paddingVertical = Math.floor(baseSize * 0.8);
-  const margin = Math.floor(baseSize * 1.2); // Sicherheitsabstand zum Bildrand
+  const margin = Math.floor(baseSize * 1.2);
 
   const lines = [
     { text: data.title, font: `bold ${Math.floor(baseSize * 1.1)}px 'Plus Jakarta Sans', sans-serif`, color: '#818cf8' },
     { text: `Fahrer: ${data.driver}`, font: `600 ${baseSize}px 'Plus Jakarta Sans', sans-serif`, color: '#ffffff' },
-    { text: `Ort: ${data.address}`, font: `600 ${baseSize}px 'Plus Jakarta Sans', sans-serif`, color: '#ffffff' },
-    { text: `Zeit: ${data.time} | GPS: ${data.gps}`, font: `500 ${Math.floor(baseSize * 0.9)}px 'Plus Jakarta Sans', sans-serif`, color: '#cbd5e1' },
+    { text: `Ziel-Adresse: ${data.targetAddress}`, font: `600 ${baseSize}px 'Plus Jakarta Sans', sans-serif`, color: '#ffffff' },
+    { text: `Echtzeit-GPS: ${data.gps}`, font: `700 ${baseSize}px 'Plus Jakarta Sans', sans-serif`, color: '#38bdf8' },
+    { text: `Zeitstempel: ${data.time}`, font: `500 ${Math.floor(baseSize * 0.9)}px 'Plus Jakarta Sans', sans-serif`, color: '#cbd5e1' },
     data.note ? { text: `Notiz: ${data.note}`, font: `italic 500 ${Math.floor(baseSize * 0.9)}px 'Plus Jakarta Sans', sans-serif`, color: '#fbbf24' } : null
   ].filter(Boolean);
 
@@ -1031,17 +1030,15 @@ function drawAuditStamp(ctx, width, height, data) {
     if (w > maxTextWidth) maxTextWidth = w;
   });
 
-  const lineHeight = baseSize * 1.4;
+  const lineHeight = baseSize * 1.45;
   const boxWidth = maxTextWidth + (paddingHorizontal * 2);
   const boxHeight = (lines.length * lineHeight) + (paddingVertical * 2);
 
-  // Platzierung unten links mit Sicherheitsabstand
   const x = margin;
   const y = height - boxHeight - margin;
 
-  // Abgerundetes dunkles Rechteck
   ctx.save();
-  ctx.fillStyle = 'rgba(3, 7, 18, 0.88)';
+  ctx.fillStyle = 'rgba(3, 7, 18, 0.90)';
   ctx.strokeStyle = 'rgba(99, 102, 241, 0.5)';
   ctx.lineWidth = Math.max(2, Math.floor(baseSize / 10));
 
@@ -1060,7 +1057,6 @@ function drawAuditStamp(ctx, width, height, data) {
   ctx.fill();
   ctx.stroke();
 
-  // Text zeichnen
   lines.forEach((line, index) => {
     ctx.font = line.font;
     ctx.fillStyle = line.color;
@@ -1093,7 +1089,7 @@ async function refreshStampPreview() {
         drawAuditStamp(ctx, canvas.width, canvas.height, {
           title: `VERIBASE - AUDIT-FOTOBEWEIS #${currentStopIndex + 1}`,
           driver: driverDisplayName,
-          address: currentStop.address,
+          targetAddress: currentStop.address,
           time: now,
           gps: currentGPSCoords,
           note: userNote
