@@ -372,7 +372,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 <div class="container">
   <div class="header">
     <div class="user-greeting-box">
-      <span class="driver-welcome" id="driverWelcomeDisplay">Hallo Bj</span>
+      <span class="driver-welcome" id="driverWelcomeDisplay">Hallo Björn</span>
     </div>
     <div class="header-actions">
       <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
@@ -386,15 +386,21 @@ input:checked + .slider:before { transform: translateX(18px); }
     <div class="main-inputs-group">
       <div class="section-label">Tour starten</div>
       
-      <!-- Smart-Scan / Tour-Foto einlesen Button wieder integriert -->
+      <!-- BEIDE BUTTONS WIEDER VORHANDEN -->
       <div class="btn-grid">
         <button onclick="document.getElementById('ocrCameraInput').click()">
           <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          Tour-Foto einlesen (Smart-Scan)
+          Tour-Foto aufnehmen (Kamera)
+        </button>
+        <button onclick="document.getElementById('ocrGalleryInput').click()">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Tour-Foto aus Galerie hochladen
         </button>
       </div>
 
+      <!-- Versteckte Eingabefelder: Eins für Kamera, eins für Galerie-Upload -->
       <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
+      <input type="file" id="ocrGalleryInput" accept="image/*" style="display: none;" onchange="handleOcrImage(event)">
 
       <textarea id="addressInput" placeholder="Adressen zeilenweise einfügen..."></textarea>
 
@@ -531,15 +537,6 @@ input:checked + .slider:before { transform: translateX(18px); }
       <button class="btn-danger" style="margin-bottom:0; padding: 11px;" onclick="archiveCurrentDetailTour()">Ausblenden</button>
       <button style="margin-bottom:0; padding: 11px;" onclick="closeDetailModal()">Zurück</button>
     </div>
-  </div>
-</div>
-
-<!-- IN-APP ALERT MODAL FÜR GEODATEN / SICHERHEIT -->
-<div class="modal-overlay" id="geoAlertModal">
-  <div class="modal-box" style="text-align: left;">
-    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--danger);">Sicherheits-Sperre</div>
-    <div id="geoAlertBody" style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px; line-height: 1.5;"></div>
-    <button class="btn-success" onclick="closeGeoAlertModal()" style="margin-bottom:0; padding: 12px;">Schließen</button>
   </div>
 </div>
 
@@ -709,39 +706,6 @@ function forceFreshGPSFix() {
       { enableHighAccuracy: true, maximumAge: 0, timeout: 4000 }
     );
   });
-}
-
-function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371000;
-  const dLat = deg2rad(lat2 - lat1);
-  const dLon = deg2rad(lon2 - lon1);
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
-
-function deg2rad(deg) {
-  return deg * (Math.PI/180);
-}
-
-async function getCoordinatesForAddress(addressStr) {
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressStr)}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    if (data && data.length > 0) {
-      return {
-        lat: parseFloat(data[0].lat),
-        lon: parseFloat(data[0].lon)
-      };
-    }
-  } catch (e) {
-    console.error("Geocoding Fehler:", e);
-  }
-  return null;
 }
 
 async function loadSupabaseTour() {
@@ -946,48 +910,14 @@ function closeNoteModal() {
   document.getElementById('noteEditModal').style.display = 'none';
 }
 
-// Geofencing-Prüfung und direkter Kamera-Start
-async function triggerCompleteStop() {
+function triggerCompleteStop() {
   if (currentStopIndex >= tourStops.length) return;
-  const current = tourStops[currentStopIndex];
 
   if (isPhotoProofEnabled) {
-    // 1. Frischen GPS-Fix holen
-    await forceFreshGPSFix();
-
-    if (currentLatitude === null || currentLongitude === null) {
-      showGeoAlert("GPS-Signal nicht verfügbar. Bitte aktiviere GPS auf deinem Gerät.");
-      return;
-    }
-
-    // 2. Entfernung zur Zieladresse im Hintergrund prüfen
-    const targetCoords = await getCoordinatesForAddress(current.address);
-
-    if (targetCoords) {
-      const distanceMeters = getDistanceFromLatLonInMeters(currentLatitude, currentLongitude, targetCoords.lat, targetCoords.lon);
-
-      // Toleranz: 150 Meter Radius
-      if (distanceMeters > 150) {
-        showGeoAlert(`Sicherheits-Sperre: Du bist ca. ${Math.round(distanceMeters)} Meter von "${current.address}" entfernt.<br><br>Du musst vor Ort sein, um diesen Stopp abzuhaken!`);
-        return;
-      }
-    }
-
-    // 3. Wenn vor Ort -> Sofort Kamera triggern!
     document.getElementById('proofCameraInput').click();
   } else {
-    // Wenn Fotobeweis aus -> direkt ohne Foto abschließen
     completeCurrentStopWithoutPhoto();
   }
-}
-
-function showGeoAlert(htmlMessage) {
-  document.getElementById('geoAlertBody').innerHTML = htmlMessage;
-  document.getElementById('geoAlertModal').style.display = 'flex';
-}
-
-function closeGeoAlertModal() {
-  document.getElementById('geoAlertModal').style.display = 'none';
 }
 
 async function handleProofCapture(event) {
