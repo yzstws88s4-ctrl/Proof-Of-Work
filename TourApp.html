@@ -386,7 +386,6 @@ input:checked + .slider:before { transform: translateX(18px); }
     <div class="main-inputs-group">
       <div class="section-label">Tour starten</div>
       
-      <!-- BEIDE OPTIONEN ZUM TOUR-EINLESEN -->
       <div class="btn-grid">
         <button onclick="document.getElementById('ocrCameraInput').click()">
           <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -459,7 +458,6 @@ input:checked + .slider:before { transform: translateX(18px); }
         Vorherigen Stopp zurückholen
       </button>
 
-      <!-- Für Stopps innerhalb der Tour bleibt NUR die Live-Kamera erlaubt -->
       <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
       <input type="file" id="modalReplaceCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleModalReplaceCapture(event)">
 
@@ -952,33 +950,30 @@ function closeNoteModal() {
   document.getElementById('noteEditModal').style.display = 'none';
 }
 
-// Geofencing-Prüfung vor Ort
-async function triggerCompleteStop() {
+// Sofortiger Kamera-Trigger ohne Async-Blockade auf iOS/Android
+function triggerCompleteStop() {
   if (currentStopIndex >= tourStops.length) return;
   const current = tourStops[currentStopIndex];
 
   if (isPhotoProofEnabled) {
-    await forceFreshGPSFix();
-
-    if (currentLatitude === null || currentLongitude === null) {
-      showGeoAlert("GPS-Signal nicht verfügbar. Bitte aktiviere GPS auf deinem Gerät.");
-      return;
-    }
-
-    const targetCoords = await getCoordinatesForAddress(current.address);
-
-    if (targetCoords) {
-      const distanceMeters = getDistanceFromLatLonInMeters(currentLatitude, currentLongitude, targetCoords.lat, targetCoords.lon);
-
-      // Toleranz: 150 Meter Radius
-      if (distanceMeters > 150) {
-        showGeoAlert(`Sicherheits-Sperre: Du bist ca. ${Math.round(distanceMeters)} Meter von "${current.address}" entfernt.<br><br>Du musst vor Ort sein, um diesen Stopp abzuhaken!`);
-        return;
-      }
-    }
-
-    // Wenn vor Ort -> Kamera öffnen
+    // Direkt das Datei-Input-Element im synchronen Kontext des User-Klicks ansprechen
     document.getElementById('proofCameraInput').click();
+
+    // Die Entfernungsprüfung und GPS-Validierung laufen parallel im Hintergrund
+    setTimeout(async () => {
+      await forceFreshGPSFix();
+      if (currentLatitude !== null && currentLongitude !== null) {
+        const targetCoords = await getCoordinatesForAddress(current.address);
+        if (targetCoords) {
+          const distanceMeters = getDistanceFromLatLonInMeters(currentLatitude, currentLongitude, targetCoords.lat, targetCoords.lon);
+          if (distanceMeters > 150) {
+            // Falls er zu weit weg war, schließen wir das Fotofenster/Reset und zeigen die Warnung
+            document.getElementById('proofCameraInput').value = '';
+            showGeoAlert(`Sicherheits-Sperre: Du bist ca. ${Math.round(distanceMeters)} Meter von "${current.address}" entfernt.<br><br>Du musst vor Ort sein, um diesen Stopp abzuhaken!`);
+          }
+        }
+      }
+    }, 100);
   } else {
     completeCurrentStopWithoutPhoto();
   }
@@ -1549,9 +1544,9 @@ function updateProgress(percent, text) {
   }
 }
 
-function showModal(title, bodyText, showProgress = false) {
+function showModal(title, bodyTest, showProgress = false) {
   document.getElementById('modalTitle').innerText = title;
-  document.getElementById('modalBody').innerText = bodyText;
+  document.getElementById('modalBody').innerText = bodyTest;
   
   const progContainer = document.getElementById('modalProgressContainer');
   const okBtn = document.getElementById('modalOkBtn');
