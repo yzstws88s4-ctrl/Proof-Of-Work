@@ -950,30 +950,34 @@ function closeNoteModal() {
   document.getElementById('noteEditModal').style.display = 'none';
 }
 
-// Sofortiger Kamera-Trigger ohne Async-Blockade auf iOS/Android
-function triggerCompleteStop() {
+// Strikte Geofencing-Prüfung ZUERST, Kamera erst bei erfolgreichem Standort
+async function triggerCompleteStop() {
   if (currentStopIndex >= tourStops.length) return;
   const current = tourStops[currentStopIndex];
 
   if (isPhotoProofEnabled) {
-    // Direkt das Datei-Input-Element im synchronen Kontext des User-Klicks ansprechen
-    document.getElementById('proofCameraInput').click();
+    // 1. Erst GPS und Koordinaten abrufen
+    await forceFreshGPSFix();
 
-    // Die Entfernungsprüfung und GPS-Validierung laufen parallel im Hintergrund
-    setTimeout(async () => {
-      await forceFreshGPSFix();
-      if (currentLatitude !== null && currentLongitude !== null) {
-        const targetCoords = await getCoordinatesForAddress(current.address);
-        if (targetCoords) {
-          const distanceMeters = getDistanceFromLatLonInMeters(currentLatitude, currentLongitude, targetCoords.lat, targetCoords.lon);
-          if (distanceMeters > 150) {
-            // Falls er zu weit weg war, schließen wir das Fotofenster/Reset und zeigen die Warnung
-            document.getElementById('proofCameraInput').value = '';
-            showGeoAlert(`Sicherheits-Sperre: Du bist ca. ${Math.round(distanceMeters)} Meter von "${current.address}" entfernt.<br><br>Du musst vor Ort sein, um diesen Stopp abzuhaken!`);
-          }
-        }
+    if (currentLatitude === null || currentLongitude === null) {
+      showGeoAlert("GPS-Signal nicht verfügbar. Bitte aktiviere GPS auf deinem Gerät.");
+      return;
+    }
+
+    const targetCoords = await getCoordinatesForAddress(current.address);
+
+    if (targetCoords) {
+      const distanceMeters = getDistanceFromLatLonInMeters(currentLatitude, currentLongitude, targetCoords.lat, targetCoords.lon);
+
+      // 2. Wenn zu weit weg -> Sofort abbrechen und Warnung zeigen (Kamera bleibt geschlossen!)
+      if (distanceMeters > 150) {
+        showGeoAlert(`Sicherheits-Sperre: Du bist ca. ${Math.round(distanceMeters)} Meter von "${current.address}" entfernt.<br><br>Du musst vor Ort sein, um diesen Stopp abzuhaken!`);
+        return;
       }
-    }, 100);
+    }
+
+    // 3. Erst wenn man wirklich in der Nähe ist, öffnen wir die Kamera
+    document.getElementById('proofCameraInput').click();
   } else {
     completeCurrentStopWithoutPhoto();
   }
@@ -1544,9 +1548,9 @@ function updateProgress(percent, text) {
   }
 }
 
-function showModal(title, bodyTest, showProgress = false) {
+function showModal(title, bodyText, showProgress = false) {
   document.getElementById('modalTitle').innerText = title;
-  document.getElementById('modalBody').innerText = bodyTest;
+  document.getElementById('modalBody').innerText = bodyText;
   
   const progContainer = document.getElementById('modalProgressContainer');
   const okBtn = document.getElementById('modalOkBtn');
