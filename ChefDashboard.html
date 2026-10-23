@@ -726,7 +726,7 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
-    <!-- FIRMENDATEN (MAXIMAL RECHTSSICHERES FORMULAR FÜR ALLE MANDANTEN/UNTERNEHMENSFORMEN) -->
+    <!-- FIRMENDATEN -->
     <div id="pane-company" class="tab-pane">
       <div class="card-header" style="margin-bottom:12px;">Unternehmensdaten & Rechtliche Pflichtangaben für PDFs</div>
       
@@ -808,12 +808,11 @@ tr:last-child td { border-bottom: none; }
           </form>
         </div>
 
-        <!-- ECHTZEIT VORSCHAU: GERICHTSFESTES PDF-LAYOUT -->
+        <!-- ECHTZEIT VORSCHAU -->
         <div>
           <div class="card-header" style="margin-bottom:12px;">Live-Vorschau (Gerichtsfester PDF Briefkopf)</div>
           <div style="background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; border-radius:12px; padding:32px 28px; box-shadow:var(--shadow); min-height:520px; display:flex; flex-direction:column; justify-content:space-between; font-family:sans-serif;">
             <div>
-              <!-- HEADER -->
               <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #6366f1; padding-bottom:18px; margin-bottom:20px;">
                 <div style="display:flex; align-items:center;">
                   <div id="prevLogoArea" style="display:flex; align-items:center;"></div>
@@ -830,7 +829,6 @@ tr:last-child td { border-bottom: none; }
                 </div>
               </div>
 
-              <!-- DOKUMENT TITEL & PRÜF-VERMERK -->
               <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:16px;">
                 <div>
                   <h3 style="font-size:14px; text-transform:uppercase; color:#0f172a; margin:0; font-weight:800;">LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL</h3>
@@ -842,13 +840,11 @@ tr:last-child td { border-bottom: none; }
                 </div>
               </div>
 
-              <!-- CONTENT DUMMY -->
               <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:30px 20px; text-align:center; color:#94a3b8; font-size:12px; margin-top:16px;">
                 [ Tabellen-Inhalt & Fotobeweise im erzeugten PDF ]
               </div>
             </div>
 
-            <!-- DREISPALTIGER RECHTSSICHERER FUSSBEREICH -->
             <div style="border-top:1px solid #e2e8f0; padding-top:14px; margin-top:24px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; font-size:9px; color:#64748b; line-height:1.5;">
               <div>
                 <strong style="color:#0f172a;">Unternehmensangaben</strong><br>
@@ -1025,7 +1021,7 @@ function toggleLegalFields() {
   if (form === 'GmbH' || form === 'GmbH & Co. KG' || form === 'AG') {
     hrGroup.style.display = 'block';
   } else {
-    hrGroup.style.display = 'block'; // Allgemein sichtbar lassen für e.K.
+    hrGroup.style.display = 'block';
   }
 }
 
@@ -1720,7 +1716,6 @@ function closeProofModal() {
   activeModalProof = null;
 }
 
-// 100% RECHTSSICHERE & FORMAL ABSOLUT WASSERDICHTE PDF-GENERIERUNGS-ENGINE
 function generatePDFHTML(proofs, title = 'LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL') {
   const comp = getCompanyProfile();
   const date = new Date().toLocaleDateString('de-DE');
@@ -1728,9 +1723,7 @@ function generatePDFHTML(proofs, title = 'LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL') 
   const total = proofs.length;
   const done = proofs.filter(p => p.status === 'erledigt').length;
   
-  // Eindeutige fortlaufende Protokoll-ID
   const docId = 'LN-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
-  // Digitaler Hash für Unverfälschbarkeit
   const securityHash = 'SHA256-' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
   const fullCompanyName = `${comp.name} ${comp.legalForm !== 'Einzelunternehmen' ? comp.legalForm : ''}`.trim();
@@ -1758,7 +1751,6 @@ function generatePDFHTML(proofs, title = 'LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL') 
 
   return `
     <div style="padding: 32px; font-family: sans-serif; color: #0f172a; background: #fff;">
-      <!-- BRIEFKOPF HEADER -->
       <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #6366f1; padding-bottom:16px; margin-bottom:20px;">
         <div style="display:flex; align-items:center;">
           ${logoHtml}
@@ -1775,7 +1767,6 @@ function generatePDFHTML(proofs, title = 'LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL') 
         </div>
       </div>
 
-      <!-- METADATEN ZUM PROTOKOLL -->
       <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:18px;">
         <div>
           <h2 style="font-size:15px; text-transform:uppercase; margin:0 0 4px 0; font-weight:800; letter-spacing:0.04em;">${title}</h2>
@@ -1787,7 +1778,6 @@ function generatePDFHTML(proofs, title = 'LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL') 
         </div>
       </div>
 
-      <!-- MAIN TABELLE -->
       <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
         <thead>
           <tr style="background:#f8fafc; font-size:11px; text-align:left; text-transform:uppercase; color:#64748b; border-bottom:1px solid #cbd5e1;">
@@ -1800,7 +1790,6 @@ function generatePDFHTML(proofs, title = 'LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL') 
         <tbody>${rows}</tbody>
       </table>
 
-      <!-- AUDIT & DSGVO VERMERK (GERICHTSSICHER) -->
       <div style="margin-top:24px; padding:10px 14px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; font-size:9px; color:#64748b; display:flex; justify-content:space-between; align-items:center;">
         <span>🔒 Erfasst via Veribase Realtime Engine | Art. 6 Abs. 1 lit. f DSGVO konform</span>
         <span>Integritäts-Hash: ${securityHash}</span>
@@ -1808,7 +1797,6 @@ function generatePDFHTML(proofs, title = 'LEISTUNGSNACHWEIS / AUDIT-PROTOKOLL') 
 
       ${comp.smallBiz ? `<p style="font-size:10px; color:#64748b; margin-top:10px; font-weight:600;">* Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>` : ''}
 
-      <!-- VOLLSTÄNDIGER FUSSBEREICH NACH DEUTSCHEM RECHT (HGB / GewO) -->
       <div style="margin-top:30px; border-top:1px solid #e2e8f0; padding-top:14px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; font-size:9px; color:#64748b; line-height:1.5;">
         <div>
           <strong style="color:#0f172a;">Unternehmensangaben</strong><br>
@@ -1858,7 +1846,8 @@ async function logout() {
   try {
     await supabaseClient.auth.signOut();
   } catch (e) {}
-  window.location.href = 'index.html';
+  // KORRIGIERT: Leitet nun sauber auf login.html statt index.html weiter
+  window.location.href = 'login.html';
 }
 </script>
 </body>
