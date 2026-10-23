@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Veribase</title>
+  <title>Veribase – Anmeldung</title>
 
   <!-- PWA & Homescreen Settings (iOS & Android) -->
   <meta name="apple-mobile-web-app-title" content="Veribase">
@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest.json">
 
-  <!-- Sofortiges Laden des Dark Modes im Head -->
+  <!-- Sofortiges Laden des Themes im Head -->
   <script>
     if (!localStorage.getItem('veribase_theme')) {
       localStorage.setItem('veribase_theme', 'dark');
@@ -30,6 +30,8 @@
     :root {
       --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --bg: #e2e8f0;
+      --surface: #f1f5f9;
+      --surface-solid: #ffffff;
       --text: #0f172a;
       --text-sub: #64748b;
       --text-muted: #94a3b8;
@@ -45,6 +47,8 @@
 
     html[data-theme="dark"] {
       --bg: #030712;
+      --surface: rgba(17, 24, 39, 0.75);
+      --surface-solid: #0f172a;
       --text: #f9fafb;
       --text-sub: #9ca3af;
       --text-muted: #4b5563;
@@ -76,57 +80,77 @@
 
     .login-container {
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    .theme-toggle-btn {
+    /* Top Utility Bar mit Zurück-Button & Theme-Toggle */
+    .login-top-bar {
       position: absolute;
-      top: -50px;
+      top: -60px;
+      left: 0;
       right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .utility-btn {
       background: var(--surface-glass);
       border: 1px solid var(--accent-line);
       color: var(--text);
-      width: 40px;
-      height: 40px;
+      padding: 8px 14px;
       border-radius: 12px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 6px;
       cursor: pointer;
       backdrop-filter: blur(12px);
       box-shadow: var(--shadow);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
       transition: all 0.2s ease;
     }
-    .theme-toggle-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .utility-btn:hover { border-color: var(--accent); }
+    .utility-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
-    /* Clean Form ohne Kasten */
-    .login-form-wrapper {
+    .theme-toggle-btn {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    /* Login Box im Stil der Landingpage-Cards */
+    .login-card {
       width: 100%;
-      display: flex;
-      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--accent-line);
+      border-radius: 24px;
+      padding: 36px 32px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
     }
 
     .title-group {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
     
-    /* Logo-Wrapper ohne harten Kasten, edel schwebend */
     .logo-wrapper {
       position: relative;
-      width: 88px;
-      height: 88px;
-      margin: 0 auto 18px auto;
-      border-radius: 22px;
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 16px auto;
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 12px 30px var(--accent-glow);
+      box-shadow: 0 8px 24px var(--accent-glow);
       border: 1px solid var(--accent-line);
-      background: var(--surface-glass);
-      backdrop-filter: blur(12px);
+      background: var(--surface-solid);
     }
 
     .login-logo {
@@ -136,7 +160,6 @@
       display: block;
     }
 
-    /* Der geschwungene Lichtstreifen (Ping-Pong-Effekt im Logo) */
     .logo-wrapper::after {
       content: '';
       position: absolute;
@@ -165,10 +188,10 @@
     }
 
     .title {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 800;
-      margin: 0 0 6px 0;
-      letter-spacing: -0.03em;
+      margin: 0 0 4px 0;
+      letter-spacing: -0.02em;
     }
     
     .subtitle {
@@ -180,27 +203,24 @@
 
     label {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--text-sub);
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      margin-bottom: 8px;
-      margin-left: 2px;
+      margin-bottom: 6px;
     }
 
     input {
       width: 100%;
       background: var(--input-bg);
-      border: 1px solid var(--accent-line);
-      border-radius: 14px;
-      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
       color: var(--text);
       font-family: inherit;
-      font-size: 14px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(12px);
-      box-shadow: var(--shadow);
+      font-size: 13px;
+      margin-bottom: 16px;
       transition: all 0.2s ease;
     }
 
@@ -212,23 +232,23 @@
 
     button.submit-btn {
       width: 100%;
-      padding: 15px;
+      padding: 14px;
       border: none;
-      border-radius: 14px;
+      border-radius: 12px;
       font-family: inherit;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       background: var(--accent);
       color: #ffffff;
       cursor: pointer;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      box-shadow: 0 4px 18px var(--accent-glow);
       transition: all 0.2s ease;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
-    button.submit-btn:active {
-      transform: scale(0.98);
-      opacity: 0.9;
+    button.submit-btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
     }
 
     button.submit-btn:disabled {
@@ -239,24 +259,24 @@
 
     .error {
       color: #ef4444;
-      font-size: 13px;
-      margin-top: 16px;
+      font-size: 12px;
+      margin-top: 14px;
       text-align: center;
       font-weight: 600;
-      min-height: 20px;
+      min-height: 18px;
     }
 
     /* Footer Rechtliches Links */
     .login-footer {
-      margin-top: 28px;
+      margin-top: 24px;
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 12px;
     }
 
     .login-footer a {
       color: var(--text-sub);
       text-decoration: none;
-      margin: 0 10px;
+      margin: 0 8px;
       font-weight: 600;
       transition: color 0.2s ease;
     }
@@ -270,7 +290,7 @@
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(3, 7, 18, 0.75);
+      background: rgba(3, 7, 18, 0.85);
       backdrop-filter: blur(8px);
       z-index: 9999;
       justify-content: center;
@@ -318,7 +338,7 @@
     }
 
     .legal-tab-btn.active {
-      background: var(--accent-glow);
+      background: rgba(99, 102, 241, 0.25);
       color: var(--accent);
     }
 
@@ -332,11 +352,18 @@
 <body>
 
 <div class="login-container">
-  <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
-    <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-  </button>
+  <!-- Top Bar mit Zurück zur Startseite & Theme Switch -->
+  <div class="login-top-bar">
+    <a href="index.html" class="utility-btn">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Startseite
+    </a>
+    <button class="utility-btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
+      <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </button>
+  </div>
 
-  <div class="login-form-wrapper">
+  <div class="login-card">
     <div class="title-group">
       <div class="logo-wrapper" id="logoWrapper">
         <img src="logo.png" alt="Veribase Logo" class="login-logo">
@@ -347,21 +374,21 @@
 
     <form onsubmit="handleLogin(event)">
       <label for="username">Benutzername oder E-Mail</label>
-      <input type="text" id="username" required placeholder="z. B. max_mustermann oder chef" autocomplete="username">
+      <input type="text" id="username" required placeholder="z. B. fahrer1 oder chef" autocomplete="username">
       
       <label for="password">Passwort</label>
       <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
       
-      <button type="submit" id="submitBtn" class="submit-btn">Anmelden</button>
+      <button type="submit" id="submitBtn" class="submit-btn">Anmelden &rarr;</button>
     </form>
     <div id="errorMsg" class="error"></div>
-
-    <footer class="login-footer">
-      <a href="#" onclick="openLegalModal('impressum'); return false;">Impressum</a>
-      <span>•</span>
-      <a href="#" onclick="openLegalModal('datenschutz'); return false;">Datenschutz</a>
-    </footer>
   </div>
+
+  <footer class="login-footer">
+    <a href="#" onclick="openLegalModal('impressum'); return false;">Impressum</a>
+    <span>•</span>
+    <a href="#" onclick="openLegalModal('datenschutz'); return false;">Datenschutz</a>
+  </footer>
 </div>
 
 <!-- Legal Modal -->
@@ -401,35 +428,13 @@
         Thüringer Straße 37<br>
         51766 Engelskirchen
       </p>
-
-      <p><strong>EU-Streitschlichtung / Verbraucherstreitbeilegung:</strong></p>
-      <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit. Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
     </div>
 
     <!-- Datenschutz -->
     <div id="contentDatenschutz" class="legal-tab-content">
       <h2>Datenschutzerklärung</h2>
-
-      <h3>1. Datenschutz auf einen Blick</h3>
-      <p><strong>Allgemeine Hinweise:</strong> Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie unsere B2B-Anwendung Veribase nutzen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.</p>
-
-      <h3>2. Verantwortlicher für die Datenverarbeitung</h3>
-      <p>
-        Björn Koch (Veribase)<br>
-        Thüringer Straße 37<br>
-        51766 Engelskirchen<br>
-        E-Mail: hello@veribase-app.de
-      </p>
-
-      <h3>3. Datenerfassung & Funktionen in der Anwendung</h3>
-      <p><strong>Bereitstellung der Web-App & Hosting:</strong> Unsere Anwendung wird über moderne Hosting-Infrastrukturen bereitgestellt. Dabei werden technisch notwendige Server-Logfiles (z. B. IP-Adresse, Datum und Uhrzeit des Zugriffs) verarbeitet, um den sicheren Betrieb zu gewährleisten (Art. 6 Abs. 1 lit. f DSGVO).</p>
-      
-      <p><strong>Authentifizierung & Benutzerkonten:</strong> Für die Anmeldung von Chefs und Fahrern nutzen wir einen sicheren Authentifizierungsdienst (Supabase). Hierbei werden Ihre E-Mail-Adresse sowie verschlüsselte Zugangsdaten verarbeitet (Art. 6 Abs. 1 lit. b DSGVO).</p>
-
-      <p><strong>Erfassung von GPS-Standortdaten & Fotonachweisen:</strong> Im Rahmen der Tour- und Audit-Durchführung erfasst die App auf Ihrem mobilen Endgerät (nach entsprechender Freigabe) GPS-Standortdaten und Zeitstempel, um fälschungssichere Leistungsnachweise und Fotodokumentationen für den Auftraggeber zu erstellen. Diese Daten werden in unserer verschlüsselten Datenbank (Supabase) gespeichert und dem jeweiligen Arbeitgeber / Chef im Dashboard bereitgestellt (Art. 6 Abs. 1 lit. b DSGVO).</p>
-
-      <h3>4. Ihre Rechte als betroffene Person</h3>
-      <p>Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger sowie den Zweck der Datenverarbeitung. Zudem haben Sie das Recht auf Berichtigung oder Löschung dieser Daten. Hierzu können Sie sich jederzeit unter der im Impressum angegebenen E-Mail-Adresse an uns wenden.</p>
+      <p><strong>Allgemeine Hinweise:</strong> Veribase verarbeitet personenbezogene Daten (z. B. GPS-Daten, Zeitstempel, E-Mail-Adressen) ausschließlich im Rahmen der DSGVO zur Durchführung von Touren und Audits im B2B-Verhältnis.</p>
+      <p>Verantwortlicher: Björn Koch, Thüringer Straße 37, 51766 Engelskirchen, E-Mail: hello@veribase-app.de</p>
     </div>
   </div>
 </div>
@@ -464,7 +469,6 @@
 
     btn.disabled = true;
 
-    // Animation SOFORT beim Klick starten
     logoWrapper.classList.add('glow-active');
     errorMsg.style.color = 'var(--accent)';
     errorMsg.innerText = 'Anmeldung läuft...';
