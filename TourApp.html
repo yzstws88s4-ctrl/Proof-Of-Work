@@ -369,6 +369,19 @@ input:checked + .slider:before { transform: translateX(18px); }
   vertical-align: middle;
 }
 </style>
+  <!-- PWA iOS Navigation Fix -->
+<script>
+  if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+    document.addEventListener('click', function(e) {
+      const a = e.target.closest('a');
+      if (a && a.href && a.href.includes(window.location.host)) {
+        e.preventDefault();
+        window.location.href = a.href;
+      }
+    }, false);
+  }
+</script>
+
 </head>
 <body>
 
