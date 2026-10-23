@@ -732,7 +732,10 @@ async function loadSupabaseTour() {
 
 async function startManualTour() {
   const input = document.getElementById('addressInput').value.trim();
-  if (!input) return alert("Bitte gib mindestens eine Adresse ein.");
+  if (!input) {
+    showModal("Hinweis", "Bitte gib mindestens eine Adresse ein.");
+    return;
+  }
 
   const lines = input.split('\n').map(l => l.trim()).filter(l => l.length > 2);
 
@@ -1007,7 +1010,6 @@ async function handleModalReplaceCapture(event) {
   event.target.value = '';
 }
 
-// KLAR GETRENNTE DARSTELLUNG: SOLL-ZIELADRESSE UND ECHTZEIT-GPS KOORDINATEN
 function drawAuditStamp(ctx, width, height, data) {
   const baseSize = Math.max(22, Math.floor(width / 26));
   const paddingHorizontal = Math.floor(baseSize * 1.0);
@@ -1256,10 +1258,10 @@ async function finishAndSaveTour() {
       localStorage.removeItem(`veribase_stop_index_${tourId}`);
     }
 
-    alert("Tour erfolgreich gespeichert!");
+    showModal("Erfolg", "Tour erfolgreich gespeichert!");
     resetTourView();
   } catch (err) {
-    alert("Fehler beim Speichern: " + err.message);
+    showModal("Fehler", "Fehler beim Speichern: " + err.message);
   } finally {
     btn.disabled = false;
     btn.innerText = "Tour beenden & Speichern";
@@ -1386,7 +1388,7 @@ async function archiveCurrentDetailTour() {
     closeDetailModal();
     loadTourHistory();
   } catch (err) {
-    alert("Fehler: " + err.message);
+    showModal("Fehler", "Fehler: " + err.message);
   }
 }
 
@@ -1437,7 +1439,7 @@ async function handleOcrImage(event) {
     const fullText = ret.data.text;
     if (!fullText) {
       closeModal();
-      alert("Es konnte kein Text auf dem Bild erkannt werden.");
+      showModal("Hinweis", "Es konnte kein Text auf dem Bild erkannt werden.");
       return;
     }
 
@@ -1478,14 +1480,14 @@ async function handleOcrImage(event) {
         document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
         showModal("Erfolg", `${extractedAddresses.length} Stopps erfolgreich geladen!`);
       } else {
-        alert("Es konnten keine Adressen im Bild erkannt werden.");
+        showModal("Hinweis", "Es konnten keine Adressen im Bild erkannt werden.");
       }
     }, 300);
 
   } catch (err) {
     closeModal();
     console.error("Smart-Scan Fehler:", err);
-    alert("Fehler bei der intelligenten Texterkennung.");
+    showModal("Fehler", "Fehler bei der intelligenten Texterkennung.");
   } finally {
     event.target.value = '';
   }
