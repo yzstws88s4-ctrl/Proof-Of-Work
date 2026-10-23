@@ -40,6 +40,7 @@
       --accent-glow: rgba(99, 102, 241, 0.25);
       --surface-glass: rgba(255, 255, 255, 0.6);
       --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      --modal-bg: #ffffff;
     }
 
     html[data-theme="dark"] {
@@ -54,6 +55,7 @@
       --accent-glow: rgba(99, 102, 241, 0.35);
       --surface-glass: rgba(17, 24, 39, 0.4);
       --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      --modal-bg: #111827;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -243,6 +245,88 @@
       font-weight: 600;
       min-height: 20px;
     }
+
+    /* Footer Rechtliches Links */
+    .login-footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    .login-footer a {
+      color: var(--text-sub);
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .login-footer a:hover {
+      color: var(--accent);
+    }
+
+    /* Legal Modal Container */
+    .legal-modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 7, 18, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .legal-modal-content {
+      background: var(--modal-bg);
+      border: 1px solid var(--accent-line);
+      width: 100%;
+      max-width: 600px;
+      max-height: 85vh;
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      text-align: left;
+    }
+
+    .legal-modal-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      border: none; background: transparent;
+      font-size: 26px; cursor: pointer; color: var(--text-sub);
+    }
+
+    .legal-tab-nav {
+      display: flex; gap: 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+    }
+
+    .legal-tab-btn {
+      background: none; border: none;
+      padding: 8px 14px; cursor: pointer;
+      font-weight: 700; color: var(--text-sub);
+      border-radius: 8px; font-size: 0.9rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .legal-tab-btn.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .legal-tab-content { display: none; }
+    .legal-tab-content.active { display: block; }
+    .legal-tab-content h2 { margin-top: 0; font-size: 1.3rem; color: var(--text); }
+    .legal-tab-content h3 { font-size: 1rem; margin-top: 16px; margin-bottom: 6px; color: var(--text); }
+    .legal-tab-content p { font-size: 0.88rem; line-height: 1.6; color: var(--text-sub); margin-bottom: 12px; }
   </style>
 </head>
 <body>
@@ -271,6 +355,82 @@
       <button type="submit" id="submitBtn" class="submit-btn">Anmelden</button>
     </form>
     <div id="errorMsg" class="error"></div>
+
+    <footer class="login-footer">
+      <a href="#" onclick="openLegalModal('impressum'); return false;">Impressum</a>
+      <span>•</span>
+      <a href="#" onclick="openLegalModal('datenschutz'); return false;">Datenschutz</a>
+    </footer>
+  </div>
+</div>
+
+<!-- Legal Modal -->
+<div id="legalModal" class="legal-modal-backdrop" onclick="closeLegalModal(event)">
+  <div class="legal-modal-content">
+    <button class="legal-modal-close" onclick="closeLegalModalDirect()">&times;</button>
+    
+    <div class="legal-tab-nav">
+      <button id="tabBtnImpressum" class="legal-tab-btn" onclick="switchLegalTab('impressum')">Impressum</button>
+      <button id="tabBtnDatenschutz" class="legal-tab-btn" onclick="switchLegalTab('datenschutz')">Datenschutzerklärung</button>
+    </div>
+
+    <!-- Impressum -->
+    <div id="contentImpressum" class="legal-tab-content">
+      <h2>Impressum</h2>
+      <p><strong>Angaben gemäß § 5 DDG:</strong></p>
+      <p>
+        Björn Koch<br>
+        Veribase<br>
+        Thüringer Straße 37<br>
+        51766 Engelskirchen<br>
+        Deutschland
+      </p>
+
+      <p><strong>Kontakt:</strong></p>
+      <p>
+        Telefon: 0160 1840201<br>
+        E-Mail: hello@veribase-app.de
+      </p>
+
+      <p><strong>Umsatzsteuer:</strong></p>
+      <p>Umsatzsteuerbefreit nach § 19 UStG</p>
+
+      <p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong></p>
+      <p>
+        Björn Koch<br>
+        Thüringer Straße 37<br>
+        51766 Engelskirchen
+      </p>
+
+      <p><strong>EU-Streitschlichtung / Verbraucherstreitbeilegung:</strong></p>
+      <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit. Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+    </div>
+
+    <!-- Datenschutz -->
+    <div id="contentDatenschutz" class="legal-tab-content">
+      <h2>Datenschutzerklärung</h2>
+
+      <h3>1. Datenschutz auf einen Blick</h3>
+      <p><strong>Allgemeine Hinweise:</strong> Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie unsere B2B-Anwendung Veribase nutzen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.</p>
+
+      <h3>2. Verantwortlicher für die Datenverarbeitung</h3>
+      <p>
+        Björn Koch (Veribase)<br>
+        Thüringer Straße 37<br>
+        51766 Engelskirchen<br>
+        E-Mail: hello@veribase-app.de
+      </p>
+
+      <h3>3. Datenerfassung & Funktionen in der Anwendung</h3>
+      <p><strong>Bereitstellung der Web-App & Hosting:</strong> Unsere Anwendung wird über moderne Hosting-Infrastrukturen bereitgestellt. Dabei werden technisch notwendige Server-Logfiles (z. B. IP-Adresse, Datum und Uhrzeit des Zugriffs) verarbeitet, um den sicheren Betrieb zu gewährleisten (Art. 6 Abs. 1 lit. f DSGVO).</p>
+      
+      <p><strong>Authentifizierung & Benutzerkonten:</strong> Für die Anmeldung von Chefs und Fahrern nutzen wir einen sicheren Authentifizierungsdienst (Supabase). Hierbei werden Ihre E-Mail-Adresse sowie verschlüsselte Zugangsdaten verarbeitet (Art. 6 Abs. 1 lit. b DSGVO).</p>
+
+      <p><strong>Erfassung von GPS-Standortdaten & Fotonachweisen:</strong> Im Rahmen der Tour- und Audit-Durchführung erfasst die App auf Ihrem mobilen Endgerät (nach entsprechender Freigabe) GPS-Standortdaten und Zeitstempel, um fälschungssichere Leistungsnachweise und Fotodokumentationen für den Auftraggeber zu erstellen. Diese Daten werden in unserer verschlüsselten Datenbank (Supabase) gespeichert und dem jeweiligen Arbeitgeber / Chef im Dashboard bereitgestellt (Art. 6 Abs. 1 lit. b DSGVO).</p>
+
+      <h3>4. Ihre Rechte als betroffene Person</h3>
+      <p>Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger sowie den Zweck der Datenverarbeitung. Zudem haben Sie das Recht auf Berichtigung oder Löschung dieser Daten. Hierzu können Sie sich jederzeit unter der im Impressum angegebenen E-Mail-Adresse an uns wenden.</p>
+    </div>
   </div>
 </div>
 
@@ -353,6 +513,34 @@
       window.location.href = 'ChefDashboard.html';
     } else {
       window.location.href = 'TourApp.html';
+    }
+  }
+
+  /* Legal Modal Handler */
+  function openLegalModal(tab) {
+    document.getElementById('legalModal').style.display = 'flex';
+    switchLegalTab(tab);
+  }
+  function closeLegalModalDirect() {
+    document.getElementById('legalModal').style.display = 'none';
+  }
+  function closeLegalModal(event) {
+    if (event.target.id === 'legalModal') {
+      closeLegalModalDirect();
+    }
+  }
+  function switchLegalTab(tabName) {
+    document.getElementById('contentImpressum').classList.remove('active');
+    document.getElementById('contentDatenschutz').classList.remove('active');
+    document.getElementById('tabBtnImpressum').classList.remove('active');
+    document.getElementById('tabBtnDatenschutz').classList.remove('active');
+
+    if (tabName === 'impressum') {
+      document.getElementById('contentImpressum').classList.add('active');
+      document.getElementById('tabBtnImpressum').classList.add('active');
+    } else {
+      document.getElementById('contentDatenschutz').classList.add('active');
+      document.getElementById('tabBtnDatenschutz').classList.add('active');
     }
   }
 </script>
