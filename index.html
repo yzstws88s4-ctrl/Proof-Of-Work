@@ -428,7 +428,8 @@
       <a href="#features">Features</a>
       <a href="#roi">Einsparpotenzial</a>
       <a href="#pricing">Tarife</a>
-      <a href="index.html" class="btn-login">Anmelden &rarr;</a>
+      <!-- KORRIGIERT: Verweist jetzt sauber auf login.html -->
+      <a href="login.html" class="btn-login">Anmelden &rarr;</a>
     </div>
   </header>
 
@@ -444,7 +445,8 @@
         Veribase schützt Ihr Unternehmen vor Reklamationen. Mit automatischer GPS-Standortprüfung, KI-Smart-Scan und fälschungssicheren Fotobeweisen für Fahrer und Fuhrparkleiter.
       </p>
       <div class="hero-cta">
-        <a href="index.html" class="btn-login" style="padding: 16px 36px; font-size: 16px;">Jetzt Anmelden / Login</a>
+        <!-- KORRIGIERT: Verweist jetzt sauber auf login.html -->
+        <a href="login.html" class="btn-login" style="padding: 16px 36px; font-size: 16px;">Jetzt Anmelden / Login</a>
       </div>
     </section>
 
@@ -596,7 +598,6 @@
       document.getElementById('valDrivers').innerText = drivers;
       document.getElementById('valComplaints').innerText = complaints;
 
-      // Formel: Einsparung = (Bearbeitungszeit pro Reklamation ca. 25€) + Dispo-Einsparung pro Fahrer
       const savedAmount = (complaints * 25 * 12) + (drivers * 240);
       document.getElementById('resultROI').innerText = savedAmount.toLocaleString('de-DE') + ' €';
     }
