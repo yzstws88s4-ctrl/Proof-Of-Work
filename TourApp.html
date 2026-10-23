@@ -4,13 +4,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Veribase - Touren App</title>
+<title>Veribase – Touren App</title>
 
 <meta name="apple-mobile-web-app-title" content="Veribase">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="logo1.png">
-<link rel="icon" type="image/png" href="logo1.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="manifest.json">
 
 <script>
@@ -102,11 +102,11 @@ body {
 }
 
 .user-greeting-box { display: flex; flex-direction: column; }
-.driver-welcome { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
+.driver-welcome { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
 
 .header-actions { display: flex; gap: 8px; }
 
-.theme-toggle-btn, .logout-btn {
+.utility-btn {
   background: var(--surface);
   border: 1px solid var(--accent-line);
   color: var(--text);
@@ -121,7 +121,10 @@ body {
   font-weight: 600;
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
+.utility-btn:hover { border-color: var(--accent); }
 
 .theme-toggle-btn { width: 38px; padding: 0; }
 .theme-toggle-btn svg { width: 16px; height: 16px; fill: currentColor; }
@@ -372,13 +375,13 @@ input:checked + .slider:before { transform: translateX(18px); }
 <div class="container">
   <div class="header">
     <div class="user-greeting-box">
-      <span class="driver-welcome" id="driverWelcomeDisplay">Hallo Björn</span>
+      <span class="driver-welcome" id="driverWelcomeDisplay">Hallo Fahrer</span>
     </div>
     <div class="header-actions">
-      <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
+      <button class="utility-btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
         <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
-      <button class="logout-btn" onclick="logout()">Abmelden</button>
+      <button class="utility-btn" onclick="logout()" style="color: var(--danger); border-color: rgba(239,68,68,0.2);">Abmelden</button>
     </div>
   </div>
 
@@ -668,7 +671,7 @@ function toggleTheme() {
 
 async function logout() {
   await supabaseClient.auth.signOut();
-  window.location.href = 'index.html';
+  window.location.href = 'login.html';
 }
 
 function initGPS() {
