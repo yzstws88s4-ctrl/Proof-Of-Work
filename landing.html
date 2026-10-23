@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Veribase – Die digitale B2B Tour- & Audit-Plattform</title>
+
+  <!-- PWA & Favicon Settings -->
+  <meta name="apple-mobile-web-app-title" content="Veribase">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <script>
+    if (!localStorage.getItem('veribase_theme')) {
+      localStorage.setItem('veribase_theme', 'dark');
+    }
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --bg: #030712;
+      --surface: rgba(17, 24, 39, 0.6);
+      --surface-solid: #0f172a;
+      --text: #f9fafb;
+      --text-sub: #9ca3af;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --accent-line: rgba(99, 102, 241, 0.35);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Background Ambient Glows */
+    .glow-bg-1 {
+      position: absolute;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, rgba(3,7,18,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(3, 7, 18, 0.85);
+      border-bottom: 1px solid var(--accent-line);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--accent-line);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-sub);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .btn-login {
+      background: var(--accent);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      box-shadow: 0 4px 18px var(--accent-glow);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+    }
+
+    /* Layout Wrapper */
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 90px 0 70px 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid var(--accent-line);
+      color: #a5b4fc;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 28px;
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 5.5vw, 64px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin: 0 0 24px 0;
+      background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 19px;
+      color: var(--text-sub);
+      max-width: 760px;
+      margin: 0 auto 40px auto;
+      font-weight: 500;
+      line-height: 1.6;
+    }
+
+    .hero-cta {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    /* Feature Cards */
+    .section-title {
+      text-align: center;
+      margin: 80px 0 16px 0;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-sub);
+      max-width: 600px;
+      margin: 0 auto 48px auto;
+      font-size: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .card:hover {
+      border-color: var(--accent-line);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid var(--accent-line);
+      color: #818cf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 22px;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+    }
+
+    .card-desc {
+      color: var(--text-sub);
+      font-size: 14.5px;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Calculator Section */
+    .calc-box {
+      background: linear-gradient(135deg, rgba(17,24,39,0.9) 0%, rgba(15,23,42,0.95) 100%);
+      border: 1px solid var(--accent-line);
+      border-radius: 24px;
+      padding: 40px;
+      margin: 60px 0;
+      box-shadow: var(--shadow);
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .calc-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+
+    .slider-group {
+      margin-bottom: 24px;
+    }
+
+    .slider-group label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .calc-result {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid var(--accent-line);
+      border-radius: 20px;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .result-number {
+      font-size: 42px;
+      font-weight: 800;
+      color: #818cf8;
+      margin: 10px 0;
+    }
+
+    /* Pricing Section */
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px;
+      text-align: center;
+      position: relative;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .price-tag {
+      font-size: 40px;
+      font-weight: 800;
+      margin: 20px 0 10px 0;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 14px;
+      margin-top: 80px;
+    }
+
+    footer a {
+      color: var(--text-sub);
+      text-decoration: none;
+      margin: 0 12px;
+      font-weight: 600;
+    }
+
+    footer a:hover { color: var(--accent); }
+
+    /* Modal Styling */
+    .legal-modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .legal-modal-content {
+      background: var(--surface-solid);
+      border: 1px solid var(--accent-line);
+      width: 100%;
+      max-width: 650px;
+      max-height: 85vh;
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow-y: auto;
+      text-align: left;
+      color: var(--text);
+    }
+
+    .legal-modal-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      border: none; background: transparent;
+      font-size: 26px; cursor: pointer; color: var(--text-sub);
+    }
+
+    .legal-tab-nav {
+      display: flex; gap: 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+    }
+
+    .legal-tab-btn {
+      background: none; border: none;
+      padding: 8px 14px; cursor: pointer;
+      font-weight: 700; color: var(--text-sub);
+      border-radius: 8px; font-size: 0.9rem;
+      font-family: inherit;
+    }
+
+    .legal-tab-btn.active {
+      background: rgba(99, 102, 241, 0.25);
+      color: var(--accent);
+    }
+
+    .legal-tab-content { display: none; }
+    .legal-tab-content.active { display: block; }
+    .legal-tab-content h2 { margin-top: 0; font-size: 1.3rem; }
+    .legal-tab-content h3 { font-size: 1rem; margin-top: 16px; margin-bottom: 6px; }
+    .legal-tab-content p { font-size: 0.88rem; line-height: 1.6; color: var(--text-sub); }
+  </style>
+</head>
+<body>
+
+  <div class="glow-bg-1"></div>
+
+  <header>
+    <a href="#" class="brand">
+      <img src="logo.png" alt="Veribase Logo">
+      <span class="brand-name">Veribase</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#roi">Einsparpotenzial</a>
+      <a href="#pricing">Tarife</a>
+      <a href="index.html" class="btn-login">Anmelden &rarr;</a>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="badge">
+        <span>⚡ Fälschungssichere B2B-Plattform</span>
+      </div>
+      <h1 class="hero-title">Keine Ausreden mehr bei Touren & Audits</h1>
+      <p class="hero-subtitle">
+        Veribase schützt Ihr Unternehmen vor Reklamationen. Mit automatischer GPS-Standortprüfung, KI-Smart-Scan und fälschungssicheren Fotobeweisen für Fahrer und Fuhrparkleiter.
+      </p>
+      <div class="hero-cta">
+        <a href="index.html" class="btn-login" style="padding: 16px 36px; font-size: 16px;">Jetzt Anmelden / Login</a>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <h2 class="section-title" id="features">Features der Königsklasse</h2>
+    <p class="section-subtitle">Speziell entwickelt für Logistik, Entsorgung, Lieferdienste und Außendienst-Teams.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-icon">📍</div>
+        <h3 class="card-title">GPS-Sensorik & Geofencing</h3>
+        <p class="card-desc">Keine gefälschten Stopps. Die App prüft vor Ort exakt die GPS-Koordinaten des Fahrzeugs und verifiziert den Stopp sekundengenau.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">📸</div>
+        <h3 class="card-title">Stempel-Fotobeweise</h3>
+        <p class="card-desc">Beweisfotos werden unmanipulierbar mit Uhrzeit, Fahrername und GPS-Wasserzeichen versehen und in der Supabase-Cloud gesichert.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <h3 class="card-title">OCR Smart-Scan</h3>
+        <p class="card-desc">Laden Sie gedruckte Tourlisten einfach per Fotokamera hoch. Die KI liest Adressen und Kunden automatisch aus und erstellt die Route.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3 class="card-title">Chef-Live-Dashboard</h3>
+        <p class="card-desc">Volle Transparenz im Büro. Verfolgen Sie im Dashboard den Tourenfortschritt aller Fahrer live und greifen Sie sofort auf Nachweise zu.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">📄</div>
+        <h3 class="card-title">Rechtssicherer PDF-Export</h3>
+        <p class="card-desc">Erstellen Sie auf Knopfdruck vollständige Leistungsnachweise mit Firmen-Branding für Auftraggeber oder Versicherungen.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h3 class="card-title">PWA – Keine App-Installationspflicht</h3>
+        <p class="card-desc">Funktioniert direkt im Browser auf jedem Smartphone (Android & iOS). Keine zeitraubenden Updates über App Stores nötig.</p>
+      </div>
+    </div>
+
+    <!-- Interactive ROI Calculator -->
+    <div class="calc-box" id="roi">
+      <div class="calc-grid">
+        <div>
+          <h2 style="margin-top:0; font-size: 28px;">Sparen Sie Zeit & Reklamationskosten</h2>
+          <p style="color: var(--text-sub);">Berechnen Sie Ihr jährliches Einsparpotenzial durch die Vermeidung unberechtigter Suchzeiten & Kundenreklamationen.</p>
+          
+          <div class="slider-group">
+            <label>Anzahl Fahrzeuge / Fahrer: <span id="valDrivers">5</span></label>
+            <input type="range" id="inputDrivers" min="1" max="50" value="5" oninput="updateROI()">
+          </div>
+
+          <div class="slider-group">
+            <label>Reklamationen / Monat: <span id="valComplaints">10</span></label>
+            <input type="range" id="inputComplaints" min="1" max="50" value="10" oninput="updateROI()">
+          </div>
+        </div>
+
+        <div class="calc-result">
+          <div style="font-size:14px; font-weight:700; color:var(--text-sub); text-transform:uppercase;">Geschätzte Ersparnis pro Jahr</div>
+          <div class="result-number" id="resultROI">3.600 €</div>
+          <div style="font-size:13px; color:var(--text-sub);">Durch automatische Foto-Gegenbeweise & reduzierte Dispo-Rückfragen.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <h2 class="section-title" id="pricing">Transparente B2B-Tarife</h2>
+    <p class="section-subtitle">Volle Kontrolle. Keine versteckten Zusatzkosten.</p>
+
+    <div class="grid-3" style="margin-bottom: 60px;">
+      <div class="pricing-card">
+        <h3>Starter</h3>
+        <p style="color:var(--text-sub);">Für kleine Teams & Testbetriebe</p>
+        <div class="price-tag">29 € <span style="font-size:16px; color:var(--text-sub);">/Monat</span></div>
+        <p style="font-size:14px; color:var(--text-sub);">Inklusive bis zu 3 Fahrer-Lizenzen</p>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="badge" style="margin-top:-10px;">Empfohlen</div>
+        <h3>Pro Fleet</h3>
+        <p style="color:var(--text-sub);">Für wachsende Logistikbetriebe</p>
+        <div class="price-tag">89 € <span style="font-size:16px; color:var(--text-sub);">/Monat</span></div>
+        <p style="font-size:14px; color:var(--text-sub);">Inklusive bis zu 12 Fahrer-Lizenzen & OCR-Scan</p>
+      </div>
+
+      <div class="pricing-card">
+        <h3>Enterprise</h3>
+        <p style="color:var(--text-sub);">Große Flotten & Sonderwünsche</p>
+        <div class="price-tag">Auf Anfrage</div>
+        <p style="font-size:14px; color:var(--text-sub);">Unbegrenzte Fahrer & Vor-Ort-Betreuung</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 Veribase • Björn Koch. Alle Rechte vorbehalten.</p>
+    <p>
+      <a href="#" onclick="openLegalModal('impressum'); return false;">Impressum</a>
+      <span>•</span>
+      <a href="#" onclick="openLegalModal('datenschutz'); return false;">Datenschutzerklärung</a>
+    </p>
+  </footer>
+
+  <!-- Modal Impressum / Datenschutz -->
+  <div id="legalModal" class="legal-modal-backdrop" onclick="closeLegalModal(event)">
+    <div class="legal-modal-content">
+      <button class="legal-modal-close" onclick="closeLegalModalDirect()">&times;</button>
+      
+      <div class="legal-tab-nav">
+        <button id="tabBtnImpressum" class="legal-tab-btn" onclick="switchLegalTab('impressum')">Impressum</button>
+        <button id="tabBtnDatenschutz" class="legal-tab-btn" onclick="switchLegalTab('datenschutz')">Datenschutzerklärung</button>
+      </div>
+
+      <div id="contentImpressum" class="legal-tab-content">
+        <h2>Impressum</h2>
+        <p><strong>Angaben gemäß § 5 DDG:</strong></p>
+        <p>
+          Björn Koch<br>
+          Veribase<br>
+          Thüringer Straße 37<br>
+          51766 Engelskirchen<br>
+          Deutschland
+        </p>
+        <p><strong>Kontakt:</strong><br>Telefon: 0160 1840201<br>E-Mail: hello@veribase-app.de</p>
+        <p><strong>Umsatzsteuer:</strong><br>Umsatzsteuerbefreit nach § 19 UStG</p>
+      </div>
+
+      <div id="contentDatenschutz" class="legal-tab-content">
+        <h2>Datenschutzerklärung</h2>
+        <p><strong>Allgemeine Hinweise:</strong> Veribase verarbeitet personenbezogene Daten (z.B. GPS-Daten, Zeitstempel, E-Mail-Adressen) ausschließlich im Rahmen der DSGVO zur Durchführung von Touren und Audits im B2B-Verhältnis.</p>
+        <p>Verantwortlicher: Björn Koch, Thüringer Straße 37, 51766 Engelskirchen, E-Mail: hello@veribase-app.de</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateROI() {
+      const drivers = parseInt(document.getElementById('inputDrivers').value);
+      const complaints = parseInt(document.getElementById('inputComplaints').value);
+
+      document.getElementById('valDrivers').innerText = drivers;
+      document.getElementById('valComplaints').innerText = complaints;
+
+      // Formel: Einsparung = (Bearbeitungszeit pro Reklamation ca. 25€) + Dispo-Einsparung pro Fahrer
+      const savedAmount = (complaints * 25 * 12) + (drivers * 240);
+      document.getElementById('resultROI').innerText = savedAmount.toLocaleString('de-DE') + ' €';
+    }
+
+    /* Modal Handler */
+    function openLegalModal(tab) {
+      document.getElementById('legalModal').style.display = 'flex';
+      switchLegalTab(tab);
+    }
+    function closeLegalModalDirect() {
+      document.getElementById('legalModal').style.display = 'none';
+    }
+    function closeLegalModal(event) {
+      if (event.target.id === 'legalModal') closeLegalModalDirect();
+    }
+    function switchLegalTab(tabName) {
+      document.getElementById('contentImpressum').classList.remove('active');
+      document.getElementById('contentDatenschutz').classList.remove('active');
+      document.getElementById('tabBtnImpressum').classList.remove('active');
+      document.getElementById('tabBtnDatenschutz').classList.remove('active');
+
+      if (tabName === 'impressum') {
+        document.getElementById('contentImpressum').classList.add('active');
+        document.getElementById('tabBtnImpressum').classList.add('active');
+      } else {
+        document.getElementById('contentDatenschutz').classList.add('active');
+        document.getElementById('tabBtnDatenschutz').classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
