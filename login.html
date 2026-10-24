@@ -545,6 +545,14 @@
     }, 1200);
   }
 
+  // PWA-konforme Navigation, die das Ausbrechen in die Safari-Webansicht verhindert
+  function pwaNavigate(url) {
+    const a = document.createElement('a');
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+  }
+
   async function redirectUser(userId) {
     const errorMsg = document.getElementById('errorMsg');
     
@@ -562,9 +570,9 @@
     }
 
     if (profile.role === 'chef') {
-      window.location.replace('ChefDashboard.html');
+      pwaNavigate('ChefDashboard.html');
     } else {
-      window.location.replace('TourApp.html');
+      pwaNavigate('TourApp.html');
     }
   }
 
