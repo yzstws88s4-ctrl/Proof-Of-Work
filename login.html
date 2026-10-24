@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Veribase – Anmeldung</title>
+
+  <!-- PWA & Homescreen Settings (iOS & Android) -->
+  <meta name="apple-mobile-web-app-title" content="Veribase">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Sofortiges Laden des Themes im Head -->
+  <script>
+    if (!localStorage.getItem('veribase_theme')) {
+      localStorage.setItem('veribase_theme', 'dark');
+    }
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --bg: #e2e8f0;
+      --surface-solid: #ffffff;
+      --text: #0f172a;
+      --text-sub: #64748b;
+      --border: #cbd5e1;
+      --accent-line: rgba(99, 102, 241, 0.4);
+      --input-bg: #ffffff;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      --modal-bg: #ffffff;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #030712;
+      --surface-solid: #0f172a;
+      --text: #f9fafb;
+      --text-sub: #9ca3af;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent-line: rgba(99, 102, 241, 0.35);
+      --input-bg: rgba(17, 24, 39, 0.6);
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      --modal-bg: #111827;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .glow-bg-1 {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, rgba(3,7,18,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 380px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .login-top-bar {
+      position: absolute;
+      top: -70px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .utility-btn {
+      background: rgba(17, 24, 39, 0.4);
+      border: 1px solid var(--accent-line);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .utility-btn:hover { border-color: var(--accent); }
+    .utility-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+    .theme-toggle-btn {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    .login-form-wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .title-group {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .logo-wrapper {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 16px auto;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px var(--accent-glow);
+      border: 1px solid var(--accent-line);
+      background: var(--surface-solid);
+    }
+
+    .login-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .logo-wrapper::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -150%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.65) 50%,
+        transparent 65%
+      );
+      transform: rotate(25deg);
+      pointer-events: none;
+    }
+
+    .logo-wrapper.glow-active::after {
+      animation: logoShinePingPong 1.4s ease-in-out forwards !important;
+    }
+
+    @keyframes logoShinePingPong {
+      0% { left: -150%; }
+      50% { left: 100%; }
+      100% { left: -150%; }
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.03em;
+    }
+    
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    button.submit-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--accent);
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transition: all 0.2s ease;
+      margin-top: 6px;
+    }
+
+    button.submit-btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    button.submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error {
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 14px;
+      text-align: center;
+      font-weight: 600;
+      min-height: 18px;
+    }
+
+    .login-footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .login-footer a {
+      color: var(--text-sub);
+      text-decoration: none;
+      margin: 0 6px;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .login-footer a:hover {
+      color: var(--accent);
+    }
+
+    .legal-modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .legal-modal-content {
+      background: var(--modal-bg);
+      border: 1px solid var(--accent-line);
+      width: 100%;
+      max-width: 600px;
+      max-height: 85vh;
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      text-align: left;
+    }
+
+    .legal-modal-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      border: none; background: transparent;
+      font-size: 26px; cursor: pointer; color: var(--text-sub);
+    }
+
+    .legal-tab-nav {
+      display: flex; gap: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .legal-tab-btn {
+      background: none; border: none;
+      padding: 8px 14px; cursor: pointer;
+      font-weight: 700; color: var(--text-sub);
+      border-radius: 8px; font-size: 0.88rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .legal-tab-btn.active {
+      background: rgba(99, 102, 241, 0.25);
+      color: var(--accent);
+    }
+
+    .legal-tab-content { display: none; }
+    .legal-tab-content.active { display: block; }
+    .legal-tab-content h2 { margin-top: 0; font-size: 1.3rem; color: var(--text); }
+    .legal-tab-content h3 { font-size: 1rem; margin-top: 16px; margin-bottom: 6px; color: var(--text); }
+    .legal-tab-content p { font-size: 0.88rem; line-height: 1.6; color: var(--text-sub); margin-bottom: 12px; }
+  </style>
+
+  <!-- Strenger iOS PWA Navigation Fix (Verhindert das Ausbrechen in die Safari-Webansicht) -->
+  <script>
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.addEventListener('click', function(e) {
+        const a = e.target.closest('a');
+        if (a && a.href && a.href.includes(window.location.host) && !a.getAttribute('target')) {
+          e.preventDefault();
+          window.location.href = a.href;
+        }
+      }, false);
+    }
+  </script>
+</head>
+<body>
+
+<div class="glow-bg-1"></div>
+
+<div class="login-container">
+  <div class="login-top-bar">
+    <a href="index.html" class="utility-btn">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Startseite
+    </a>
+    <button class="utility-btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
+      <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </button>
+  </div>
+
+  <div class="login-form-wrapper">
+    <div class="title-group">
+      <div class="logo-wrapper" id="logoWrapper">
+        <img src="logo.png" alt="Veribase Logo" class="login-logo">
+      </div>
+      <h1 class="title">Veribase</h1>
+      <p class="subtitle">Anmeldung für Chefs & Fahrer</p>
+    </div>
+
+    <form onsubmit="handleLogin(event)">
+      <label for="username">Benutzername oder E-Mail</label>
+      <input type="text" id="username" required placeholder="z. B. fahrer1 oder chef" autocomplete="username">
+      
+      <label for="password">Passwort</label>
+      <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+      
+      <button type="submit" id="submitBtn" class="submit-btn">Anmelden &rarr;</button>
+    </form>
+    <div id="errorMsg" class="error"></div>
+
+    <footer class="login-footer">
+      <a href="#" onclick="openLegalModal('impressum'); return false;">Impressum</a>
+      <span>•</span>
+      <a href="#" onclick="openLegalModal('datenschutz'); return false;">Datenschutz</a>
+      <span>•</span>
+      <a href="#" onclick="openLegalModal('agb'); return false;">AGB (B2B)</a>
+    </footer>
+  </div>
+</div>
+
+<!-- Legal Modal -->
+<div id="legalModal" class="legal-modal-backdrop" onclick="closeLegalModal(event)">
+  <div class="legal-modal-content">
+    <button class="legal-modal-close" onclick="closeLegalModalDirect()">&times;</button>
+    
+    <div class="legal-tab-nav">
+      <button id="tabBtnImpressum" class="legal-tab-btn" onclick="switchLegalTab('impressum')">Impressum</button>
+      <button id="tabBtnDatenschutz" class="legal-tab-btn" onclick="switchLegalTab('datenschutz')">Datenschutzerklärung</button>
+      <button id="tabBtnAgb" class="legal-tab-btn" onclick="switchLegalTab('agb')">AGB (B2B)</button>
+    </div>
+
+    <div id="contentImpressum" class="legal-tab-content">
+      <h2>Impressum</h2>
+      <p><strong>Angaben gemäß § 5 DDG:</strong></p>
+      <p>
+        Björn Koch<br>
+        Veribase<br>
+        Thüringer Straße 37<br>
+        51766 Engelskirchen<br>
+        Deutschland
+      </p>
+
+      <p><strong>Kontakt:</strong></p>
+      <p>
+        Telefon: 0160 1840201<br>
+        E-Mail: hello@veribase-app.de
+      </p>
+
+      <p><strong>Umsatzsteuer:</strong></p>
+      <p>Umsatzsteuerbefreit nach § 19 UStG</p>
+
+      <p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong></p>
+      <p>
+        Björn Koch<br>
+        Thüringer Straße 37<br>
+        51766 Engelskirchen
+      </p>
+    </div>
+
+    <div id="contentDatenschutz" class="legal-tab-content">
+      <h2>Datenschutzerklärung</h2>
+      <p><strong>Allgemeine Hinweise:</strong> Veribase verarbeitet personenbezogene Daten (z. B. GPS-Daten, Zeitstempel, E-Mail-Adressen) ausschließlich im Rahmen der DSGVO zur Durchführung von Touren und Audits im B2B-Verhältnis.</p>
+      <p>Verantwortlicher: Björn Koch, Thüringer Straße 37, 51766 Engelskirchen, E-Mail: hello@veribase-app.de</p>
+    </div>
+
+    <div id="contentAgb" class="legal-tab-content">
+      <h2>Allgemeine Geschäftsbedingungen (AGB) – B2B</h2>
+      
+      <h3>§ 1 Geltungsbereich & Vertragspartner</h3>
+      <p>1. Diese AGB gelten für alle Verträge über die Nutzung der B2B-SaaS-Plattform Veribase (veribase-app.de) zwischen Björn Koch, Veribase, Thüringer Straße 37, 51766 Engelskirchen (Anbieter) und dem Kunden.</p>
+      <p>2. Das Angebot richtet sich ausschließlich an Unternehmer im Sinne des § 14 BGB. Ein Vertragsschluss mit Verbrauchern (§ 13 BGB) ist ausgeschlossen.</p>
+
+      <h3>§ 2 Leistungsumfang & Testphase</h3>
+      <p>1. Der Anbieter stellt dem Kunden die cloudbasierte Software Veribase zur Routen- und Tourendisposition, Fahrerführung sowie zur Foto- und Statusdokumentation zur Verfügung.</p>
+      <p>2. Neukunden erhalten auf Wunsch eine kostenlose 14-tägige Testphase. Der Testzugang endet automatisch, ohne dass es einer Kündigung bedarf.</p>
+
+      <h3>§ 3 Preise, Abrechnung & Zahlungsbedingungen</h3>
+      <p>1. Die Vergütung setzt sich aus dem gewählten Basistarif sowie ggf. einer variablen Gebühr pro weiterem Fahrer-Account zusammen. Alle Preise verstehen sich netto zzgl. gesetzlicher Umsatzsteuer.</p>
+      <p>2. Die Abrechnung erfolgt monatlich im Voraus. Die Zahlungsabwicklung erfolgt über den Zahlungsdienstleister Stripe (z. B. SEPA-Lastschrift, Kreditkarte).</p>
+
+      <h3>§ 4 Pflichten des Kunden & Datenschutz</h3>
+      <p>1. Der Kunde ist verpflichtet, Zugangsdaten geheim zu halten und vor unbefugtem Zugriff zu schützen.</p>
+      <p>2. Der Kunde stellt eigenverantwortlich sicher, dass seine Mitarbeiter/Fahrer über die Erfassung von GPS-Daten und Foto-Uploads im Rahmen der App-Nutzung datenschutzkonform informiert wurden.</p>
+
+      <h3>§ 5 Verfügbarkeit & Haftung</h3>
+      <p>1. Der Anbieter strebt eine jährliche Durchschnittsverfügbarkeit der SaaS-Dienste von 98 % an (ausgenommen Wartungsarbeiten).</p>
+      <p>2. Die Haftung des Anbieters ist bei leicht fahrlässiger Verletzung unwesentlicher Vertragspflichten ausgeschlossen. Bei der Verletzung wesentlicher Vertragspflichten ist die Haftung auf den vorhersehbaren, vertragstypischen Schaden begrenzt.</p>
+
+      <h3>§ 6 Vertragslaufzeit & Kündigung</h3>
+      <p>1. Der Vertrag verlängert sich bei Monatsabos jeweils um einen weiteren Monat, wenn er nicht mit einer Frist von 14 Tagen zum Ende des jeweiligen Abrechnungsmonats gekündigt wird.</p>
+      <p>2. Das Recht zur fristlosen Kündigung aus wichtigem Grund bleibt unberührt.</p>
+
+      <h3>§ 7 Anwendbares Recht & Gerichtsstand</h3>
+      <p>Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist, soweit gesetzlich zulässig, der Sitz des Anbieters.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://cvfbkxzhpxopbkaymvvf.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_EK07XF7umKLsdfbRK9p6gQ_0-5AkSjb';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  window.onload = async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session && session.user) {
+      await redirectUser(session.user.id);
+    }
+  };
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('veribase_theme', next);
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const logoWrapper = document.getElementById('logoWrapper');
+    
+    let identifier = document.getElementById('username').value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
+
+    btn.disabled = true;
+
+    logoWrapper.classList.add('glow-active');
+    errorMsg.style.color = 'var(--accent)';
+    errorMsg.innerText = 'Anmeldung läuft...';
+
+    if (!identifier.includes('@')) {
+      identifier = `${identifier}@app.local`;
+    }
+
+    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ 
+      email: identifier, 
+      password 
+    });
+
+    if (authError) {
+      logoWrapper.classList.remove('glow-active');
+      errorMsg.style.color = '#ef4444';
+      errorMsg.innerText = 'Login fehlgeschlagen: Zugangsdaten ungültig.';
+      btn.disabled = false;
+      return;
+    }
+
+    errorMsg.innerText = 'Login erfolgreich!';
+
+    setTimeout(async () => {
+      await redirectUser(authData.user.id);
+    }, 1200);
+  }
+
+  async function redirectUser(userId) {
+    const errorMsg = document.getElementById('errorMsg');
+    
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      errorMsg.style.color = '#ef4444';
+      errorMsg.innerText = 'Profil konnte nicht geladen werden.';
+      document.getElementById('submitBtn').disabled = false;
+      return;
+    }
+
+    if (profile.role === 'chef') {
+      window.location.replace('ChefDashboard.html');
+    } else {
+      window.location.replace('TourApp.html');
+    }
+  }
+
+  function openLegalModal(tab) {
+    document.getElementById('legalModal').style.display = 'flex';
+    switchLegalTab(tab);
+  }
+  function closeLegalModalDirect() {
+    document.getElementById('legalModal').style.display = 'none';
+  }
+  function closeLegalModal(event) {
+    if (event.target.id === 'legalModal') {
+      closeLegalModalDirect();
+    }
+  }
+  function switchLegalTab(tabName) {
+    document.getElementById('contentImpressum').classList.remove('active');
+    document.getElementById('contentDatenschutz').classList.remove('active');
+    document.getElementById('contentAgb').classList.remove('active');
+    
+    document.getElementById('tabBtnImpressum').classList.remove('active');
+    document.getElementById('tabBtnDatenschutz').classList.remove('active');
+    document.getElementById('tabBtnAgb').classList.remove('active');
+
+    if (tabName === 'impressum') {
+      document.getElementById('contentImpressum').classList.add('active');
+      document.getElementById('tabBtnImpressum').classList.add('active');
+    } else if (tabName === 'datenschutz') {
+      document.getElementById('contentDatenschutz').classList.add('active');
+      document.getElementById('tabBtnDatenschutz').classList.add('active');
+    } else if (tabName === 'agb') {
+      document.getElementById('contentAgb').classList.add('active');
+      document.getElementById('tabBtnAgb').classList.add('active');
+    }
+  }
+</script>
+
+</body>
+</html>
