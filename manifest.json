@@ -1,0 +1,17 @@
+{
+  "short_name": "Veribase",
+  "name": "Veribase Tourapp",
+  "icons": [
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./login.html",
+  "background_color": "#030712",
+  "theme_color": "#6366f1",
+  "display": "standalone",
+  "orientation": "portrait"
+}
