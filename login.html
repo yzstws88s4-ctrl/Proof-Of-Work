@@ -76,15 +76,15 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     html, body {
-      height: 100%;
+      min-height: 100%;
       margin: 0;
+      padding: 0;
     }
 
     body {
       font-family: var(--font-family);
       background-color: var(--bg);
       color: var(--text);
-      padding: 16px 12px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -93,12 +93,14 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* HARTE TRENNUNG DER ANSICHTEN (Kein Überlappen mehr!) */
     .app-view {
       width: 100%;
-      display: none;
+      display: none !important;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      box-sizing: border-box;
+      padding: 16px 12px;
     }
     
     .app-view.active-view {
@@ -126,11 +128,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding-top: 40px;
     }
 
     .login-top-bar {
       position: absolute;
-      top: -70px;
+      top: -30px;
       left: 0;
       right: 0;
       display: flex;
@@ -234,7 +237,7 @@
       display: flex; flex-direction: column; justify-content: space-between;
     }
     .chef-container {
-      width: 100%; max-width: 1600px; height: calc(100vh - 40px);
+      width: 100%; max-width: 1600px; min-height: calc(100vh - 40px);
       display: flex; flex-direction: column; justify-content: space-between; gap: 16px;
     }
 
@@ -484,11 +487,11 @@
         <div class="section-label">Tour starten</div>
         
         <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
-          <button type="button" onclick="document.getElementById('ocrCameraInput').click()">
+          <button type="button" class="utility-btn" style="justify-content:center; padding:12px;" onclick="document.getElementById('ocrCameraInput').click()">
             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             Tour-Foto aufnehmen (Kamera)
           </button>
-          <button type="button" onclick="document.getElementById('ocrGalleryInput').click()">
+          <button type="button" class="utility-btn" style="justify-content:center; padding:12px;" onclick="document.getElementById('ocrGalleryInput').click()">
             <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             Tour-Foto aus Galerie hochladen
           </button>
@@ -497,7 +500,7 @@
         <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
         <input type="file" id="ocrGalleryInput" accept="image/*" style="display: none;" onchange="handleOcrImage(event)">
 
-        <textarea id="addressInput" placeholder="Adressen zeilenweise einfügen..."></textarea>
+        <textarea id="addressInput" rows="5" placeholder="Adressen zeilenweise einfügen..."></textarea>
 
         <div class="toggle-box">
           <div>
@@ -515,17 +518,17 @@
           <option value="apple">Apple Maps</option>
         </select>
 
-        <button type="button" onclick="loadSupabaseTour()">
+        <button type="button" class="utility-btn" style="justify-content:center; padding:12px;" onclick="loadSupabaseTour()">
           <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           Live-Tour vom Chef laden
         </button>
-        <button type="button" class="btn-success" onclick="startManualTour()" style="font-weight: 700; padding: 14px;">
+        <button type="button" class="btn-success btn-main" onclick="startManualTour()" style="font-weight: 700; padding: 14px;">
           <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           TOUR JETZT STARTEN
         </button>
       </div>
 
-      <div>
+      <div style="margin-top:20px;">
         <div class="section-label">Vergangene Touren</div>
         <div class="tour-history-scroll-box" id="tourHistoryContainer">
           <p style="color: var(--text-muted); font-size: 12px; margin-left: 2px; margin-top: 0;">Lade Archiv...</p>
@@ -541,16 +544,16 @@
           <div class="gps-status" id="gpsStatusText">GPS aktiv</div>
         </div>
 
-        <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+        <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate" style="display:flex; align-items:center; justify-content:center; text-decoration:none; border-radius:14px;">
           <svg class="icon-svg" style="width:20px; height:20px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
           JETZT NAVIGIEREN
         </a>
 
-        <button type="button" class="btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
+        <button type="button" class="btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()" style="border-radius:14px;">
           STOPP ERLEDIGT ✓
         </button>
 
-        <button type="button" id="prevStopBtn" onclick="previousStop()" style="padding: 10px; font-size: 12px;">
+        <button type="button" id="prevStopBtn" class="utility-btn" onclick="previousStop()" style="justify-content:center; padding: 10px; font-size: 12px;">
           <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
           Vorherigen Stopp zurückholen
         </button>
@@ -569,11 +572,11 @@
         </div>
       </div>
 
-      <div>
-        <button type="button" class="btn-success" style="padding: 12px; margin-bottom: 6px;" id="finishTourBtn" onclick="finishAndSaveTour()">
+      <div style="margin-top:16px;">
+        <button type="button" class="btn-success btn-main" style="padding: 12px; margin-bottom: 6px;" id="finishTourBtn" onclick="finishAndSaveTour()">
           Tour beenden & Speichern
         </button>
-        <button type="button" class="btn-danger" onclick="openCancelModal()" style="padding: 10px;">
+        <button type="button" class="btn-danger btn-main" onclick="openCancelModal()" style="padding: 10px;">
           Tour abbrechen (Notfall)
         </button>
       </div>
@@ -995,7 +998,7 @@
     <div style="border-radius: 12px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--accent-line); background: #000; display: flex; align-items: center; justify-content: center;">
       <img id="modalProofImagePreview" src="" style="width: 100%; max-height: 280px; object-fit: contain; display: block;">
     </div>
-    <button type="button" class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()" style="padding: 13px;">Bestätigen & Übermitteln</button>
+    <button type="button" class="btn-success btn-main" id="confirmProofBtn" onclick="confirmAndUploadProof()" style="padding: 13px;">Bestätigen & Übermitteln</button>
   </div>
 </div>
 
@@ -1004,8 +1007,8 @@
     <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--danger);">Tour abbrechen</div>
     <input type="text" id="cancelReasonInput" placeholder="Grund hier eingeben..." style="margin-bottom: 16px;">
     <div style="display: flex; gap: 8px;">
-      <button type="button" class="btn-danger" style="margin-bottom:0; padding: 12px;" onclick="confirmCancelTour()">Abbruch bestätigen</button>
-      <button type="button" style="margin-bottom:0; padding: 12px;" onclick="closeCancelModal()">Zurück</button>
+      <button type="button" class="btn-danger btn-main" style="margin-bottom:0; padding: 12px;" onclick="confirmCancelTour()">Abbruch bestätigen</button>
+      <button type="button" class="utility-btn" style="margin-bottom:0; padding: 12px; flex:1; justify-content:center;" onclick="closeCancelModal()">Zurück</button>
     </div>
   </div>
 </div>
@@ -1015,15 +1018,15 @@
     <div style="font-size: 15px; font-weight: 700; margin-bottom: 2px;" id="noteModalTitle">Stopp bearbeiten</div>
     <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;" id="noteModalSub">Details</div>
     <textarea id="noteModalInput" placeholder="z.B. Abgabe beim Nachbarn..."></textarea>
-    <button type="button" id="modalPhotoReplaceBtn" onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 8px; padding: 11px;">
+    <button type="button" id="modalPhotoReplaceBtn" class="utility-btn" onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 8px; padding: 11px; width:100%; justify-content:center;">
       📷 Live-Foto aufnehmen / hinzufügen
     </button>
     <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 8px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-line);">
       <img id="modalStopPhotoImg" src="" style="width: 100%; max-height: 150px; object-fit: cover; display: block;">
     </div>
     <div style="display: flex; gap: 8px;">
-      <button type="button" class="btn-success" style="margin-bottom:0; padding: 11px;" onclick="saveStopNoteFromModal()">Speichern</button>
-      <button type="button" style="margin-bottom:0; padding: 11px;" onclick="closeNoteModal()">Abbrechen</button>
+      <button type="button" class="btn-success btn-main" style="margin-bottom:0; padding: 11px;" onclick="saveStopNoteFromModal()">Speichern</button>
+      <button type="button" class="utility-btn" style="margin-bottom:0; padding: 11px; flex:1; justify-content:center;" onclick="closeNoteModal()">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -1033,8 +1036,8 @@
     <h3 id="detailTourTitle" style="margin-top:0; margin-bottom: 8px; font-size: 15px;">Tour Details</h3>
     <div id="detailStopsContainer" style="overflow-y: auto; flex-grow: 1; margin-bottom: 12px; padding-right: 4px;"></div>
     <div style="display: flex; gap: 8px; border-top: 1px solid var(--accent-line); padding-top: 10px;">
-      <button type="button" class="btn-danger" style="margin-bottom:0; padding: 11px;" onclick="archiveCurrentDetailTour()">Ausblenden</button>
-      <button type="button" style="margin-bottom:0; padding: 11px;" onclick="closeDetailModal()">Zurück</button>
+      <button type="button" class="btn-danger btn-main" style="margin-bottom:0; padding: 11px;" onclick="archiveCurrentDetailTour()">Ausblenden</button>
+      <button type="button" class="utility-btn" style="margin-bottom:0; padding: 11px; flex:1; justify-content:center;" onclick="closeDetailModal()">Zurück</button>
     </div>
   </div>
 </div>
@@ -1052,7 +1055,7 @@
         <div id="modalProgressBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.2s ease;"></div>
       </div>
     </div>
-    <button type="button" class="btn-success" id="modalOkBtn" onclick="closeModal()" style="margin-bottom:0; padding: 11px; margin-top: 8px;">OK</button>
+    <button type="button" class="btn-success btn-main" id="modalOkBtn" onclick="closeModal()" style="margin-bottom:0; padding: 11px; margin-top: 8px;">OK</button>
   </div>
 </div>
 
@@ -1151,18 +1154,26 @@ function toggleTheme() {
   localStorage.setItem('veribase_chef_theme', next);
 }
 
+// FIX: Saubere Trennung der Views & Body Alignment
 function showView(viewName) {
-  document.getElementById('viewLogin').classList.remove('active-view');
-  document.getElementById('viewDriver').classList.remove('active-view');
-  document.getElementById('viewChef').classList.remove('active-view');
+  const loginEl = document.getElementById('viewLogin');
+  const driverEl = document.getElementById('viewDriver');
+  const chefEl = document.getElementById('viewChef');
+
+  loginEl.classList.remove('active-view');
+  driverEl.classList.remove('active-view');
+  chefEl.classList.remove('active-view');
 
   if (viewName === 'login') {
-    document.getElementById('viewLogin').classList.add('active-view');
+    document.body.style.alignItems = 'center';
+    loginEl.classList.add('active-view');
   } else if (viewName === 'driver') {
-    document.getElementById('viewDriver').classList.add('active-view');
+    document.body.style.alignItems = 'flex-start';
+    driverEl.classList.add('active-view');
     initDriverAppEnvironment();
   } else if (viewName === 'chef') {
-    document.getElementById('viewChef').classList.add('active-view');
+    document.body.style.alignItems = 'flex-start';
+    chefEl.classList.add('active-view');
     initChefAppEnvironment();
   }
 }
@@ -1223,7 +1234,7 @@ async function handleLogin(e) {
 
   setTimeout(async () => {
     await fetchAndActivateUserRole(currentUser.id);
-  }, 800);
+  }, 500);
 }
 
 async function logout() {
