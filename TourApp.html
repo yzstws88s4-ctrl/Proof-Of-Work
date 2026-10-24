@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Veribase – Touren App</title>
+
+<meta name="apple-mobile-web-app-title" content="Veribase">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="manifest" href="manifest.json">
+
+<script>
+  if (!localStorage.getItem('veribase_theme')) {
+    localStorage.setItem('veribase_theme', 'dark');
+  }
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('veribase_theme'));
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+:root {
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --bg: #e2e8f0;
+  --surface: #f1f5f9;
+  --surface-solid: #ffffff;
+  --surface-hover: #e8ecf4;
+  --text: #0f172a;
+  --text-sub: #64748b;
+  --text-muted: #94a3b8;
+  --border: #cbd5e1;
+  --accent-line: rgba(99, 102, 241, 0.4);
+  --input-bg: #ffffff;
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  --switch-active: #6366f1;
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+}
+
+html[data-theme="dark"] {
+  --bg: #030712;
+  --surface: rgba(17, 24, 39, 0.75);
+  --surface-solid: #0f172a;
+  --surface-hover: rgba(30, 41, 59, 0.95);
+  --text: #f9fafb;
+  --text-sub: #9ca3af;
+  --text-muted: #4b5563;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent-line: rgba(99, 102, 241, 0.35);
+  --input-bg: rgba(3, 7, 18, 0.8);
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  --switch-active: #6366f1;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg);
+  color: var(--text);
+  padding: 16px 12px;
+  display: flex;
+  justify-content: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container { 
+  width: 100%; 
+  max-width: 480px; 
+  min-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+}
+
+.user-greeting-box { display: flex; flex-direction: column; }
+.driver-welcome { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
+
+.header-actions { display: flex; gap: 8px; }
+
+.utility-btn {
+  background: var(--surface);
+  border: 1px solid var(--accent-line);
+  color: var(--text);
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.utility-btn:hover { border-color: var(--accent); }
+
+.theme-toggle-btn { width: 38px; padding: 0; }
+.theme-toggle-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+.app-view-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-evenly;
+  margin: 10px 0;
+}
+
+.main-inputs-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+  margin-left: 2px;
+}
+
+button, .nav-link-btn {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--accent-line);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  box-sizing: border-box;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+
+button:active, .nav-link-btn:active { opacity: 0.7; }
+button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.btn-success {
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.btn-complete-action {
+  min-height: 48px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--surface);
+  color: var(--text-sub);
+  border: 1px solid var(--accent-line);
+  box-shadow: var(--shadow);
+}
+
+.btn-danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+
+.btn-navigate {
+  min-height: 64px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+textarea, input[type="text"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--accent-line);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+textarea { height: 100px; resize: vertical; }
+
+select {
+  width: 100%;
+  padding: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--accent-line);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+}
+select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+.toggle-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--accent-line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border); transition: .25s; border-radius: 24px;
+}
+.slider:before {
+  position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+  background-color: white; transition: .25s; border-radius: 50%;
+}
+
+input:checked + .slider { background-color: var(--switch-active) !important; }
+input:checked + .slider:before { transform: translateX(18px); }
+
+#tour-view { display: none; }
+
+.current-destination {
+  background: var(--surface);
+  border: 1px solid var(--accent-line);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.dest-label { font-size: 10px; text-transform: uppercase; color: var(--text-sub); font-weight: 800; letter-spacing: 0.06em; }
+.dest-text { font-size: 17px; font-weight: 800; margin-top: 2px; word-break: break-word; }
+.gps-status { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+
+.stop-list {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid var(--accent-line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.stop-item {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.stop-item:last-child { border-bottom: none; }
+.stop-item.done { opacity: 0.35; }
+.stop-item.done .stop-name { text-decoration: line-through; }
+.stop-item.active { background: var(--input-bg); font-weight: 700; color: var(--text); border-left: 4px solid var(--accent); }
+
+.proof-gallery-container { display: flex; flex-direction: column; gap: 8px; }
+.proof-item-card { background: var(--surface); border: 1px solid var(--accent-line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.proof-item-card img { width: 100%; max-height: 110px; object-fit: cover; display: block; }
+.proof-item-info { padding: 8px; font-size: 11px; display: flex; flex-direction: column; gap: 2px; }
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(3, 7, 18, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+}
+
+.modal-box {
+  background: var(--surface-solid);
+  border: 1px solid var(--accent-line);
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+
+.history-card {
+  border: 1px solid var(--accent-line);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s;
+}
+.history-card:hover { border-color: var(--accent); }
+
+.tour-history-scroll-box {
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.icon-svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: inline-block;
+  vertical-align: middle;
+}
+</style>
+
+  <!-- Strenger iOS PWA Navigation Fix (Verhindert das Ausbrechen in die Safari-Webansicht) -->
+  <script>
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.addEventListener('click', function(e) {
+        const a = e.target.closest('a');
+        if (a && a.href && a.href.includes(window.location.host) && !a.getAttribute('target')) {
+          e.preventDefault();
+          window.location.href = a.href;
+        }
+      }, false);
+    }
+  </script>
+
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="user-greeting-box">
+      <span class="driver-welcome" id="driverWelcomeDisplay">Hallo Fahrer</span>
+    </div>
+    <div class="header-actions">
+      <button class="utility-btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Design umschalten">
+        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      <button class="utility-btn" onclick="logout()" style="color: var(--danger); border-color: rgba(239,68,68,0.2);">Abmelden</button>
+    </div>
+  </div>
+
+  <div class="app-view-container" id="setup-view">
+    <div class="main-inputs-group">
+      <div class="section-label">Tour starten</div>
+      
+      <div class="btn-grid">
+        <button onclick="document.getElementById('ocrCameraInput').click()">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Tour-Foto aufnehmen (Kamera)
+        </button>
+        <button onclick="document.getElementById('ocrGalleryInput').click()">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Tour-Foto aus Galerie hochladen
+        </button>
+      </div>
+
+      <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleOcrImage(event)">
+      <input type="file" id="ocrGalleryInput" accept="image/*" style="display: none;" onchange="handleOcrImage(event)">
+
+      <textarea id="addressInput" placeholder="Adressen zeilenweise einfügen..."></textarea>
+
+      <div class="toggle-box">
+        <div>
+          <strong style="font-size: 12px; display: block;">Fotobeweis-Pflicht</strong>
+          <span style="font-size: 10px; color: var(--text-sub);">Foto bei Stopps anfordern</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="photoProofToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <select id="mapAppSelect">
+        <option value="google">Google Maps</option>
+        <option value="apple">Apple Maps</option>
+      </select>
+
+      <button onclick="loadSupabaseTour()">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Live-Tour vom Chef laden
+      </button>
+      <button class="btn-success" onclick="startManualTour()" style="font-weight: 700; padding: 14px;">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        TOUR JETZT STARTEN
+      </button>
+    </div>
+
+    <div>
+      <div class="section-label">Vergangene Touren</div>
+      <div class="tour-history-scroll-box" id="tourHistoryContainer">
+        <p style="color: var(--text-muted); font-size: 12px; margin-left: 2px; margin-top: 0;">Lade Archiv...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-view-container" id="tour-view" style="display:none;">
+    <div class="main-inputs-group">
+      <div class="current-destination">
+        <div class="dest-label" id="stopCounter">Stopp 1 von 16</div>
+        <div class="dest-text" id="currentStopText">Lade Stopps...</div>
+        <div class="gps-status" id="gpsStatusText">GPS aktiv</div>
+      </div>
+
+      <a id="navDirectBtn" href="#" target="_blank" class="nav-link-btn btn-navigate">
+        <svg class="icon-svg" style="width:20px; height:20px;" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        JETZT NAVIGIEREN
+      </a>
+
+      <button class="btn-complete-action" id="manualCompleteBtn" onclick="triggerCompleteStop()">
+        STOPP ERLEDIGT ✓
+      </button>
+
+      <button id="prevStopBtn" onclick="previousStop()" style="padding: 10px; font-size: 12px;">
+        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Vorherigen Stopp zurückholen
+      </button>
+
+      <input type="file" id="proofCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleProofCapture(event)">
+      <input type="file" id="modalReplaceCameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleModalReplaceCapture(event)">
+
+      <div style="margin-top: 2px;">
+        <div class="section-label">Stopps (Tippen für Notiz / Foto)</div>
+        <div class="stop-list" id="stopListContainer"></div>
+      </div>
+
+      <div style="margin-top: 2px;" id="gallerySectionContainer">
+        <div class="section-label">Fotobeweise (<span id="photoCount">0</span>)</div>
+        <div class="proof-gallery-container" id="galleryGrid"></div>
+      </div>
+    </div>
+
+    <div>
+      <button class="btn-success" style="padding: 12px; margin-bottom: 6px;" id="finishTourBtn" onclick="finishAndSaveTour()">
+        Tour beenden & Speichern
+      </button>
+      <button class="btn-danger" onclick="openCancelModal()" style="padding: 10px;">
+        Tour abbrechen (Notfall)
+      </button>
+    </div>
+  </div>
+</div>
+
+<canvas id="proofCanvas" style="display:none;"></canvas>
+
+<div class="modal-overlay" id="proofPreviewModal">
+  <div class="modal-box">
+    <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Fälschungssicherer Fotobeweis</div>
+    <input type="text" id="modalProofNoteInput" placeholder="Notiz zum Stopp (optional)..." style="margin-bottom: 10px;" oninput="updateLiveStampNote()">
+    
+    <div style="border-radius: 12px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--accent-line); background: #000; display: flex; align-items: center; justify-content: center;">
+      <img id="modalProofImagePreview" src="" style="width: 100%; max-height: 280px; object-fit: contain; display: block;">
+    </div>
+    
+    <button class="btn-success" id="confirmProofBtn" onclick="confirmAndUploadProof()" style="padding: 13px;">Bestätigen & Übermitteln</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal-box">
+    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--danger);">Tour abbrechen</div>
+    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Bitte gib den Grund für den Abbruch ein:</div>
+    <input type="text" id="cancelReasonInput" placeholder="Grund hier eingeben..." style="margin-bottom: 16px;">
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-danger" style="margin-bottom:0; padding: 12px;" onclick="confirmCancelTour()">Abbruch bestätigen</button>
+      <button style="margin-bottom:0; padding: 12px;" onclick="closeCancelModal()">Zurück</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="noteEditModal">
+  <div class="modal-box" style="max-height: 85vh; overflow-y: auto;">
+    <div style="font-size: 15px; font-weight: 700; margin-bottom: 2px;" id="noteModalTitle">Stopp bearbeiten</div>
+    <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;" id="noteModalSub">Details</div>
+    <textarea id="noteModalInput" placeholder="z.B. Abgabe beim Nachbarn..."></textarea>
+    <button id="modalPhotoReplaceBtn" onclick="document.getElementById('modalReplaceCameraInput').click()" style="margin-bottom: 8px; padding: 11px;">
+      <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Live-Foto aufnehmen / hinzufügen
+    </button>
+    <div id="modalStopPhotoPreviewContainer" style="display: none; margin-bottom: 8px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-line);">
+      <img id="modalStopPhotoImg" src="" style="width: 100%; max-height: 150px; object-fit: cover; display: block;">
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-success" style="margin-bottom:0; padding: 11px;" onclick="saveStopNoteFromModal()">Speichern</button>
+      <button style="margin-bottom:0; padding: 11px;" onclick="closeNoteModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="tourDetailModal">
+  <div class="modal-box" style="max-height: 85vh;">
+    <h3 id="detailTourTitle" style="margin-top:0; margin-bottom: 8px; font-size: 15px;">Tour Details</h3>
+    <div id="detailStopsContainer" style="overflow-y: auto; flex-grow: 1; margin-bottom: 12px; padding-right: 4px;"></div>
+    <div style="display: flex; gap: 8px; border-top: 1px solid var(--accent-line); padding-top: 10px;">
+      <button class="btn-danger" style="margin-bottom:0; padding: 11px;" onclick="archiveCurrentDetailTour()">Ausblenden</button>
+      <button style="margin-bottom:0; padding: 11px;" onclick="closeDetailModal()">Zurück</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="customModal">
+  <div class="modal-box" style="text-align: center;">
+    <div style="font-size:15px; font-weight:700;" id="modalTitle">Hinweis</div>
+    <div id="modalBody" style="margin: 8px 0; font-size: 12px;"></div>
+    <div id="modalProgressContainer" style="display: none; margin: 12px 0 4px 0;">
+      <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-sub); margin-bottom: 4px;">
+        <span id="modalProgressText">Analysiere Tour...</span>
+        <span id="modalProgressPercent">0%</span>
+      </div>
+      <div style="width: 100%; height: 6px; background: var(--border); border-radius: 6px; overflow: hidden;">
+        <div id="modalProgressBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.2s ease;"></div>
+      </div>
+    </div>
+    <button class="btn-success" id="modalOkBtn" onclick="closeModal()" style="margin-bottom:0; padding: 11px; margin-top: 8px;">OK</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://cvfbkxzhpxopbkaymvvf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_EK07XF7umKLsdfbRK9p6gQ_0-5AkSjb';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let currentProfile = null;
+let tourStops = [];
+let currentStopIndex = 0;
+let currentSupabaseTourId = null;
+let loadedChefStops = [];
+let currentGPSCoords = "Ermittle GPS...";
+let currentLatitude = null;
+let currentLongitude = null;
+
+let tempCapturedFile = null;
+let tempCanvasBlob = null;
+let editingStopIndex = null;
+let activeDetailTourId = null;
+let isPhotoProofEnabled = false;
+
+window.onload = async () => {
+  if (!localStorage.getItem('veribase_theme')) {
+    localStorage.setItem('veribase_theme', 'dark');
+  }
+  const savedTheme = localStorage.getItem('veribase_theme');
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
+  const savedProofToggle = localStorage.getItem('veribase_photo_proof_enabled');
+  isPhotoProofEnabled = savedProofToggle === 'true';
+  document.getElementById('photoProofToggle').checked = isPhotoProofEnabled;
+
+  document.getElementById('photoProofToggle').addEventListener('change', (e) => {
+    isPhotoProofEnabled = e.target.checked;
+    localStorage.setItem('veribase_photo_proof_enabled', isPhotoProofEnabled);
+  });
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    window.location.replace('login.html');
+    return;
+  }
+  currentUser = session.user;
+
+  const { data: profile } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', currentUser.id)
+    .maybeSingle();
+
+  currentProfile = profile;
+  const rawName = profile?.full_name || currentUser.email.split('@')[0];
+  document.getElementById('driverWelcomeDisplay').innerText = `Hallo ${rawName.split(' ')[0]}`;
+
+  initGPS();
+  await loadTourHistory();
+  await restoreActiveTourSession();
+};
+
+async function restoreActiveTourSession() {
+  try {
+    const activeTourId = localStorage.getItem('veribase_active_tour_id');
+    if (!activeTourId) return;
+
+    const { data: tour } = await supabaseClient
+      .from('tours')
+      .select('*, stops(*)')
+      .eq('id', activeTourId)
+      .maybeSingle();
+
+    if (!tour || tour.status !== 'aktiv') {
+      localStorage.removeItem('veribase_active_tour_id');
+      localStorage.removeItem('veribase_active_stop_index');
+      return;
+    }
+
+    currentSupabaseTourId = tour.id;
+    if (tour.stops && tour.stops.length > 0) {
+      const sortedStops = tour.stops.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+      
+      tourStops = sortedStops.map(s => ({
+        id: s.id,
+        address: s.address,
+        notes: s.notes || '',
+        done: s.status === 'erledigt',
+        photo_url: s.photo_url || null,
+        blob: null
+      }));
+
+      const savedIndex = parseInt(localStorage.getItem(`veribase_stop_index_${tour.id}`) || '0', 10);
+      currentStopIndex = savedIndex < tourStops.length ? savedIndex : 0;
+
+      updateGalleryGrid();
+      document.getElementById('setup-view').style.display = 'none';
+      document.getElementById('tour-view').style.display = 'flex';
+      renderTourUI();
+    }
+  } catch (err) {
+    console.error("Wiederherstellungsfehler:", err);
+  }
+}
+
+function toggleTheme() {
+  const htmlEl = document.documentElement;
+  const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  htmlEl.setAttribute('data-theme', next);
+  localStorage.setItem('veribase_theme', next);
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  window.location.replace('login.html');
+}
+
+function initGPS() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.watchPosition(
+      (pos) => {
+        currentLatitude = pos.coords.latitude;
+        currentLongitude = pos.coords.longitude;
+        currentGPSCoords = `${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}`;
+        document.getElementById('gpsStatusText').innerText = `GPS aktiv (${currentGPSCoords})`;
+      },
+      (err) => {
+        currentGPSCoords = "GPS Signal schwach";
+        document.getElementById('gpsStatusText').innerText = "GPS Offline / Fehler";
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+    );
+  }
+}
+
+function forceFreshGPSFix() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(null);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        currentLatitude = pos.coords.latitude;
+        currentLongitude = pos.coords.longitude;
+        currentGPSCoords = `${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}`;
+        resolve(pos.coords);
+      },
+      () => { resolve(null); },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 4000 }
+    );
+  });
+}
+
+async function loadSupabaseTour() {
+  const { data: tours } = await supabaseClient
+    .from('tours')
+    .select('*, stops(*)')
+    .eq('assigned_to', currentUser.id)
+    .eq('status', 'geplant')
+    .order('created_at', { ascending: false });
+
+  if (!tours || tours.length === 0) {
+    showModal("Info", "Keine neue zugewiesene Live-Tour gefunden.");
+    return;
+  }
+
+  const tour = tours[0];
+  currentSupabaseTourId = tour.id;
+  if (tour.stops) {
+    loadedChefStops = tour.stops.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+    document.getElementById('addressInput').value = loadedChefStops.map(s => s.address).join('\n');
+    showModal("Erfolg", "Tour erfolgreich geladen!");
+  }
+}
+
+async function startManualTour() {
+  const input = document.getElementById('addressInput').value.trim();
+  if (!input) {
+    showModal("Hinweis", "Bitte gib mindestens eine Adresse ein.");
+    return;
+  }
+
+  const lines = input.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+
+  if (!currentSupabaseTourId) {
+    const { data: newTour, error } = await supabaseClient
+      .from('tours')
+      .insert([{
+        title: "Tour " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
+        assigned_to: currentUser.id,
+        status: 'aktiv',
+        archived_by_driver: false
+      }])
+      .select('*')
+      .single();
+
+    if (!error && newTour) {
+      currentSupabaseTourId = newTour.id;
+      const stopsToInsert = lines.map((addr, idx) => ({
+        tour_id: currentSupabaseTourId,
+        address: addr,
+        sequence: idx + 1,
+        status: 'offen'
+      }));
+      const { data: insertedStops } = await supabaseClient.from('stops').insert(stopsToInsert).select('*');
+      if (insertedStops) {
+        loadedChefStops = insertedStops;
+      }
+    }
+  }
+
+  tourStops = lines.map((addr, idx) => ({
+    id: (loadedChefStops[idx] && loadedChefStops[idx].id) ? loadedChefStops[idx].id : null,
+    address: addr,
+    notes: (loadedChefStops[idx] && loadedChefStops[idx].notes) ? loadedChefStops[idx].notes : '',
+    done: false,
+    photo_url: null,
+    blob: null
+  }));
+
+  currentStopIndex = 0;
+  
+  localStorage.setItem('veribase_active_tour_id', currentSupabaseTourId);
+  localStorage.setItem(`veribase_stop_index_${currentSupabaseTourId}`, currentStopIndex);
+
+  document.getElementById('galleryGrid').innerHTML = '';
+  document.getElementById('photoCount').innerText = '0';
+  document.getElementById('gallerySectionContainer').style.display = isPhotoProofEnabled ? 'block' : 'none';
+
+  document.getElementById('setup-view').style.display = 'none';
+  document.getElementById('tour-view').style.display = 'flex';
+  renderTourUI();
+}
+
+function renderTourUI() {
+  const container = document.getElementById('stopListContainer');
+  container.innerHTML = '';
+
+  const current = tourStops[currentStopIndex];
+
+  const prevBtn = document.getElementById('prevStopBtn');
+  if (prevBtn) {
+    prevBtn.disabled = (currentStopIndex <= 0);
+  }
+
+  const completeBtn = document.getElementById('manualCompleteBtn');
+  if (isPhotoProofEnabled) {
+    completeBtn.innerText = "STOPP ERLEDIGT ✓ (Mit Live-Foto)";
+  } else {
+    completeBtn.innerText = "STOPP ERLEDIGT ✓ (Ohne Foto)";
+  }
+
+  if (current && !current.done) {
+    document.getElementById('stopCounter').innerText = `Stopp ${currentStopIndex + 1} von ${tourStops.length}`;
+    document.getElementById('currentStopText').innerText = current.address;
+
+    const mapType = document.getElementById('mapAppSelect').value;
+    const navUrl = mapType === 'apple' 
+      ? `http://maps.apple.com/?saddr=Current+Location&daddr=${encodeURIComponent(current.address)}&dirflg=d`
+      : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(current.address)}&travelmode=driving&dir_action=navigate`;
+
+    document.getElementById('navDirectBtn').href = navUrl;
+    document.getElementById('navDirectBtn').style.display = 'flex';
+  } else {
+    document.getElementById('stopCounter').innerText = "GESCHAFFT!";
+    document.getElementById('currentStopText').innerText = "Alle Stopps erledigt!";
+    document.getElementById('navDirectBtn').style.display = 'none';
+  }
+
+  tourStops.forEach((stop, idx) => {
+    const item = document.createElement('div');
+    const isActive = idx === currentStopIndex && !stop.done;
+    item.className = `stop-item ${stop.done ? 'done' : ''} ${isActive ? 'active' : ''}`;
+    
+    item.onclick = function() {
+      openNoteModal(idx);
+    };
+
+    const hasPhotoBadge = stop.photo_url ? ' 📷' : '';
+    item.innerHTML = `
+      <div class="stop-name" style="pointer-events: none;">
+        <strong>#${idx + 1}</strong> ${stop.address}${hasPhotoBadge}
+        ${stop.notes ? `<div style="font-size: 11px; color: var(--text-sub); font-weight: 500; margin-top: 2px;">Notiz: ${stop.notes}</div>` : ''}
+      </div>
+      <div style="font-size: 11px; color: var(--text-sub); text-align: right; pointer-events: none; min-width: 65px;">
+        ${stop.done ? 'Erledigt' : 'Offen'}<br>
+        <span style="font-size: 10px; color: var(--text); font-weight: 600; text-decoration: underline;">Ändern</span>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function previousStop() {
+  if (currentStopIndex > 0) {
+    currentStopIndex--;
+    tourStops[currentStopIndex].done = false;
+    
+    if (currentSupabaseTourId) {
+      localStorage.setItem(`veribase_stop_index_${currentSupabaseTourId}`, currentStopIndex);
+      if (tourStops[currentStopIndex].id) {
+        supabaseClient.from('stops').update({ status: 'offen', completed_at: null }).eq('id', tourStops[currentStopIndex].id);
+      }
+    }
+    renderTourUI();
+  }
+}
+
+function openNoteModal(index) {
+  editingStopIndex = index;
+  const stop = tourStops[index];
+  if (!stop) return;
+
+  document.getElementById('noteModalTitle').innerText = `Stopp #${index + 1} bearbeiten`;
+  document.getElementById('noteModalSub').innerText = stop.address;
+  document.getElementById('noteModalInput').value = stop.notes || '';
+
+  const imgPrevContainer = document.getElementById('modalStopPhotoPreviewContainer');
+  const imgPrev = document.getElementById('modalStopPhotoImg');
+  const replaceBtn = document.getElementById('modalPhotoReplaceBtn');
+
+  if (!isPhotoProofEnabled) {
+    replaceBtn.style.display = 'none';
+  } else {
+    replaceBtn.style.display = 'flex';
+  }
+
+  if (stop.photo_url) {
+    imgPrev.src = stop.photo_url;
+    imgPrevContainer.style.display = 'block';
+  } else {
+    imgPrevContainer.style.display = 'none';
+    imgPrev.src = '';
+  }
+
+  document.getElementById('noteEditModal').style.display = 'flex';
+  setTimeout(() => { document.getElementById('noteModalInput').focus(); }, 150);
+}
+
+async function saveStopNoteFromModal() {
+  if (editingStopIndex !== null && tourStops[editingStopIndex]) {
+    const text = document.getElementById('noteModalInput').value.trim();
+    tourStops[editingStopIndex].notes = text;
+    
+    const stopObj = tourStops[editingStopIndex];
+    if (stopObj.id) {
+      await supabaseClient.from('stops').update({ notes: text }).eq('id', stopObj.id);
+    }
+    renderTourUI();
+  }
+  closeNoteModal();
+}
+
+function closeNoteModal() {
+  editingStopIndex = null;
+  document.getElementById('noteEditModal').style.display = 'none';
+}
+
+function triggerCompleteStop() {
+  if (currentStopIndex >= tourStops.length) return;
+
+  if (isPhotoProofEnabled) {
+    document.getElementById('proofCameraInput').click();
+  } else {
+    completeCurrentStopWithoutPhoto();
+  }
+}
+
+async function handleProofCapture(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  tempCapturedFile = file;
+
+  const current = tourStops[currentStopIndex];
+  if (current && current.notes) {
+    document.getElementById('modalProofNoteInput').value = current.notes;
+  } else {
+    document.getElementById('modalProofNoteInput').value = '';
+  }
+
+  await refreshStampPreview();
+  document.getElementById('proofPreviewModal').style.display = 'flex';
+  event.target.value = '';
+}
+
+async function handleModalReplaceCapture(event) {
+  const file = event.target.files[0];
+  if (!file || editingStopIndex === null) return;
+  
+  const stop = tourStops[editingStopIndex];
+  await forceFreshGPSFix();
+  
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.getElementById('proofCanvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      const userNote = document.getElementById('noteModalInput').value.trim();
+      const now = new Date().toLocaleString('de-DE');
+      const driverDisplayName = currentProfile?.full_name || currentUser.email.split('@')[0];
+
+      drawAuditStamp(ctx, canvas.width, canvas.height, {
+        title: `VERIBASE - AUDIT-FOTOBEWEIS #${editingStopIndex + 1}`,
+        driver: driverDisplayName,
+        targetAddress: stop.address,
+        time: now,
+        gps: currentGPSCoords,
+        note: userNote
+      });
+
+      canvas.toBlob(async (blob) => {
+        let uploadedUrl = null;
+        if (currentSupabaseTourId) {
+          const filePath = `proofs_${currentSupabaseTourId}_stop_${editingStopIndex}_${Date.now()}.jpg`;
+          const { error: upErr } = await supabaseClient.storage.from('proofs').upload(filePath, blob, { contentType: 'image/jpeg' });
+          if (!upErr) {
+            const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
+            uploadedUrl = urlData.publicUrl;
+          }
+        }
+
+        const localUrl = URL.createObjectURL(blob);
+        stop.blob = blob;
+        stop.photo_url = uploadedUrl || localUrl;
+        stop.done = true;
+
+        if (stop.id) {
+          await supabaseClient.from('stops').update({
+            status: 'erledigt',
+            photo_url: stop.photo_url,
+            completed_at: new Date().toISOString()
+          }).eq('id', stop.id);
+        }
+
+        const imgPrevContainer = document.getElementById('modalStopPhotoPreviewContainer');
+        const imgPrev = document.getElementById('modalStopPhotoImg');
+        imgPrev.src = stop.photo_url;
+        imgPrevContainer.style.display = 'block';
+
+        updateGalleryGrid();
+        renderTourUI();
+      }, 'image/jpeg', 0.92);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function drawAuditStamp(ctx, width, height, data) {
+  const baseSize = Math.max(22, Math.floor(width / 26));
+  const paddingHorizontal = Math.floor(baseSize * 1.0);
+  const paddingVertical = Math.floor(baseSize * 0.8);
+  const margin = Math.floor(baseSize * 1.2);
+
+  const lines = [
+    { text: data.title, font: `bold ${Math.floor(baseSize * 1.1)}px 'Plus Jakarta Sans', sans-serif`, color: '#818cf8' },
+    { text: `Fahrer: ${data.driver}`, font: `600 ${baseSize}px 'Plus Jakarta Sans', sans-serif`, color: '#ffffff' },
+    { text: `Ziel-Adresse: ${data.targetAddress}`, font: `600 ${baseSize}px 'Plus Jakarta Sans', sans-serif`, color: '#ffffff' },
+    { text: `Echtzeit-GPS: ${data.gps}`, font: `700 ${baseSize}px 'Plus Jakarta Sans', sans-serif`, color: '#38bdf8' },
+    { text: `Zeitstempel: ${data.time}`, font: `500 ${Math.floor(baseSize * 0.9)}px 'Plus Jakarta Sans', sans-serif`, color: '#cbd5e1' },
+    data.note ? { text: `Notiz: ${data.note}`, font: `italic 500 ${Math.floor(baseSize * 0.9)}px 'Plus Jakarta Sans', sans-serif`, color: '#fbbf24' } : null
+  ].filter(Boolean);
+
+  let maxTextWidth = 0;
+  lines.forEach(line => {
+    ctx.font = line.font;
+    const w = ctx.measureText(line.text).width;
+    if (w > maxTextWidth) maxTextWidth = w;
+  });
+
+  const lineHeight = baseSize * 1.45;
+  const boxWidth = maxTextWidth + (paddingHorizontal * 2);
+  const boxHeight = (lines.length * lineHeight) + (paddingVertical * 2);
+
+  const x = margin;
+  const y = height - boxHeight - margin;
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(3, 7, 18, 0.90)';
+  ctx.strokeStyle = 'rgba(99, 102, 241, 0.5)';
+  ctx.lineWidth = Math.max(2, Math.floor(baseSize / 10));
+
+  const radius = Math.floor(baseSize * 0.5);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + boxWidth - radius, y);
+  ctx.quadraticCurveTo(x + boxWidth, y, x + boxWidth, y + radius);
+  ctx.lineTo(x + boxWidth, y + boxHeight - radius);
+  ctx.quadraticCurveTo(x + boxWidth, y + boxHeight, x + boxWidth - radius, y + boxHeight);
+  ctx.lineTo(x + radius, y + boxHeight);
+  ctx.quadraticCurveTo(x, y + boxHeight, x, y + boxHeight - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  lines.forEach((line, index) => {
+    ctx.font = line.font;
+    ctx.fillStyle = line.color;
+    ctx.textBaseline = 'top';
+    ctx.fillText(line.text, x + paddingHorizontal, y + paddingVertical + (index * lineHeight));
+  });
+
+  ctx.restore();
+}
+
+async function refreshStampPreview() {
+  await forceFreshGPSFix();
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.getElementById('proofCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        const currentStop = tourStops[currentStopIndex];
+        const userNote = document.getElementById('modalProofNoteInput').value.trim();
+        const now = new Date().toLocaleString('de-DE');
+        const driverDisplayName = currentProfile?.full_name || currentUser.email.split('@')[0];
+
+        drawAuditStamp(ctx, canvas.width, canvas.height, {
+          title: `VERIBASE - AUDIT-FOTOBEWEIS #${currentStopIndex + 1}`,
+          driver: driverDisplayName,
+          targetAddress: currentStop.address,
+          time: now,
+          gps: currentGPSCoords,
+          note: userNote
+        });
+
+        canvas.toBlob((blob) => {
+          tempCanvasBlob = blob;
+          document.getElementById('modalProofImagePreview').src = URL.createObjectURL(blob);
+          resolve();
+        }, 'image/jpeg', 0.92);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(tempCapturedFile);
+  });
+}
+
+let debounceTimer;
+function updateLiveStampNote() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => { refreshStampPreview(); }, 250);
+}
+
+function confirmAndUploadProof() {
+  const noteText = document.getElementById('modalProofNoteInput').value.trim();
+  const localUrl = URL.createObjectURL(tempCanvasBlob);
+
+  completeCurrentStop(localUrl, tempCanvasBlob, noteText);
+
+  document.getElementById('proofPreviewModal').style.display = 'none';
+  document.getElementById('modalProofNoteInput').value = '';
+}
+
+async function completeCurrentStopWithoutPhoto() {
+  const current = tourStops[currentStopIndex];
+  if (!current) return;
+
+  current.done = true;
+  current.photo_url = null;
+
+  if (current.id) {
+    await supabaseClient.from('stops').update({
+      status: 'erledigt',
+      photo_url: null,
+      completed_at: new Date().toISOString()
+    }).eq('id', current.id);
+  } else if (currentSupabaseTourId) {
+    const { data: newStop } = await supabaseClient.from('stops').insert([{
+      tour_id: currentSupabaseTourId,
+      address: current.address,
+      sequence: currentStopIndex + 1,
+      status: 'erledigt',
+      photo_url: null,
+      completed_at: new Date().toISOString()
+    }]).select('*').single();
+    if (newStop) current.id = newStop.id;
+  }
+
+  if (currentStopIndex < tourStops.length) {
+    currentStopIndex++;
+  }
+
+  if (currentSupabaseTourId) {
+    localStorage.setItem(`veribase_stop_index_${currentSupabaseTourId}`, currentStopIndex);
+  }
+
+  renderTourUI();
+}
+
+async function completeCurrentStop(localUrl, blob, noteText = '') {
+  const current = tourStops[currentStopIndex];
+  if (!current) return;
+
+  current.done = true;
+  if (noteText) current.notes = noteText;
+  if (blob) current.blob = blob;
+
+  let uploadedUrl = localUrl;
+  if (blob && currentSupabaseTourId) {
+    const filePath = `proofs_${currentSupabaseTourId}_stop_${currentStopIndex}_${Date.now()}.jpg`;
+    const { error: upErr } = await supabaseClient.storage.from('proofs').upload(filePath, blob, { contentType: 'image/jpeg' });
+    if (!upErr) {
+      const { data: urlData } = supabaseClient.storage.from('proofs').getPublicUrl(filePath);
+      uploadedUrl = urlData.publicUrl;
+    }
+  }
+  current.photo_url = uploadedUrl;
+
+  if (current.id) {
+    await supabaseClient.from('stops').update({
+      status: 'erledigt',
+      notes: current.notes || null,
+      photo_url: current.photo_url,
+      completed_at: new Date().toISOString()
+    }).eq('id', current.id);
+  } else if (currentSupabaseTourId) {
+    const { data: newStop } = await supabaseClient.from('stops').insert([{
+      tour_id: currentSupabaseTourId,
+      address: current.address,
+      sequence: currentStopIndex + 1,
+      status: 'erledigt',
+      notes: current.notes || null,
+      photo_url: current.photo_url,
+      completed_at: new Date().toISOString()
+    }]).select('*').single();
+    if (newStop) current.id = newStop.id;
+  }
+
+  updateGalleryGrid();
+
+  if (currentStopIndex < tourStops.length) {
+    currentStopIndex++;
+  }
+
+  if (currentSupabaseTourId) {
+    localStorage.setItem(`veribase_stop_index_${currentSupabaseTourId}`, currentStopIndex);
+  }
+
+  renderTourUI();
+}
+
+function updateGalleryGrid() {
+  const gallery = document.getElementById('galleryGrid');
+  gallery.innerHTML = '';
+  
+  let count = 0;
+  tourStops.forEach((stop, idx) => {
+    if (stop.photo_url) {
+      count++;
+      const card = document.createElement('div');
+      card.className = 'proof-item-card';
+      card.innerHTML = `
+        <img src="${stop.photo_url}">
+        <div class="proof-item-info">
+          <strong>Stopp #${idx + 1}: ${stop.address}</strong>
+          ${stop.notes ? `<span>Notiz: ${stop.notes}</span>` : ''}
+        </div>
+      `;
+      gallery.appendChild(card);
+    }
+  });
+  document.getElementById('photoCount').innerText = count;
+}
+
+async function finishAndSaveTour() {
+  const btn = document.getElementById('finishTourBtn');
+  btn.disabled = true;
+  btn.innerText = "Speichere Tour...";
+
+  try {
+    let tourId = currentSupabaseTourId;
+
+    if (tourId) {
+      await supabaseClient
+        .from('tours')
+        .update({ 
+          status: 'beendet', 
+          ended_at: new Date().toISOString(),
+          archived_by_driver: false
+        })
+        .eq('id', tourId);
+
+      localStorage.removeItem('veribase_active_tour_id');
+      localStorage.removeItem(`veribase_stop_index_${tourId}`);
+    }
+
+    showModal("Erfolg", "Tour erfolgreich gespeichert!");
+    resetTourView();
+  } catch (err) {
+    showModal("Fehler", "Fehler beim Speichern: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Tour beenden & Speichern";
+  }
+}
+
+function openCancelModal() {
+  document.getElementById('cancelReasonInput').value = '';
+  document.getElementById('cancelModal').style.display = 'flex';
+  setTimeout(() => { document.getElementById('cancelReasonInput').focus(); }, 150);
+}
+
+function closeCancelModal() {
+  document.getElementById('cancelModal').style.display = 'none';
+}
+
+async function confirmCancelTour() {
+  const reason = document.getElementById('cancelReasonInput').value.trim();
+  closeCancelModal();
+
+  if (currentSupabaseTourId) {
+    try {
+      await supabaseClient
+        .from('tours')
+        .update({ 
+          status: 'abgebrochen', 
+          notes: reason ? `[ABGEBROCHEN] Grund: ${reason}` : '[ABGEBROCHEN] Ohne Grund',
+          ended_at: new Date().toISOString() 
+        })
+        .eq('id', currentSupabaseTourId);
+    } catch (e) {
+      console.error("Fehler beim Abbrechen der Tour:", e);
+    }
+
+    localStorage.removeItem('veribase_active_tour_id');
+    localStorage.removeItem(`veribase_stop_index_${currentSupabaseTourId}`);
+  }
+
+  resetTourView();
+}
+
+function resetTourView() {
+  tourStops = [];
+  currentSupabaseTourId = null;
+  loadedChefStops = [];
+  document.getElementById('addressInput').value = '';
+  document.getElementById('tour-view').style.display = 'none';
+  document.getElementById('setup-view').style.display = 'flex';
+  loadTourHistory();
+}
+
+async function loadTourHistory() {
+  const container = document.getElementById('tourHistoryContainer');
+  if (!container) return;
+
+  const { data: tours } = await supabaseClient
+    .from('tours')
+    .select('*, stops(*)')
+    .eq('assigned_to', currentUser.id)
+    .eq('archived_by_driver', false)
+    .order('created_at', { ascending: false });
+
+  if (!tours || tours.length === 0) {
+    container.innerHTML = '<p style="color: var(--text-muted); font-size: 12px; margin-left: 2px; margin-top: 0;">Keine Archiv-Touren.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  tours.forEach((tour, idx) => {
+    const dateStr = new Date(tour.created_at).toLocaleDateString('de-DE');
+    const total = tour.stops ? tour.stops.length : 0;
+    const done = tour.stops ? tour.stops.filter(s => s.status === 'erledigt').length : 0;
+
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    card.onclick = () => openTourDetails(tour);
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+        <span>${tour.title}</span>
+        <span style="color:var(--text-sub); font-size:11px;">${dateStr}</span>
+      </div>
+      <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">
+        Erledigt: ${done}/${total} Stopps
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function openTourDetails(tour) {
+  activeDetailTourId = tour.id;
+  document.getElementById('detailTourTitle').innerText = tour.title;
+  const container = document.getElementById('detailStopsContainer');
+  container.innerHTML = '';
+
+  if (!tour.stops || tour.stops.length === 0) {
+    container.innerHTML = '<p style="font-size:12px; color:var(--text-sub);">Keine Stopps vorhanden.</p>';
+  } else {
+    tour.stops.sort((a,b) => a.sequence - b.sequence).forEach(s => {
+      const box = document.createElement('div');
+      box.style.cssText = "border:1px solid var(--accent-line); padding:8px; border-radius:8px; margin-bottom:8px; background:var(--input-bg); font-size:12px;";
+      box.innerHTML = `
+        <strong>#${s.sequence}: ${s.address}</strong><br>
+        <span style="color:var(--text-sub);">Status: ${s.status}</span>
+        ${s.notes ? `<br><span>Notiz: ${s.notes}</span>` : ''}
+        ${s.photo_url ? `<img src="${s.photo_url}" style="width:100%; border-radius:6px; margin-top:6px; max-height:130px; object-fit:cover;">` : ''}
+      `;
+      container.appendChild(box);
+    });
+  }
+
+  document.getElementById('tourDetailModal').style.display = 'flex';
+}
+
+function closeDetailModal() {
+  activeDetailTourId = null;
+  document.getElementById('tourDetailModal').style.display = 'none';
+}
+
+async function archiveCurrentDetailTour() {
+  if (!activeDetailTourId) return;
+  try {
+    await supabaseClient.from('tours').update({ archived_by_driver: true }).eq('id', activeDetailTourId);
+    closeDetailModal();
+    loadTourHistory();
+  } catch (err) {
+    showModal("Fehler", "Fehler: " + err.message);
+  }
+}
+
+async function handleOcrImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  showModal("Smart-Scan", "Analysiere Tour...", true);
+  updateProgress(5, "Bild wird vorbereitet...");
+
+  try {
+    const imageUrl = URL.createObjectURL(file);
+    const img = new Image();
+    
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = imageUrl;
+    });
+
+    updateProgress(15, "Auflösung wird optimiert...");
+
+    const canvas = document.getElementById('proofCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = img.width * 2;
+    canvas.height = img.height * 2;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
+    const scaledDataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+    updateProgress(25, "Starte Texterkennung...");
+
+    const worker = await Tesseract.createWorker('deu', 1, {
+      logger: m => {
+        if (m && m.progress !== undefined) {
+          const prog = Math.floor(25 + (m.progress * 65));
+          updateProgress(prog, m.status ? `${m.status}` : "Erkenne Text...");
+        }
+      }
+    });
+
+    const ret = await worker.recognize(scaledDataUrl);
+    await worker.terminate();
+
+    updateProgress(92, "Adressen werden extrahiert...");
+
+    const fullText = ret.data.text;
+    if (!fullText) {
+      closeModal();
+      showModal("Hinweis", "Es konnte kein Text auf dem Bild erkannt werden.");
+      return;
+    }
+
+    const cleanedText = fullText.replace(/\r?\n|\r/g, ' ');
+    const plzRegex = /\b(5\d{4})\b/g;
+    let match;
+    const extractedAddresses = [];
+
+    while ((match = plzRegex.exec(cleanedText)) !== null) {
+      const plzIndex = match.index;
+      const snippet = cleanedText.substring(plzIndex, plzIndex + 70);
+      const tokens = snippet.split(/\s+/);
+      
+      if (tokens.length >= 4) {
+        const plz = tokens[0];
+        const ort = tokens[1];
+        let streetAndMore = tokens.slice(2).join(' ');
+        
+        const addressMatch = streetAndMore.match(/^(.*?\d+\s*[a-zA-Z]?)/);
+        
+        if (addressMatch) {
+          let cleanStreetNum = addressMatch[1].trim().replace(/\s+([a-zA-Z])$/, '$1');
+          const fullAddress = `${plz} ${ort} ${cleanStreetNum}`;
+          
+          if (!extractedAddresses.includes(fullAddress)) {
+            extractedAddresses.push(fullAddress);
+          }
+        }
+      }
+    }
+
+    updateProgress(100, "Fertig!");
+    setTimeout(() => {
+      closeModal();
+      if (extractedAddresses.length > 0) {
+        const existing = document.getElementById('addressInput').value;
+        const newText = extractedAddresses.join('\n');
+        document.getElementById('addressInput').value = existing ? existing + '\n' + newText : newText;
+        showModal("Erfolg", `${extractedAddresses.length} Stopps erfolgreich geladen!`);
+      } else {
+        showModal("Hinweis", "Es konnten keine Adressen im Bild erkannt werden.");
+      }
+    }, 300);
+
+  } catch (err) {
+    closeModal();
+    console.error("Smart-Scan Fehler:", err);
+    showModal("Fehler", "Fehler bei der intelligenten Texterkennung.");
+  } finally {
+    event.target.value = '';
+  }
+}
+
+function updateProgress(percent, text) {
+  const bar = document.getElementById('modalProgressBar');
+  const txt = document.getElementById('modalProgressText');
+  const pct = document.getElementById('modalProgressPercent');
+  if (bar && txt && pct) {
+    bar.style.width = percent + '%';
+    txt.innerText = text;
+    pct.innerText = percent + '%';
+  }
+}
+
+function showModal(title, bodyText, showProgress = false) {
+  document.getElementById('modalTitle').innerText = title;
+  document.getElementById('modalBody').innerText = bodyText;
+  
+  const progContainer = document.getElementById('modalProgressContainer');
+  const okBtn = document.getElementById('modalOkBtn');
+
+  if (showProgress) {
+    progContainer.style.display = 'block';
+    okBtn.style.display = 'none';
+    updateProgress(0, "Starte Scan...");
+  } else {
+    progContainer.style.display = 'none';
+    okBtn.style.display = 'block';
+  }
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('customModal').style.display = 'none';
+}
+</script>
+</body>
+</html>
