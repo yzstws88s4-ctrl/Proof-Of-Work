@@ -95,10 +95,14 @@
 
     .app-view {
       width: 100%;
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+    }
+    
+    .app-view.active-view {
+      display: flex !important;
     }
 
     /* --- LOGIN STYLES --- */
@@ -418,7 +422,7 @@
   <div class="glow-bg-1"></div>
   <div class="login-container">
     <div class="login-top-bar">
-      <a href="#" onclick="showToast('Veribase Startseite', 'ℹ️'); return false;" class="utility-btn">
+      <a href="index.html" class="utility-btn">
         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
         Startseite
       </a>
@@ -461,7 +465,7 @@
 <!-- ========================================== -->
 <!-- 2. VIEW: DRIVER TOUR APP                   -->
 <!-- ========================================== -->
-<div id="viewDriver" class="app-view" style="display: none;">
+<div id="viewDriver" class="app-view">
   <div class="driver-container">
     <div class="header">
       <div class="user-greeting-box">
@@ -580,7 +584,7 @@
 <!-- ========================================== -->
 <!-- 3. VIEW: CHEF DASHBOARD                    -->
 <!-- ========================================== -->
-<div id="viewChef" class="app-view" style="display: none;">
+<div id="viewChef" class="app-view">
   <div class="chef-container">
     <div class="top-section">
       <div class="top-utility-bar">
@@ -1148,17 +1152,17 @@ function toggleTheme() {
 }
 
 function showView(viewName) {
-  document.getElementById('viewLogin').style.display = 'none';
-  document.getElementById('viewDriver').style.display = 'none';
-  document.getElementById('viewChef').style.display = 'none';
+  document.getElementById('viewLogin').classList.remove('active-view');
+  document.getElementById('viewDriver').classList.remove('active-view');
+  document.getElementById('viewChef').classList.remove('active-view');
 
   if (viewName === 'login') {
-    document.getElementById('viewLogin').style.display = 'flex';
+    document.getElementById('viewLogin').classList.add('active-view');
   } else if (viewName === 'driver') {
-    document.getElementById('viewDriver').style.display = 'flex';
+    document.getElementById('viewDriver').classList.add('active-view');
     initDriverAppEnvironment();
   } else if (viewName === 'chef') {
-    document.getElementById('viewChef').style.display = 'flex';
+    document.getElementById('viewChef').classList.add('active-view');
     initChefAppEnvironment();
   }
 }
